@@ -5,3 +5,12 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+const config: NextConfig = {
+  compilerOptions: {
+    moduleResolution: "node",
+    esModuleInterop: true
+  },
+  include: ["src", "node_modules"]
+};
+
+module.exports = config;
