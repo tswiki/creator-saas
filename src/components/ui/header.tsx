@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { UserCircle } from 'lucide-react';
+import { UserCircle, BellRing } from 'lucide-react';
 
 export default function Header() {
   return (
@@ -53,7 +53,10 @@ export default function Header() {
               </Link>
             </div>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center space-x-4">
+            <Link href="/notifications">
+              <BellRing className="h-6 w-6 text-gray-600 hover:text-indigo-600 cursor-pointer" />
+            </Link>
             <Link href="/profile">
               <UserCircle className="h-8 w-8 text-gray-600 hover:text-indigo-600 cursor-pointer" />
             </Link>
@@ -63,5 +66,3 @@ export default function Header() {
     </header>
   );
 }
-
-
