@@ -34,22 +34,10 @@ export default function Header() {
                 CRM
               </Link>
               <Link
-                href="/calendar"
-                className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-indigo-600 border-b-2 border-transparent hover:border-indigo-600 whitespace-nowrap"
-              >
-                Calendar
-              </Link>
-              <Link
                 href="/marketplace"
                 className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-indigo-600 border-b-2 border-transparent hover:border-indigo-600 whitespace-nowrap"
               >
                 Marketplace
-              </Link>
-              <Link
-                href="/ai"
-                className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-indigo-600 border-b-2 border-transparent hover:border-indigo-600 whitespace-nowrap"
-              >
-                AI
               </Link>
             </div>
           </div>
