@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { CalendarForm } from '@/components/ui/datePicker';
-import { BellRing, Check, Calendar as CalendarIcon, MessageSquare, ListTodo, Mic, Video, ChevronLeft } from "lucide-react";
+import { BellRing, Check, Calendar as CalendarIcon, MessageSquare, ListTodo, Mic, Video, ChevronLeft, Pin, ChevronDown } from "lucide-react";
 import {
   Card,
   CardContent,
-  CardDescription,
+  CardDescription, 
   CardFooter,
   CardHeader,
   CardTitle,
@@ -15,12 +15,20 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { NotificationsCard } from '@/components/ui/card-notifications';
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-interface Message {
+interface Post {
   id: number;
-  text: string;
-  sender: 'user' | 'other';
+  author: string;
+  content: string;
   timestamp: Date;
+  isPinned: boolean;
+  likes: number;
+  comments: number;
+  type?: 'update' | 'event';
+  eventDate?: Date;
 }
 
 const notifications = [
@@ -68,77 +76,181 @@ const events = [
   },
 ];
 
+const initialPinnedPosts: Post[] = [
+  {
+    id: 1,
+    author: 'Admin',
+    content: '🎉 Welcome to our new community platform! Please read our community guidelines.',
+    timestamp: new Date(),
+    isPinned: true,
+    likes: 15,
+    comments: 5,
+    type: 'update'
+  },
+  {
+    id: 2,
+    author: 'Events Team',
+    content: '📅 Upcoming Workshop: Advanced React Patterns - Join us next week!',
+    timestamp: new Date(),
+    isPinned: true,
+    likes: 20,
+    comments: 8,
+    type: 'event',
+    eventDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+  }
+];
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<'chat' | 'notifications' | 'tasks' | 'schedule'>('chat');
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
+  const [activeTab, setActiveTab] = useState<'community' | 'notifications' | 'tasks' | 'schedule'>('community');
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [newPost, setNewPost] = useState('');
+  const [pinnedPosts] = useState<Post[]>(initialPinnedPosts);
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleCreatePost = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim()) return;
+    if (!newPost.trim()) return;
 
-    const message: Message = {
+    const post: Post = {
       id: Date.now(),
-      text: newMessage,
-      sender: 'user',
-      timestamp: new Date()
+      author: 'You',
+      content: newPost,
+      timestamp: new Date(),
+      isPinned: false,
+      likes: 0,
+      comments: 0
     };
 
-    setMessages([...messages, message]);
-    setNewMessage('');
+    setPosts([post, ...posts]);
+    setNewPost('');
+    scrollToBottom();
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const bottom = e.currentTarget.scrollHeight - e.currentTarget.scrollTop === e.currentTarget.clientHeight;
+    setShowScrollButton(!bottom);
   };
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'chat':
+      case 'community':
         return (
-          <>
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-100">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[70%] rounded-lg p-3 ${
-                      message.sender === 'user'
-                        ? 'bg-gray-700 text-white'
-                        : 'bg-white text-gray-800'
-                    }`}
-                  >
-                    <p>{message.text}</p>
-                    <span className="text-xs opacity-75">
-                      {message.timestamp.toLocaleTimeString()}
-                    </span>
-                  </div>
+          <div className="flex-1 flex flex-col">
+            <div className="p-4 border-b">
+              <form onSubmit={handleCreatePost}>
+                <div className="flex gap-4">
+                  <Avatar>
+                    <AvatarFallback>Y</AvatarFallback>
+                  </Avatar>
+                  <Input
+                    value={newPost}
+                    onChange={(e) => setNewPost(e.target.value)}
+                    placeholder="Write something..."
+                    className="flex-1"
+                  />
+                  <Button type="submit">Post</Button>
                 </div>
-              ))}
+              </form>
             </div>
-            <form onSubmit={handleSendMessage} className="p-4 bg-white border-t border-gray-200">
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Type a message..."
-                  className="flex-1 p-2 border border-gray-300 rounded-full focus:outline-none focus:border-gray-500"
-                />
-                <button
-                  type="submit"
-                  className="bg-gray-700 text-white px-6 py-2 rounded-full hover:bg-gray-600 transition-colors"
-                >
-                  Send
-                </button>
+
+            <div className="flex-1 overflow-y-auto p-4 relative" onScroll={handleScroll}>
+              {/* Pinned Section */}
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <Pin className="h-5 w-5" />
+                  Pinned Updates & Events
+                </h3>
+                <div className="space-y-4">
+                  {pinnedPosts.map((post) => (
+                    <Card key={post.id} className="border-yellow-500 bg-yellow-50">
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Avatar>
+                              <AvatarFallback>{post.author[0]}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <CardTitle className="text-sm">{post.author}</CardTitle>
+                              <CardDescription>{post.timestamp.toLocaleString()}</CardDescription>
+                            </div>
+                          </div>
+                          <span className="text-xs font-medium text-yellow-600 bg-yellow-100 px-2 py-1 rounded">
+                            {post.type === 'event' ? 'Event' : 'Update'}
+                          </span>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p>{post.content}</p>
+                        {post.eventDate && (
+                          <p className="mt-2 text-sm text-gray-600">
+                            Date: {post.eventDate.toLocaleDateString()}
+                          </p>
+                        )}
+                      </CardContent>
+                      <CardFooter className="flex gap-4 text-sm text-gray-500">
+                        <button className="hover:text-gray-700">
+                          {post.likes} Likes
+                        </button>
+                        <button className="hover:text-gray-700">
+                          {post.comments} Comments
+                        </button>
+                      </CardFooter>
+                    </Card>
+                  ))}
+                </div>
               </div>
-            </form>
-          </>
+
+              {/* Regular Posts */}
+              <div className="space-y-4">
+                {posts.map((post) => (
+                  <Card key={post.id}>
+                    <CardHeader>
+                      <div className="flex items-center gap-2">
+                        <Avatar>
+                          <AvatarFallback>{post.author[0]}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <CardTitle className="text-sm">{post.author}</CardTitle>
+                          <CardDescription>{post.timestamp.toLocaleString()}</CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p>{post.content}</p>
+                    </CardContent>
+                    <CardFooter className="flex gap-4 text-sm text-gray-500">
+                      <button className="hover:text-gray-700">
+                        {post.likes} Likes
+                      </button>
+                      <button className="hover:text-gray-700">
+                        {post.comments} Comments
+                      </button>
+                    </CardFooter>
+                  </Card>
+                ))}
+                <div ref={messagesEndRef} />
+              </div>
+
+              {showScrollButton && (
+                <button
+                  onClick={scrollToBottom}
+                  className="fixed bottom-8 right-8 bg-gray-800 text-white p-3 rounded-full shadow-lg hover:bg-gray-700 transition-colors"
+                >
+                  <ChevronDown className="h-6 w-6" />
+                </button>
+              )}
+            </div>
+          </div>
         );
       default:
         return null;
     }
   };
-  
 
   return (
     <div className="flex h-screen bg-gray-900">
