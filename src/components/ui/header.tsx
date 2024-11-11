@@ -9,16 +9,6 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleOverlayClick = () => {
-    if (!isModalOpen) {
-      setIsOpen(false);
-    }
-  };
-
-  const handleProfileClose = () => {
-    setIsModalOpen(false);
-  };
-
   return (
     <>
       <button
@@ -30,11 +20,11 @@ export default function Header() {
 
       {/* Profile Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[60] overflow-y-auto">
+        <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4">
-            <div className="fixed inset-0 bg-black bg-opacity-50" onClick={handleProfileClose} />
-            <div className="relative z-[70]">
-              <Profile onClose={handleProfileClose} />
+            <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setIsModalOpen(false)} />
+            <div className="relative z-50">
+              <Profile onClose={() => setIsModalOpen(false)} />
             </div>
           </div>
         </div>
@@ -44,7 +34,7 @@ export default function Header() {
       {isOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300"
-          onClick={handleOverlayClick}
+          onClick={() => setIsOpen(false)}
         />
       )}
 
@@ -96,6 +86,13 @@ export default function Header() {
             >
               Store
             </Link>
+
+            <Link
+              href="/chat"
+              className="block py-2 px-4 text-sm font-medium text-gray-900 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg"
+            >
+              Chat
+            </Link>
           </nav>
 
           <div className="absolute bottom-4 left-0 right-0 px-4">
@@ -103,7 +100,10 @@ export default function Header() {
               <div className="flex flex-col items-center space-y-1 px-2">
                 <div className="text-sm font-medium text-gray-600">cohort</div>
                 <button 
-                  onClick={() => setIsModalOpen(true)}
+                  onClick={() => {
+                    setIsModalOpen(true);
+                    setIsOpen(false);
+                  }}
                   className="flex items-center space-x-3 hover:bg-gray-100 rounded-lg px-2 py-1 w-full"
                 >
                   <div className="bg-gray-200 rounded-full h-8 w-8 flex items-center justify-center">
