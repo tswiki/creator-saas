@@ -10,7 +10,7 @@ interface MarqueeProps {
   [key: string]: any;
 }
 
-export default function Marquee({
+export default function ({
   className,
   reverse,
   pauseOnHover = false,

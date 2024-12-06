@@ -1,0 +1,149 @@
+
+'use client';
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+function BrandSection() {
+  return (
+    <div className="hidden lg:flex flex-col justify-center items-center w-1/2 bg-blue-600 h-screen p-8">
+      <div className="space-y-8 text-center">
+        <div className="flex justify-center">
+          {/* Replace with your actual logo */}
+          <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center">
+            <span className="text-blue-600 text-4xl font-bold">G</span>
+          </div>
+        </div>
+        <div className="space-y-4">
+          <h1 className="text-4xl font-bold text-white">Growth Creator</h1>
+          <p className="text-xl text-blue-100 max-w-md">
+            Transform your knowledge into a thriving digital business
+          </p>
+        </div>
+        <div className="space-y-2 text-blue-100">
+          <p>✓ Build and sell info products</p>
+          <p>✓ Grow your audience</p>
+          <p>✓ Analytics and insights</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AuthSection() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // Add authentication logic here
+  };
+
+  return (
+    <div className="flex items-center justify-center w-full lg:w-1/2 h-screen bg-gray-50 p-8">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1">
+          <h2 className="text-2xl font-bold text-center">Welcome Back</h2>
+          <p className="text-center text-gray-500">
+            Sign in to access your creator dashboard
+          </p>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="signin" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="signin">Sign In</TabsTrigger>
+              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="signin">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                  <Input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full">
+                  Sign In
+                </Button>
+              </form>
+            </TabsContent>
+
+            <TabsContent value="signup">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Input
+                    type="text"
+                    placeholder="Full Name"
+                    required
+                  />
+                  <Input
+                    type="email"
+                    placeholder="Email"
+                    required
+                  />
+                  <Input
+                    type="password"
+                    placeholder="Password"
+                    required
+                  />
+                  <Input
+                    type="password"
+                    placeholder="Confirm Password"
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full">
+                  Create Account
+                </Button>
+              </form>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+        <CardFooter className="flex flex-col space-y-4">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-gray-500">
+                Or continue with
+              </span>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Button variant="outline">
+              Google
+            </Button>
+            <Button variant="outline">
+              Twitter
+            </Button>
+          </div>
+        </CardFooter>
+      </Card>
+    </div>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <div className="flex min-h-screen">
+      <BrandSection />
+      <AuthSection />
+    </div>
+  );
+}
+
