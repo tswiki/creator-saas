@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import HeroVideoDialog from "@/components/ui/hero-video-dialog";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -43,42 +45,140 @@ import {
   MicOff,
   Activity,
   VideoOff,
-  PhoneOff
+  PhoneOff,
+  Check
 } from "lucide-react";
+
+
+export function HeroVideoDialogDemoTopInBottomOut() {
+  return (
+    <div className="relative">
+      <HeroVideoDialog
+        className="dark:hidden block"
+        animationStyle="top-in-bottom-out"
+        videoSrc="https://www.youtube.com/embed/qh3NGpYRG3I?si=4rb-zSdDkVK9qxxb"
+        thumbnailSrc="https://startup-template-sage.vercel.app/hero-light.png"
+        thumbnailAlt="Hero Video"
+      />
+      <HeroVideoDialog
+        className="hidden dark:block"
+        animationStyle="top-in-bottom-out"
+        videoSrc="https://www.youtube.com/embed/qh3NGpYRG3I?si=4rb-zSdDkVK9qxxb"
+        thumbnailSrc="https://startup-template-sage.vercel.app/hero-dark.png"
+        thumbnailAlt="Hero Video"
+      />
+    </div>
+  );
+}
 
 export default function MentorshipPortal() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [currentView, setCurrentView] = useState('dashboard');
   const [date, setDate] = useState<Date | undefined>(new Date());
 
-  const Sidebar = () => (
-    <div className="h-full flex flex-col gap-4 p-4">
-      <div className="font-bold text-2xl">Mentorship Portal</div>
-      
-      <div className="flex flex-col gap-2">
-        <Button variant="ghost" className="justify-start" onClick={() => setCurrentView('dashboard')}>
-          <User className="mr-2 h-4 w-4" />
-          My Profile
-        </Button>
-        <Button variant="ghost" className="justify-start">
-          <Users className="mr-2 h-4 w-4" />
-          My Mentor
-        </Button>
-        <Button variant="ghost" className="justify-start" onClick={() => setCurrentView('schedule')}>
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          Schedule
-        </Button>
-        <Button variant="ghost" className="justify-start" onClick={() => setCurrentView('messages')}>
-          <MessageSquare className="mr-2 h-4 w-4" />
-          Messages
-        </Button>
-        <Button variant="ghost" className="justify-start" onClick={() => setCurrentView('resources')}>
-          <BookOpen className="mr-2 h-4 w-4" />
-          Resources
-        </Button>
+  const Sidebar = () => {
+    const [showProfileDialog, setShowProfileDialog] = useState(false);
+    const [profileData, setProfileData] = useState({
+      username: "user123",
+      bio: "",
+      niche: "",
+      mrr: "",
+      goal: ""
+    });
+
+    return (
+      <div className="h-screen min-h-full w-64 flex flex-col p-4 border-r fixed">
+        <div className="font-bold text-2xl mb-6">Mentorship Portal</div>
+        
+        <div className="flex flex-col gap-3 flex-1">
+          <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('dashboard')}>
+            <User className="mr-2 h-4 w-4" />
+            My Profile
+          </Button>
+          <Button variant="ghost" className="justify-start w-full">
+            <Users className="mr-2 h-4 w-4" />
+            My Mentor
+          </Button>
+          <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('schedule')}>
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            Schedule
+          </Button>
+          <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('messages')}>
+            <MessageSquare className="mr-2 h-4 w-4" />
+            Messages
+          </Button>
+          <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('resources')}>
+            <BookOpen className="mr-2 h-4 w-4" />
+            Resources
+          </Button>
+        </div>
+
+        <Dialog open={showProfileDialog} onOpenChange={setShowProfileDialog}>
+          <DialogTrigger asChild>
+            <Button variant="ghost" className="justify-between w-full mt-auto border-t pt-4">
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                <span className="text-sm text-muted-foreground">@{profileData.username}</span>
+              </div>
+              <Settings className="h-4 w-4" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Profile</DialogTitle>
+              <DialogDescription>
+                Update your profile information below
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <label htmlFor="username">Username</label>
+                <input
+                  id="username"
+                  value={profileData.username}
+                  onChange={(e) => setProfileData({...profileData, username: e.target.value})}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                />
+              </div>
+              <div className="grid gap-2">
+                <label htmlFor="bio">Bio</label>
+                <textarea
+                  id="bio"
+                  value={profileData.bio}
+                  onChange={(e) => setProfileData({...profileData, bio: e.target.value})}
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  placeholder="Tell us about yourself..."
+                />
+              </div>
+              <div className="grid gap-2">
+                <label htmlFor="niche">Niche</label>
+                <input
+                  id="niche"
+                  value={profileData.niche}
+                  onChange={(e) => setProfileData({...profileData, niche: e.target.value})}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  placeholder="Your area of expertise"
+                />
+              </div>
+              <div className="grid gap-2">
+                <label htmlFor="goal">Goal</label>
+                <input
+                  id="goal"
+                  value={profileData.goal}
+                  onChange={(e) => setProfileData({...profileData, goal: e.target.value})}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  placeholder="What's your main goal?"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button onClick={() => setShowProfileDialog(false)}>Save changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
-    </div>
-  );
+    );
+  };
 
   const ScheduleView = () => (
     <div className="space-y-6">
@@ -391,209 +491,281 @@ export default function MentorshipPortal() {
   );
 
 
-  const ResourcesView = () => (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Learning Resources</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Recommended Resources */}
-            <div>
-              <h3 className="font-semibold mb-4">Recommended by Your Mentor</h3>
-              <div className="space-y-4">
-                {[
-                  {
-                    title: "Advanced JavaScript Concepts",
-                    type: "Course",
-                    platform: "Udemy",
-                    link: "https://udemy.com/advanced-js",
-                    recommended: "Sarah Wilson",
-                    description: "Deep dive into closures, prototypes, and async programming",
-                    attachments: [
-                      { name: "Course Slides", type: "PDF", size: "2.4MB" },
-                      { name: "Exercise Files", type: "ZIP", size: "15MB" }
-                    ],
-                    progress: 45
-                  },
-                  {
-                    title: "System Design Interview Guide",
-                    type: "Document",
-                    platform: "Google Docs",
-                    link: "https://docs.google.com/system-design", 
-                    recommended: "Michael Chen",
-                    description: "Comprehensive guide for system design interviews",
-                    attachments: [
-                      { name: "Practice Problems", type: "PDF", size: "1.2MB" },
-                      { name: "Sample Solutions", type: "PDF", size: "3.1MB" }
-                    ],
-                    progress: 75
-                  },
-                  {
-                    title: "Clean Code Principles",
-                    type: "Book",
-                    platform: "PDF",
-                    link: "https://cleancode.pdf",
-                    recommended: "Sarah Wilson",
-                    description: "Best practices for writing maintainable code",
-                    attachments: [
-                      { name: "Book PDF", type: "PDF", size: "8.5MB" },
-                      { name: "Code Examples", type: "ZIP", size: "4.2MB" }
-                    ],
-                    progress: 20
-                  }
-                ].map((resource, i) => (
-                  <Card key={i}>
-                    <CardContent className="p-4">
-                      <div className="space-y-4">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h4 className="font-medium">{resource.title}</h4>
-                            <div className="text-sm text-muted-foreground">
-                              Recommended by {resource.recommended}
+  const ResourcesView = () => {
+    const [showAddDialog, setShowAddDialog] = useState(false);
+    const [newResource, setNewResource] = useState({
+      title: '',
+      type: '',
+      platform: '',
+      author: '',
+      description: '',
+    });
+
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle>Learning Resources</CardTitle>
+              <Button onClick={() => setShowAddDialog(true)}>
+                Add Resource
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Recommended Resources */}
+              <div>
+                <h3 className="font-semibold mb-4">Recommended by Your Mentor</h3>
+                <div className="space-y-4">
+                  {[
+                    {
+                      title: "Advanced JavaScript Concepts",
+                      type: "Course",
+                      platform: "Udemy",
+                      link: "https://udemy.com/advanced-js",
+                      recommended: "Sarah Wilson",
+                      description: "Deep dive into closures, prototypes, and async programming",
+                      attachments: [
+                        { name: "Course Slides", type: "PDF", size: "2.4MB" },
+                        { name: "Exercise Files", type: "ZIP", size: "15MB" }
+                      ],
+                      progress: 45
+                    },
+                    {
+                      title: "System Design Interview Guide",
+                      type: "Document",
+                      platform: "Google Docs",
+                      link: "https://docs.google.com/system-design", 
+                      recommended: "Michael Chen",
+                      description: "Comprehensive guide for system design interviews",
+                      attachments: [
+                        { name: "Practice Problems", type: "PDF", size: "1.2MB" },
+                        { name: "Sample Solutions", type: "PDF", size: "3.1MB" }
+                      ],
+                      progress: 75
+                    },
+                    {
+                      title: "Clean Code Principles",
+                      type: "Book",
+                      platform: "PDF",
+                      link: "https://cleancode.pdf",
+                      recommended: "Sarah Wilson",
+                      description: "Best practices for writing maintainable code",
+                      attachments: [
+                        { name: "Book PDF", type: "PDF", size: "8.5MB" },
+                        { name: "Code Examples", type: "ZIP", size: "4.2MB" }
+                      ],
+                      progress: 20
+                    }
+                  ].map((resource, i) => (
+                    <Card key={i}>
+                      <CardContent className="p-4">
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h4 className="font-medium">{resource.title}</h4>
+                              <div className="text-sm text-muted-foreground">
+                                Recommended by {resource.recommended}
+                              </div>
+                              <p className="text-sm mt-2">{resource.description}</p>
+                              <Badge variant="secondary" className="mt-2">
+                                {resource.type}
+                              </Badge>
                             </div>
-                            <p className="text-sm mt-2">{resource.description}</p>
-                            <Badge variant="secondary" className="mt-2">
-                              {resource.type}
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <BookOpen className="h-4 w-4 mr-2" />
+                                  Open
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="sm:max-w-[500px]">
+                                <DialogHeader>
+                                  <DialogTitle>{resource.title}</DialogTitle>
+                                  <DialogDescription>{resource.description}</DialogDescription>
+                                </DialogHeader>
+                                <div className="space-y-4">
+                                  <div>
+                                    <h4 className="font-medium mb-2">Progress</h4>
+                                    <div className="h-2 bg-secondary rounded-full">
+                                      <div 
+                                        className="h-full bg-primary rounded-full" 
+                                        style={{width: `${resource.progress}%`}}
+                                      />
+                                    </div>
+                                    <p className="text-sm text-right mt-1">{resource.progress}% Complete</p>
+                                  </div>
+                                  
+                                  <div>
+                                    <h4 className="font-medium mb-2">Attachments</h4>
+                                    <div className="space-y-2">
+                                      {resource.attachments.map((file, j) => (
+                                        <div key={j} className="flex items-center justify-between p-2 border rounded-lg">
+                                          <div className="flex items-center gap-2">
+                                            <BookOpen className="h-4 w-4" />
+                                            <span className="text-sm">{file.name}</span>
+                                            <Badge variant="outline" className="text-xs">
+                                              {file.size}
+                                            </Badge>
+                                          </div>
+                                          <Button variant="ghost" size="sm">
+                                            Download
+                                          </Button>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="flex justify-between">
+                                    <Button variant="outline" onClick={() => window.open(resource.link, '_blank')}>
+                                      Open in {resource.platform}
+                                    </Button>
+                                    <Button onClick={() => setCurrentView('course')}>Continue Learning</Button>
+                                  </div>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+
+              {/* Learning Path */}
+              <div>
+                <h3 className="font-semibold mb-4">Your Learning Path</h3>
+                <div className="space-y-4">
+                  {[
+                    {
+                      milestone: "Frontend Fundamentals",
+                      status: "Completed",
+                      tasks: ["HTML/CSS Basics", "JavaScript Fundamentals", "React Basics"],
+                      resources: [
+                        { name: "HTML Guide", type: "PDF" },
+                        { name: "CSS Examples", type: "Code" }
+                      ]
+                    },
+                    {
+                      milestone: "Advanced Frontend",
+                      status: "In Progress",
+                      tasks: ["State Management", "Performance Optimization", "Testing"],
+                      resources: [
+                        { name: "Redux Tutorial", type: "Video" },
+                        { name: "Testing Guide", type: "Document" }
+                      ]
+                    },
+                    {
+                      milestone: "Backend Integration",
+                      status: "Upcoming",
+                      tasks: ["API Design", "Database Fundamentals", "Authentication"],
+                      resources: [
+                        { name: "API Best Practices", type: "PDF" },
+                        { name: "Database Schemas", type: "Document" }
+                      ]
+                    }
+                  ].map((milestone, i) => (
+                    <Card key={i}>
+                      <CardContent className="p-4">
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <h4 className="font-medium">{milestone.milestone}</h4>
+                            <Badge variant={
+                              milestone.status === "Completed" ? "default" :
+                              milestone.status === "In Progress" ? "secondary" : "outline"
+                            }>
+                              {milestone.status}
                             </Badge>
                           </div>
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                <BookOpen className="h-4 w-4 mr-2" />
-                                Open
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-[500px]">
-                              <DialogHeader>
-                                <DialogTitle>{resource.title}</DialogTitle>
-                                <DialogDescription>{resource.description}</DialogDescription>
-                              </DialogHeader>
-                              <div className="space-y-4">
-                                <div>
-                                  <h4 className="font-medium mb-2">Progress</h4>
-                                  <div className="h-2 bg-secondary rounded-full">
-                                    <div 
-                                      className="h-full bg-primary rounded-full" 
-                                      style={{width: `${resource.progress}%`}}
-                                    />
-                                  </div>
-                                  <p className="text-sm text-right mt-1">{resource.progress}% Complete</p>
-                                </div>
-                                
-                                <div>
-                                  <h4 className="font-medium mb-2">Attachments</h4>
-                                  <div className="space-y-2">
-                                    {resource.attachments.map((file, j) => (
-                                      <div key={j} className="flex items-center justify-between p-2 border rounded-lg">
-                                        <div className="flex items-center gap-2">
-                                          <BookOpen className="h-4 w-4" />
-                                          <span className="text-sm">{file.name}</span>
-                                          <Badge variant="outline" className="text-xs">
-                                            {file.size}
-                                          </Badge>
-                                        </div>
-                                        <Button variant="ghost" size="sm">
-                                          Download
-                                        </Button>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                                
-                                <div className="flex justify-between">
-                                  <Button variant="outline" onClick={() => window.open(resource.link, '_blank')}>
-                                    Open in {resource.platform}
-                                  </Button>
-                                  <Button onClick={() => setCurrentView('course')}>Continue Learning</Button>
-                                  
-                                </div>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-
-            {/* Learning Path */}
-            <div>
-              <h3 className="font-semibold mb-4">Your Learning Path</h3>
-              <div className="space-y-4">
-                {[
-                  {
-                    milestone: "Frontend Fundamentals",
-                    status: "Completed",
-                    tasks: ["HTML/CSS Basics", "JavaScript Fundamentals", "React Basics"],
-                    resources: [
-                      { name: "HTML Guide", type: "PDF" },
-                      { name: "CSS Examples", type: "Code" }
-                    ]
-                  },
-                  {
-                    milestone: "Advanced Frontend",
-                    status: "In Progress",
-                    tasks: ["State Management", "Performance Optimization", "Testing"],
-                    resources: [
-                      { name: "Redux Tutorial", type: "Video" },
-                      { name: "Testing Guide", type: "Document" }
-                    ]
-                  },
-                  {
-                    milestone: "Backend Integration",
-                    status: "Upcoming",
-                    tasks: ["API Design", "Database Fundamentals", "Authentication"],
-                    resources: [
-                      { name: "API Best Practices", type: "PDF" },
-                      { name: "Database Schemas", type: "Document" }
-                    ]
-                  }
-                ].map((milestone, i) => (
-                  <Card key={i}>
-                    <CardContent className="p-4">
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <h4 className="font-medium">{milestone.milestone}</h4>
-                          <Badge variant={
-                            milestone.status === "Completed" ? "default" :
-                            milestone.status === "In Progress" ? "secondary" : "outline"
-                          }>
-                            {milestone.status}
-                          </Badge>
-                        </div>
-                        <ul className="text-sm text-muted-foreground space-y-1">
-                          {milestone.tasks.map((task, j) => (
-                            <li key={j} className="flex items-center">
-                              <div className="w-2 h-2 rounded-full bg-primary mr-2" />
-                              {task}
-                            </li>
-                          ))}
-                        </ul>
-                        <div className="pt-2">
-                          <p className="text-sm font-medium mb-1">Resources:</p>
-                          <div className="flex gap-2">
-                            {milestone.resources.map((resource, k) => (
-                              <Badge key={k} variant="outline">
-                                {resource.name}
-                              </Badge>
+                          <ul className="text-sm text-muted-foreground space-y-1">
+                            {milestone.tasks.map((task, j) => (
+                              <li key={j} className="flex items-center">
+                                <div className="w-2 h-2 rounded-full bg-primary mr-2" />
+                                {task}
+                              </li>
                             ))}
+                          </ul>
+                          <div className="pt-2">
+                            <p className="text-sm font-medium mb-1">Resources:</p>
+                            <div className="flex gap-2">
+                              {milestone.resources.map((resource, k) => (
+                                <Badge key={k} variant="outline">
+                                  {resource.name}
+                                </Badge>
+                              ))}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
+          </CardContent>
+        </Card>
+
+        <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New Resource</DialogTitle>
+              <DialogDescription>
+                Add a new course or information product to your resources
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <label htmlFor="title">Title</label>
+                <input
+                  id="title"
+                  value={newResource.title}
+                  onChange={(e) => setNewResource({...newResource, title: e.target.value})}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                />
+              </div>
+              <div className="grid gap-2">
+                <label htmlFor="type">Type</label>
+                <Select onValueChange={(value) => setNewResource({...newResource, type: value})}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Course">Course</SelectItem>
+                    <SelectItem value="Book">Book</SelectItem>
+                    <SelectItem value="Document">Document</SelectItem>
+                    <SelectItem value="Video">Video</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <label htmlFor="author">Author</label>
+                <input
+                  id="author"
+                  value={newResource.author}
+                  onChange={(e) => setNewResource({...newResource, author: e.target.value})}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                />
+              </div>
+              <div className="grid gap-2">
+                <label htmlFor="description">Description</label>
+                <textarea
+                  id="description"
+                  value={newResource.description}
+                  onChange={(e) => setNewResource({...newResource, description: e.target.value})}
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button onClick={() => setShowAddDialog(false)}>Add Resource</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  };
 
   const CourseView = () => (
     <div className="space-y-6">
@@ -607,61 +779,158 @@ export default function MentorshipPortal() {
         <CardContent>
           <div className="grid md:grid-cols-3 gap-6">
             {/* Course Content Navigation */}
-            <div className="md:col-span-1 border-r">
+            <div className="md:col-span-1 flex flex-col h-full">
               <div className="font-semibold mb-4">Course Modules</div>
-              <ScrollArea className="h-[600px] pr-4">
-                {[
-                  {
-                    title: "Introduction to Advanced JS",
-                    completed: true,
-                    lessons: [
-                      { name: "Course Overview", completed: true, current: false },
-                      { name: "Setting Up Environment", completed: true, current: false }
-                    ]
-                  },
-                  {
-                    title: "Closures & Scope",
-                    completed: false,
-                    current: true,
-                    lessons: [
-                      { name: "Understanding Closures", completed: true, current: false },
-                      { name: "Lexical Scope", completed: false, current: true },
-                      { name: "Practical Applications", completed: false, current: false }
-                    ]
-                  },
-                  {
-                    title: "Prototypes & Inheritance",
-                    completed: false,
-                    lessons: [
-                      { name: "Prototype Chain", completed: false, current: false },
-                      { name: "Inheritance Patterns", completed: false, current: false }
-                    ]
-                  }
-                ].map((module, i) => (
-                  <div key={i} className="mb-4">
-                    <div className={`flex items-center gap-2 p-2 rounded-lg ${module.current ? 'bg-accent' : ''}`}>
-                      {module.completed ? (
-                        <div className="w-4 h-4 rounded-full bg-primary" />
-                      ) : (
-                        <div className="w-4 h-4 rounded-full border border-primary" />
-                      )}
-                      <span className="font-medium">{module.title}</span>
-                    </div>
-                    <div className="ml-6 mt-2 space-y-2">
-                      {module.lessons.map((lesson, j) => (
-                        <div key={j} className={`flex items-center gap-2 p-2 rounded-lg ${lesson.current ? 'bg-accent/50' : ''}`}>
-                          {lesson.completed ? (
-                            <div className="w-3 h-3 rounded-full bg-primary/60" />
-                          ) : (
-                            <div className="w-3 h-3 rounded-full border border-primary/60" />
-                          )}
-                          <span className="text-sm">{lesson.name}</span>
+              <ScrollArea className="flex-grow pr-4">
+                <div className="relative">
+                  {/* Vertical line connecting modules */}
+                  <div className="absolute left-[18px] top-6 bottom-6 w-0.5 bg-border" />
+                  
+                  {[
+                    {
+                      title: "Introduction to Advanced JS",
+                      completed: true,
+                      lessons: [
+                        { name: "Course Overview", completed: true, current: false },
+                        { name: "Setting Up Environment", completed: true, current: false }
+                      ]
+                    },
+                    {
+                      title: "Closures & Scope",
+                      completed: false,
+                      current: true,
+                      lessons: [
+                        { name: "Understanding Closures", completed: true, current: false },
+                        { name: "Lexical Scope", completed: false, current: true },
+                        { name: "Practical Applications", completed: false, current: false }
+                      ]
+                    },
+                    {
+                      title: "Prototypes & Inheritance",
+                      completed: false,
+                      lessons: [
+                        { name: "Prototype Chain", completed: false, current: false },
+                        { name: "Inheritance Patterns", completed: false, current: false }
+                      ]
+                    },
+                    {
+                      title: "Asynchronous JavaScript",
+                      completed: false,
+                      lessons: [
+                        { name: "Promises Deep Dive", completed: false, current: false },
+                        { name: "Async/Await Patterns", completed: false, current: false },
+                        { name: "Error Handling", completed: false, current: false }
+                      ]
+                    },
+                    {
+                      title: "Design Patterns",
+                      completed: false,
+                      lessons: [
+                        { name: "Singleton Pattern", completed: false, current: false },
+                        { name: "Factory Pattern", completed: false, current: false },
+                        { name: "Observer Pattern", completed: false, current: false },
+                        { name: "Module Pattern", completed: false, current: false }
+                      ]
+                    },
+                    {
+                      title: "Performance Optimization",
+                      completed: false,
+                      lessons: [
+                        { name: "Memory Management", completed: false, current: false },
+                        { name: "Code Splitting", completed: false, current: false },
+                        { name: "Lazy Loading", completed: false, current: false }
+                      ]
+                    }
+                  ].map((module, i) => (
+                    <div key={i} className="mb-6 relative">
+                      <div className={`
+                        border rounded-lg p-4
+                        ${module.current ? 'border-primary bg-accent shadow-sm' : 'border-border'}
+                      `}>
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className={`
+                            w-5 h-5 rounded-full z-10 flex items-center justify-center
+                            ${module.completed ? 'bg-primary' : module.current ? 'border-2 border-primary' : 'border-2 border-muted-foreground'}
+                          `}>
+                            {module.completed && <Check className="h-3 w-3 text-primary-foreground" />}
+                          </div>
+                          <span className="font-medium">{module.title}</span>
                         </div>
-                      ))}
+                        
+                        <div className="space-y-2 ml-6 border-l-2 pl-4 border-border">
+                          {module.lessons.map((lesson, j) => (
+                            <div 
+                              key={j} 
+                              className={`
+                                flex items-center gap-2 p-2 rounded-md transition-colors
+                                ${lesson.current ? 'bg-accent/50 text-primary font-medium' : ''}
+                                ${lesson.completed ? 'text-muted-foreground' : ''}
+                              `}
+                            >
+                              <div className={`
+                                w-3 h-3 rounded-full
+                                ${lesson.completed ? 'bg-primary/60' : lesson.current ? 'border-2 border-primary' : 'border border-muted-foreground'}
+                              `} />
+                              <span className="text-sm">{lesson.name}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+
+              {/* Add New Module Section */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="w-full mt-6">
+                    + Add New Module
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Add New Module</DialogTitle>
+                    <DialogDescription>
+                      Create a new module and add its submodules. Click save when you're done.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid gap-2">
+                      <label htmlFor="module-name" className="text-sm font-medium">
+                        Module Name
+                      </label>
+                      <input
+                        id="module-name"
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        placeholder="Enter module name"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <label className="text-sm font-medium">
+                        Submodules
+                      </label>
+                      <div className="space-y-2">
+                        <input
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                          placeholder="Submodule 1"
+                        />
+                        <input
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                          placeholder="Submodule 2"
+                        />
+                        <Button variant="outline" className="w-full">
+                          + Add Another Submodule
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                ))}
-              </ScrollArea>
+                  <div className="flex justify-end gap-3">
+                    <Button variant="outline">Cancel</Button>
+                    <Button>Save Module</Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
 
             {/* Main Content Area */}
@@ -673,7 +942,7 @@ export default function MentorshipPortal() {
                 <Card className="mb-4">
                   <CardContent className="p-4">
                     <div className="aspect-video bg-accent rounded-lg flex items-center justify-center">
-                      <Video className="h-12 w-12 text-muted-foreground" />
+                    <HeroVideoDialogDemoTopInBottomOut />
                     </div>
                   </CardContent>
                 </Card>
@@ -727,36 +996,59 @@ export default function MentorshipPortal() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {[
-                        {
-                          question: "What is the main difference between lexical and dynamic scope?",
-                          options: [
-                            "Lexical scope is determined at runtime",
-                            "Lexical scope is determined at write time",
-                            "There is no difference",
-                            "Dynamic scope is more performant"
-                          ],
-                          correct: 1
-                        }
-                      ].map((question, i) => (
-                        <div key={i} className="space-y-2">
-                          <p className="font-medium">{question.question}</p>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Question</label>
+                          <input
+                            type="text"
+                            placeholder="Enter your question"
+                            className="w-full rounded-md border border-input px-3 py-2"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Answer Type</label>
+                          <select className="w-full rounded-md border border-input px-3 py-2">
+                            <option value="radio">Single Choice (Radio)</option>
+                            <option value="checkbox">Multiple Choice (Checkbox)</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Answer Options</label>
                           <div className="space-y-2">
-                            {question.options.map((option, j) => (
-                              <div key={j} className="flex items-center">
-                                <input 
-                                  type="radio" 
-                                  name={`question-${i}`} 
-                                  id={`q${i}-option${j}`}
-                                  className="mr-2"
+                            {[1, 2, 3, 4].map((num) => (
+                              <div key={num} className="flex gap-2">
+                                <input
+                                  type="text"
+                                  placeholder={`Option ${num}`}
+                                  className="flex-1 rounded-md border border-input px-3 py-2"
                                 />
-                                <label htmlFor={`q${i}-option${j}`}>{option}</label>
+                                <div className="flex items-center">
+                                  <input
+                                    type="checkbox"
+                                    id={`correct-${num}`}
+                                    className="mr-2"
+                                  />
+                                  <label htmlFor={`correct-${num}`} className="text-sm">
+                                    Correct Answer
+                                  </label>
+                                </div>
                               </div>
                             ))}
                           </div>
                         </div>
-                      ))}
-                      <Button className="w-full">Submit Answers</Button>
+
+                        <Button className="w-full">Add Question</Button>
+                      </div>
+
+                      <div className="border-t pt-4">
+                        <h3 className="font-medium mb-4">Preview</h3>
+                        {/* Preview section would render the created questions */}
+                        <div className="text-muted-foreground text-sm text-center py-8">
+                          Questions you create will appear here
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
