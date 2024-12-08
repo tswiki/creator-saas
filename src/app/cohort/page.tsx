@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import HeroVideoDialog from "@/components/ui/hero-video-dialog";
@@ -182,68 +182,132 @@ export default function MentorshipPortal() {
 
   const ScheduleView = () => (
     <div className="space-y-6">
-      <Card>
+      <Card className="max-w-5xl mx-auto">
         <CardHeader>
-          <CardTitle>Schedule a Mentorship Session</CardTitle>
+          <CardTitle className="text-center">Schedule a Mentorship Session</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="font-semibold mb-4">Select Date</h3>
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                className="rounded-md border"
-              />
+          <div className="grid md:grid-cols-2 gap-8 items-start justify-items-center">
+            <div className="flex flex-col items-center w-full max-w-[400px]">
+              <h3 className="font-semibold mb-6 text-center text-lg">Select Date</h3>
+              <div className="w-full bg-card rounded-lg p-4 shadow-sm border">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={(newDate) => {
+                    setDate(newDate);
+                  }}
+                  defaultMonth={date}
+                  fromDate={new Date()} // Prevent selecting past dates
+                  className="rounded-md mx-auto"
+                  disabled={(date) => 
+                    date < new Date() || // Disable past dates
+                    date.getDay() === 0 || // Disable Sundays
+                    date.getDay() === 6    // Disable Saturdays
+                  }
+                  initialFocus
+                  classNames={{
+                    months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+                    month: "space-y-4 w-full",
+                    caption: "flex justify-center pt-1 relative items-center",
+                    caption_label: "text-sm font-medium",
+                    nav: "space-x-1 flex items-center",
+                    table: "w-full border-collapse space-y-1",
+                    head_row: "flex justify-between",
+                    head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
+                    row: "flex w-full mt-2 justify-between",
+                    cell: "text-center text-sm relative p-0 hover:bg-accent rounded-md cursor-pointer",
+                    day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-accent hover:text-accent-foreground rounded-md",
+                    day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+                    day_today: "bg-accent text-accent-foreground",
+                    day_outside: "text-muted-foreground opacity-50",
+                    day_disabled: "text-muted-foreground opacity-50 cursor-not-allowed",
+                    day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
+                    day_hidden: "invisible",
+                  }}
+                />
+                {date && (
+                  <p className="text-center mt-4 text-sm text-muted-foreground">
+                    Selected date: {date.toLocaleDateString()}
+                  </p>
+                )}
+              </div>
             </div>
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-semibold mb-2">Select Time</h3>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select time" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="9:00">9:00 AM</SelectItem>
-                    <SelectItem value="10:00">10:00 AM</SelectItem>
-                    <SelectItem value="11:00">11:00 AM</SelectItem>
-                    <SelectItem value="14:00">2:00 PM</SelectItem>
-                    <SelectItem value="15:00">3:00 PM</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <h3 className="font-semibold mb-2">Session Type</h3>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select session type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="technical">Technical Discussion</SelectItem>
-                    <SelectItem value="career">Career Guidance</SelectItem>
-                    <SelectItem value="project">Project Review</SelectItem>
-                    <SelectItem value="general">General Mentorship</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
 
-              <div>
-                <h3 className="font-semibold mb-2">Duration</h3>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select duration" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="30">30 minutes</SelectItem>
-                    <SelectItem value="45">45 minutes</SelectItem>
-                    <SelectItem value="60">1 hour</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="w-full max-w-[400px]">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Session Details</CardTitle>
+                  <CardDescription>Please fill in the details for your mentorship session</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <h3 className="font-medium">Select Time</h3>
+                    <Select>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select time" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="9:00">9:00 AM</SelectItem>
+                        <SelectItem value="10:00">10:00 AM</SelectItem>
+                        <SelectItem value="11:00">11:00 AM</SelectItem>
+                        <SelectItem value="14:00">2:00 PM</SelectItem>
+                        <SelectItem value="15:00">3:00 PM</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <h3 className="font-medium">Session Type</h3>
+                    <div className="space-y-4">
+                      <Select onValueChange={(value) => {
+                        setSelectedType(value);
+                      }}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select session type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="technical">Technical Discussion</SelectItem>
+                          <SelectItem value="career">Career Guidance</SelectItem>
+                          <SelectItem value="project">Project Review</SelectItem>
+                          <SelectItem value="general">General Mentorship</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      
+                      {setSelectedType === 'other' && (
+                        <div className="space-y-2">
+                          <label htmlFor="custom-type" className="text-sm text-muted-foreground">
+                            If Other, please specify:
+                          </label>
+                          <input
+                            id="custom-type"
+                            type="text"
+                            className="w-full px-3 py-2 border rounded-md"
+                            placeholder="Enter session type"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
-              <Button className="w-full mt-4">Confirm Booking</Button>
+                  <div className="space-y-4">
+                    <h3 className="font-medium">Duration</h3>
+                    <Select>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select duration" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="30">30 minutes</SelectItem>
+                        <SelectItem value="45">45 minutes</SelectItem>
+                        <SelectItem value="60">1 hour</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <Button className="w-full mt-8">Schedule Session</Button>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </CardContent>
@@ -283,8 +347,117 @@ export default function MentorshipPortal() {
               const [isAudioEnabled, setIsAudioEnabled] = useState(true);
               const [isScreenSharing, setIsScreenSharing] = useState(false);
               const [localStreamRef, setLocalStreamRef] = useState<MediaStream | null>(null);
+              const [screenStreamRef, setScreenStreamRef] = useState<MediaStream | null>(null);
               const [peerConnectionRef, setPeerConnectionRef] = useState<RTCPeerConnection | null>(null);
               const [isCallModalOpen, setIsCallModalOpen] = useState(false);
+              const videoRef = useRef<HTMLVideoElement>(null);
+
+              useEffect(() => {
+                // Cleanup function to stop all tracks when component unmounts
+                return () => {
+                  if (localStreamRef) {
+                    localStreamRef.getTracks().forEach(track => track.stop());
+                  }
+                  if (screenStreamRef) {
+                    screenStreamRef.getTracks().forEach(track => track.stop());
+                  }
+                };
+              }, [localStreamRef, screenStreamRef]);
+
+              const stopAllTracks = () => {
+                if (localStreamRef) {
+                  localStreamRef.getTracks().forEach(track => track.stop());
+                }
+                if (screenStreamRef) {
+                  screenStreamRef.getTracks().forEach(track => track.stop());
+                }
+                if (peerConnectionRef) {
+                  peerConnectionRef.close();
+                }
+                if (videoRef.current) {
+                  videoRef.current.srcObject = null;
+                }
+                setLocalStreamRef(null);
+                setScreenStreamRef(null);
+                setPeerConnectionRef(null);
+                session.isJoined = false;
+                setIsVideoEnabled(true);
+                setIsAudioEnabled(true);
+                setIsScreenSharing(false);
+              };
+
+              const setupVideoStream = async () => {
+                try {
+                  const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                      width: { ideal: 1280 },
+                      height: { ideal: 720 },
+                      facingMode: "user"
+                    },
+                    audio: true
+                  });
+                  
+                  if (videoRef.current) {
+                    videoRef.current.srcObject = stream;
+                  }
+                  
+                  const peerConnection = new RTCPeerConnection({
+                    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+                  });
+                  
+                  stream.getTracks().forEach(track => {
+                    peerConnection.addTrack(track, stream);
+                  });
+                  
+                  setLocalStreamRef(stream);
+                  setPeerConnectionRef(peerConnection);
+                  session.isJoined = true;
+                  
+                } catch (err) {
+                  console.error("Error accessing media devices:", err);
+                  alert("Failed to access camera/microphone. Please check permissions.");
+                }
+              };
+
+              const toggleScreenShare = async () => {
+                try {
+                  if (!isScreenSharing) {
+                    // Start screen sharing
+                    const screenStream = await navigator.mediaDevices.getDisplayMedia({
+                      video: true
+                    });
+
+                    if (videoRef.current) {
+                      // Save current video stream and replace with screen share
+                      videoRef.current.srcObject = screenStream;
+                      setScreenStreamRef(screenStream);
+                      setIsScreenSharing(true);
+
+                      // Handle when user stops sharing via browser controls
+                      screenStream.getVideoTracks()[0].onended = () => {
+                        if (videoRef.current && localStreamRef) {
+                          videoRef.current.srcObject = localStreamRef;
+                          setScreenStreamRef(null);
+                          setIsScreenSharing(false);
+                        }
+                      };
+                    }
+                  } else {
+                    // Stop screen sharing and revert to camera
+                    if (screenStreamRef) {
+                      screenStreamRef.getTracks().forEach(track => track.stop());
+                    }
+                    if (videoRef.current && localStreamRef) {
+                      videoRef.current.srcObject = localStreamRef;
+                    }
+                    setScreenStreamRef(null);
+                    setIsScreenSharing(false);
+                  }
+                } catch (err) {
+                  console.error("Error toggling screen share:", err);
+                  setIsScreenSharing(false);
+                }
+              };
 
               return (
                 <div key={i} className="flex items-center gap-4 p-4 border rounded-lg">
@@ -306,63 +479,69 @@ export default function MentorshipPortal() {
                       <Button 
                         variant="default"
                         onClick={async () => {
-                          try {
-                            const stream = await navigator.mediaDevices.getUserMedia({
-                              video: true,
-                              audio: true
-                            });
-                            
-                            const peerConnection = new RTCPeerConnection({
-                              iceServers: [
-                                { urls: 'stun:stun.l.google.com:19302' }
-                              ]
-                            });
-                            
-                            stream.getTracks().forEach(track => {
-                              peerConnection.addTrack(track, stream);
-                            });
-                            
-                            setLocalStreamRef(stream);
-                            setPeerConnectionRef(peerConnection);
-                            session.isJoined = true;
-                            setIsCallModalOpen(true);
-                            
-                          } catch (err) {
-                            console.error("Error joining session:", err);
-                            alert("Failed to join session. Please check your camera/microphone permissions.");
-                          }
+                          await setupVideoStream();
+                          setIsCallModalOpen(true);
                         }}
                         className="bg-green-600 hover:bg-green-700"
                       >
                         Join Session
                       </Button>
                     ) : (
-                      <Button variant="outline">Cancel</Button>
+                      <Button 
+                        variant="outline"
+                        onClick={() => {
+                          stopAllTracks();
+                          setIsCallModalOpen(false);
+                        }}
+                      >
+                        Leave Session
+                      </Button>
                     )}
                   </div>
 
-                  <Dialog open={isCallModalOpen} onOpenChange={setIsCallModalOpen}>
+                  <Dialog open={isCallModalOpen} onOpenChange={(open) => {
+                    if (!open) {
+                      stopAllTracks();
+                    }
+                    setIsCallModalOpen(open);
+                  }}>
                     <DialogContent className="sm:max-w-[90vw] h-[80vh]">
                       <DialogHeader>
                         <DialogTitle>{session.title}</DialogTitle>
-                        <DialogDescription>
-                          {session.description}
-                        </DialogDescription>
+                        <DialogDescription>{session.description}</DialogDescription>
                       </DialogHeader>
 
                       <div className="flex-1 overflow-hidden">
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4 h-full">
+                          <div className="relative aspect-video bg-slate-900 rounded-lg overflow-hidden">
+                            <video
+                              ref={videoRef}
+                              autoPlay
+                              playsInline
+                              muted
+                              className={`w-full h-full ${isScreenSharing ? 'object-contain' : 'object-cover'} ${!isVideoEnabled && !isScreenSharing ? 'hidden' : ''}`}
+                            />
+                            {!isVideoEnabled && !isScreenSharing && (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <User className="h-20 w-20 text-slate-600" />
+                              </div>
+                            )}
+                            <div className="absolute bottom-2 left-2 flex items-center gap-2 bg-black/50 px-2 py-1 rounded-md">
+                              <span className="text-white text-sm">You {isScreenSharing ? '(Screen)' : ''}</span>
+                              {!isAudioEnabled && <MicOff className="h-4 w-4 text-red-400" />}
+                            </div>
+                          </div>
+
                           {session.participants.map((participant) => (
                             <div 
-                              key={participant.id} 
+                              key={participant.id}
                               className="relative aspect-video bg-slate-900 rounded-lg overflow-hidden"
                             >
                               {participant.hasVideo ? (
                                 <video 
-                                  id={`video-${participant.id}`}
                                   autoPlay 
                                   playsInline
-                                  muted={participant.id === 1}
+                                  muted={participant.isMuted}
                                   className="w-full h-full object-cover"
                                 />
                               ) : (
@@ -372,12 +551,8 @@ export default function MentorshipPortal() {
                               )}
                               <div className="absolute bottom-2 left-2 flex items-center gap-2 bg-black/50 px-2 py-1 rounded-md">
                                 <span className="text-white text-sm">{participant.name}</span>
-                                {participant.isSpeaking && (
-                                  <Activity className="h-4 w-4 text-green-400" />
-                                )}
-                                {participant.isMuted && (
-                                  <Mic className="h-4 w-4 text-red-400" />
-                                )}
+                                {participant.isSpeaking && <Activity className="h-4 w-4 text-green-400" />}
+                                {participant.isMuted && <MicOff className="h-4 w-4 text-red-400" />}
                               </div>
                             </div>
                           ))}
@@ -398,6 +573,7 @@ export default function MentorshipPortal() {
                             }
                           }}
                           className="h-10 w-10 rounded-full"
+                          disabled={isScreenSharing}
                         >
                           {isVideoEnabled ? <Video /> : <VideoOff />}
                         </Button>
@@ -422,38 +598,7 @@ export default function MentorshipPortal() {
                         <Button 
                           variant={isScreenSharing ? "default" : "secondary"}
                           size="icon"
-                          onClick={async () => {
-                            try {
-                              if (!isScreenSharing) {
-                                const screenStream = await navigator.mediaDevices.getDisplayMedia({
-                                  video: true
-                                });
-                                
-                                if (peerConnectionRef && localStreamRef) {
-                                  const videoTrack = screenStream.getVideoTracks()[0];
-                                  const sender = peerConnectionRef.getSenders()
-                                    .find((s) => s.track?.kind === 'video');
-                                    
-                                  if (sender) {
-                                    sender.replaceTrack(videoTrack);
-                                  }
-                                  
-                                  videoTrack.onended = () => {
-                                    const cameraTrack = localStreamRef.getVideoTracks()[0];
-                                    if (sender && cameraTrack) {
-                                      sender.replaceTrack(cameraTrack);
-                                      setIsScreenSharing(false);
-                                    }
-                                  };
-                                  
-                                  setIsScreenSharing(true);
-                                }
-                              }
-                            } catch (err) {
-                              console.error("Error sharing screen:", err);
-                              setIsScreenSharing(false);
-                            }
-                          }}
+                          onClick={toggleScreenShare}
                           className="h-10 w-10 rounded-full"
                         >
                           {isScreenSharing ? <MonitorOff /> : <MonitorUp />}
@@ -463,15 +608,7 @@ export default function MentorshipPortal() {
                           variant="destructive"
                           size="icon"
                           onClick={() => {
-                            if (localStreamRef) {
-                              localStreamRef.getTracks().forEach(track => track.stop());
-                            }
-                            if (peerConnectionRef) {
-                              peerConnectionRef.close();
-                            }
-                            setLocalStreamRef(null);
-                            setPeerConnectionRef(null);
-                            session.isJoined = false;
+                            stopAllTracks();
                             setIsCallModalOpen(false);
                           }}
                           className="h-10 w-10 rounded-full"
@@ -1312,4 +1449,8 @@ export default function MentorshipPortal() {
   );
 }
 
+
+function setSelectedType(value: string): void {
+  throw new Error('Function not implemented.');
+}
 
