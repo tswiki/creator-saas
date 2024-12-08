@@ -46,8 +46,14 @@ import {
   Activity,
   VideoOff,
   PhoneOff,
-  Check
+  Check,
+  ArrowUp,
+  PenSquare,
+  Send,
+  ImageIcon,
+  Play
 } from "lucide-react";
+import { Separator } from '@/components/ui/separator';
 
 
 export function HeroVideoDialogDemoTopInBottomOut() {
@@ -1199,121 +1205,313 @@ export default function MentorshipPortal() {
 
 
 
-  const MessagesView = () => (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Messages</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Contacts List */}
-            <div className="border-r">
-              <div className="font-semibold mb-4">Recent Conversations</div>
-              <ScrollArea className="h-[500px]">
-                {[
-                  {
-                    name: "Sarah Wilson",
-                    role: "Mentor",
-                    lastMessage: "Let's discuss your progress tomorrow",
-                    time: "2h ago",
-                    unread: true
-                  },
-                  {
-                    name: "Michael Chen",
-                    role: "Mentor",
-                    lastMessage: "Great work on the project!",
-                    time: "1d ago",
-                    unread: false
-                  },
-                  {
-                    name: "Emma Thompson",
-                    role: "Program Coordinator",
-                    lastMessage: "Don't forget about the workshop",
-                    time: "2d ago",
-                    unread: false
-                  }
-                ].map((contact, i) => (
-                  <div 
-                    key={i} 
-                    className={`flex items-start gap-3 p-3 hover:bg-accent rounded-lg cursor-pointer ${
-                      contact.unread ? 'bg-accent/50' : ''
-                    }`}
-                  >
-                    <Avatar>
-                      <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${contact.name}`} />
-                      <AvatarFallback>{contact.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+  const MessagesView = () => {
+    const [isCallModalOpen, setIsCallModalOpen] = useState(false);
+    const [isVideoEnabled, setIsVideoEnabled] = useState(true);
+    const [isAudioEnabled, setIsAudioEnabled] = useState(true);
+    const [isScreenSharing, setIsScreenSharing] = useState(false);
+    const [showNewChatDialog, setShowNewChatDialog] = useState(false);
+    const [selectedContact, setSelectedContact] = useState(null);
+    const [localStreamRef, setLocalStreamRef] = useState<MediaStream | null>(null);
+    const [screenStreamRef, setScreenStreamRef] = useState<MediaStream | null>(null);
+    const [peerConnectionRef, setPeerConnectionRef] = useState<RTCPeerConnection | null>(null);
+    const videoRef = useRef<HTMLVideoElement>(null);
+
+    const setupVideoStream = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: true, 
+          audio: true 
+        });
+        setLocalStreamRef(stream);
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (err) {
+        console.error("Error accessing media devices:", err);
+      }
+    };
+
+    const startScreenShare = async () => {
+      try {
+        const screenStream = await navigator.mediaDevices.getDisplayMedia({
+          video: true
+        });
+        setScreenStreamRef(screenStream);
+        if (videoRef.current) {
+          videoRef.current.srcObject = screenStream;
+        }
+        setIsScreenSharing(true);
+      } catch (err) {
+        console.error("Error sharing screen:", err);
+      }
+    };
+
+    const stopScreenShare = () => {
+      if (screenStreamRef) {
+        screenStreamRef.getTracks().forEach(track => track.stop());
+        setScreenStreamRef(null);
+        if (videoRef.current && localStreamRef) {
+          videoRef.current.srcObject = localStreamRef;
+        }
+        setIsScreenSharing(false);
+      }
+    };
+
+    const stopAllTracks = () => {
+      if (localStreamRef) {
+        localStreamRef.getTracks().forEach(track => track.stop());
+      }
+      if (screenStreamRef) {
+        screenStreamRef.getTracks().forEach(track => track.stop());
+      }
+      setLocalStreamRef(null);
+      setScreenStreamRef(null);
+      setIsScreenSharing(false);
+    };
+
+    useEffect(() => {
+      return () => {
+        stopAllTracks();
+      };
+    }, []);
+
+    return (
+      <div className="flex h-[calc(100vh-4rem)] gap-6">
+        {/* Left Card - Chats List */}
+        <Card className="w-1/3">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Messages</CardTitle>
+            <Button variant="ghost" size="icon" onClick={() => setShowNewChatDialog(true)}>
+              <PenSquare className="h-5 w-5" />
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[calc(100vh-12rem)]">
+              {[
+                {
+                  name: "Sarah Wilson",
+                  role: "Mentor",
+                  lastMessage: "Let's discuss your progress tomorrow",
+                  time: "2h ago",
+                  unread: true
+                },
+                {
+                  name: "Michael Chen",
+                  role: "Mentor", 
+                  lastMessage: "Great work on the project!",
+                  time: "1d ago",
+                  unread: false
+                }
+              ].map((contact, i, arr) => (
+                <div key={i}>
+                  <div className={`flex items-start gap-3 p-4 hover:bg-accent rounded-lg cursor-pointer ${
+                    contact.unread ? 'bg-accent/50' : ''
+                  }`}>
+                    <Avatar className="h-10 w-10">
+                      <AvatarFallback className="bg-primary text-primary-foreground">
+                        {contact.name.split(' ').map(n => n[0]).join('')}
+                      </AvatarFallback>
                     </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <div className="font-semibold">{contact.name}</div>
-                          <div className="text-sm text-muted-foreground">{contact.role}</div>
-                        </div>
-                        <span className="text-xs text-muted-foreground whitespace-nowrap">{contact.time}</span>
+                    <div className="flex-1">
+                      <div className="flex justify-between">
+                        <div className="font-semibold">{contact.name}</div>
+                        <span className="text-xs text-muted-foreground">{contact.time}</span>
                       </div>
-                      <p className="text-sm text-muted-foreground truncate mt-1">
-                        {contact.lastMessage}
-                      </p>
-                      {contact.unread && (
-                        <Badge variant="default" className="mt-2">New</Badge>
+                      <p className="text-sm text-muted-foreground truncate">{contact.lastMessage}</p>
+                      {contact.unread && <Badge className="mt-1">New</Badge>}
+                    </div>
+                  </div>
+                  {i < arr.length - 1 && <Separator className="my-1 mx-4" />}
+                </div>
+              ))}
+            </ScrollArea>
+          </CardContent>
+        </Card>
+
+        {/* Right Card - Chat Area */}
+        <Card className="flex-1">
+          <CardHeader className="border-b">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-10 w-10">
+                  <AvatarFallback className="bg-primary text-primary-foreground">SW</AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="font-semibold">Sarah Wilson</div>
+                  <div className="text-sm text-muted-foreground">Online</div>
+                </div>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={async () => {
+                  await setupVideoStream();
+                  setIsCallModalOpen(true);
+                }}
+              >
+                <Video className="h-5 w-5" />
+              </Button>
+            </div>
+          </CardHeader>
+
+          <CardContent className="p-0">
+            <ScrollArea className="h-[calc(100vh-20rem)] p-6">
+              <div className="space-y-4">
+                {[
+                  { sender: "mentor", content: "How's your progress on the latest project?", time: "10:30 AM", type: "text" },
+                  { sender: "you", content: "/voice-note-1.mp3", time: "10:31 AM", type: "voice" },
+                  { sender: "mentor", content: "/screenshot.png", time: "10:33 AM", type: "image" },
+                  { sender: "you", content: "Yes, that would be very helpful!", time: "10:36 AM", type: "text" }
+                ].map((msg, i) => (
+                  <div key={i} className={`flex ${msg.sender === 'you' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-[70%] rounded-2xl p-3 ${
+                      msg.sender === 'you' 
+                        ? 'bg-blue-500 text-white rounded-br-none' 
+                        : 'bg-gray-100 text-gray-900 rounded-bl-none'
+                    }`}>
+                      {msg.type === 'text' && <p>{msg.content}</p>}
+                      {msg.type === 'voice' && (
+                        <div className="flex items-center gap-2">
+                          <Play className="h-4 w-4" />
+                          <div className="h-4 bg-current/20 rounded-full flex-1" />
+                          <span className="text-xs">0:30</span>
+                        </div>
                       )}
+                      {msg.type === 'image' && (
+                        <img src={msg.content} alt="" className="rounded-lg max-w-full" />
+                      )}
+                      <span className="text-xs opacity-70 mt-1 block">{msg.time}</span>
                     </div>
                   </div>
                 ))}
-              </ScrollArea>
-            </div>
+              </div>
+            </ScrollArea>
 
-            {/* Chat Area */}
-            <div className="md:col-span-2 flex flex-col">
-              <div className="border-b p-4">
-                <div className="flex items-center gap-3">
-                  <Avatar>
-                    <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah Wilson" />
-                    <AvatarFallback>SW</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="font-semibold">Sarah Wilson</div>
-                    <div className="text-sm text-muted-foreground">Mentor • Online</div>
+            <div className="border-t p-4">
+              <div className="flex items-center gap-2 bg-accent rounded-full p-2">
+                <Button variant="ghost" size="icon" className="rounded-full">
+                  <ImageIcon className="h-5 w-5" />
+                </Button>
+                <input 
+                  type="text" 
+                  placeholder="iMessage"
+                  className="flex-1 bg-transparent border-none focus:outline-none text-center"
+                />
+                <Button variant="ghost" size="icon" className="rounded-full">
+                  <Mic className="h-5 w-5" />
+                </Button>
+                <Button variant="ghost" size="icon" className="rounded-full">
+                  <Send className="h-5 w-5" />
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Video Call Dialog */}
+        <Dialog open={isCallModalOpen} onOpenChange={(open) => {
+          if (!open) {
+            stopAllTracks();
+          }
+          setIsCallModalOpen(open);
+        }}>
+          <DialogContent className="sm:max-w-[90vw] h-[80vh]">
+            <DialogHeader>
+              <DialogTitle>Video Call with Sarah Wilson</DialogTitle>
+            </DialogHeader>
+            <div className="grid grid-cols-2 gap-4 h-full">
+              <div className="relative aspect-video bg-slate-900 rounded-lg overflow-hidden">
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className={`w-full h-full ${isScreenSharing ? 'object-contain' : 'object-cover'} ${!isVideoEnabled && !isScreenSharing ? 'hidden' : ''}`}
+                />
+                {!isVideoEnabled && !isScreenSharing && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <User className="h-20 w-20 text-slate-600" />
                   </div>
-                </div>
+                )}
               </div>
-
-              <ScrollArea className="flex-1 p-4">
-                <div className="space-y-4">
-                  {[
-                    { sender: "mentor", message: "How's your progress on the latest project?", time: "10:30 AM" },
-                    { sender: "you", message: "It's going well! I've completed the main features we discussed.", time: "10:32 AM" },
-                    { sender: "mentor", message: "That's great to hear! Would you like to review it together tomorrow?", time: "10:35 AM" },
-                    { sender: "you", message: "Yes, that would be very helpful!", time: "10:36 AM" }
-                  ].map((msg, i) => (
-                    <div key={i} className={`flex ${msg.sender === 'you' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[70%] ${msg.sender === 'you' ? 'bg-primary text-primary-foreground' : 'bg-muted'} rounded-lg p-3`}>
-                        <p>{msg.message}</p>
-                        <span className="text-xs opacity-70 mt-1 block">{msg.time}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-
-              <div className="border-t p-4">
-                <div className="flex gap-2">
-                  <input 
-                    type="text" 
-                    placeholder="Type your message..." 
-                    className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                  />
-                  <Button>Send</Button>
-                </div>
-              </div>
+              <div className="aspect-video bg-slate-900 rounded-lg" />
             </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
+            <div className="flex justify-center gap-4">
+              <Button 
+                variant={isVideoEnabled ? "default" : "secondary"}
+                size="icon"
+                onClick={() => {
+                  if (localStreamRef) {
+                    const videoTrack = localStreamRef.getVideoTracks()[0];
+                    if (videoTrack) {
+                      videoTrack.enabled = !isVideoEnabled;
+                      setIsVideoEnabled(!isVideoEnabled);
+                    }
+                  }
+                }}
+                disabled={isScreenSharing}
+              >
+                {isVideoEnabled ? <Video /> : <VideoOff />}
+              </Button>
+              <Button
+                variant={isAudioEnabled ? "default" : "secondary"}
+                size="icon"
+                onClick={() => {
+                  if (localStreamRef) {
+                    const audioTrack = localStreamRef.getAudioTracks()[0];
+                    if (audioTrack) {
+                      audioTrack.enabled = !isAudioEnabled;
+                      setIsAudioEnabled(!isAudioEnabled);
+                    }
+                  }
+                }}
+              >
+                {isAudioEnabled ? <Mic /> : <MicOff />}
+              </Button>
+              <Button
+                variant={isScreenSharing ? "default" : "secondary"}
+                size="icon"
+                onClick={() => {
+                  if (isScreenSharing) {
+                    stopScreenShare();
+                  } else {
+                    startScreenShare();
+                  }
+                }}
+              >
+                {isScreenSharing ? <MonitorOff /> : <MonitorUp />}
+              </Button>
+              <Button
+                variant="destructive"
+                size="icon"
+                onClick={() => {
+                  stopAllTracks();
+                  setIsCallModalOpen(false);
+                }}
+              >
+                <PhoneOff />
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
+        {/* New Chat Dialog */}
+        <Dialog open={showNewChatDialog} onOpenChange={setShowNewChatDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>New Message</DialogTitle>
+            </DialogHeader>
+            <ScrollArea className="h-[400px]">
+              {/* List of cohort contacts would go here */}
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  };
+
+  
   const DashboardView = () => (
     <div className="max-w-7xl mx-auto space-y-6">
       <Card>
