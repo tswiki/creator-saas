@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { SetStateAction, useEffect, useRef, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -1217,6 +1217,37 @@ export default function MentorshipPortal() {
     const [peerConnectionRef, setPeerConnectionRef] = useState<RTCPeerConnection | null>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
 
+    // Mock contacts data - in real app would come from API/database
+    const contacts = [
+      {
+        id: 1,
+        name: "Sarah Wilson",
+        role: "Mentor",
+        email: "sarah.w@example.com",
+        avatar: "SW"
+      },
+      {
+        id: 2,
+        name: "Michael Chen",
+        role: "Mentor",
+        email: "michael.c@example.com",
+        avatar: "MC"
+      },
+      {
+        id: 3,
+        name: "Emma Davis",
+        role: "Student",
+        email: "emma.d@example.com",
+        avatar: "ED"
+      }
+    ];
+
+    const handleStartNewChat = (contact: SetStateAction<null>) => {
+      setSelectedContact(contact);
+      setShowNewChatDialog(false);
+      // Here you would typically initialize a new chat with the selected contact
+    };
+
     const setupVideoStream = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -1330,7 +1361,7 @@ export default function MentorshipPortal() {
         </Card>
 
         {/* Right Card - Chat Area */}
-        <Card className="flex-1">
+        <Card className="flex-1 flex flex-col">
           <CardHeader className="border-b">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-3">
@@ -1355,8 +1386,8 @@ export default function MentorshipPortal() {
             </div>
           </CardHeader>
 
-          <CardContent className="p-0">
-            <ScrollArea className="h-[calc(100vh-20rem)] p-6">
+          <CardContent className="p-0 flex-1 flex flex-col">
+            <ScrollArea className="flex-1 p-6">
               <div className="space-y-4">
                 {[
                   { sender: "mentor", content: "How's your progress on the latest project?", time: "10:30 AM", type: "text" },
@@ -1388,7 +1419,7 @@ export default function MentorshipPortal() {
               </div>
             </ScrollArea>
 
-            <div className="border-t p-4">
+            <div className="border-t p-4 mt-auto">
               <div className="flex items-center gap-2 bg-accent rounded-full p-2">
                 <Button variant="ghost" size="icon" className="rounded-full">
                   <ImageIcon className="h-5 w-5" />
@@ -1503,7 +1534,26 @@ export default function MentorshipPortal() {
               <DialogTitle>New Message</DialogTitle>
             </DialogHeader>
             <ScrollArea className="h-[400px]">
-              {/* List of cohort contacts would go here */}
+              <div className="space-y-2 p-4">
+                {contacts.map((contact) => (
+                  <div
+                    key={contact.id}
+                    className="flex items-center gap-3 p-3 hover:bg-accent rounded-lg cursor-pointer"
+                    onClick={() => handleStartNewChat(contact)}
+                  >
+                    <Avatar>
+                      <AvatarFallback className="bg-primary text-primary-foreground">
+                        {contact.avatar}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <div className="font-semibold">{contact.name}</div>
+                      <div className="text-sm text-muted-foreground">{contact.role}</div>
+                      <div className="text-sm text-muted-foreground">{contact.email}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </ScrollArea>
           </DialogContent>
         </Dialog>
