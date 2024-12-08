@@ -51,7 +51,12 @@ import {
   PenSquare,
   Send,
   ImageIcon,
-  Play
+  Play,
+  Github,
+  Link,
+  Linkedin,
+  Star,
+  Twitter
 } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 
@@ -101,7 +106,7 @@ export default function MentorshipPortal() {
             <User className="mr-2 h-4 w-4" />
             My Profile
           </Button>
-          <Button variant="ghost" className="justify-start w-full">
+          <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('mentor')}>
             <Users className="mr-2 h-4 w-4" />
             My Mentor
           </Button>
@@ -1561,6 +1566,180 @@ export default function MentorshipPortal() {
     );
   };
 
+
+  const MyMentorView = () => {
+    const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
+
+    // Define Mentor type
+    type Mentor = {
+      id: number;
+      name: string;
+      title: string; 
+      company: string;
+      expertise: string[];
+      bio: string;
+      rating: number;
+      totalSessions: number;
+      availability: string;
+      socials: {
+        linkedin: string;
+        twitter: string;
+        github: string;
+      };
+      upcomingSessions: {
+        date: string;
+        time: string;
+        topic: string;
+      }[];
+    };
+
+    // Mock mentor data - would come from API/database in real app
+    const mentors: Mentor[] = [
+      {
+        id: 1,
+        name: "Dr. Sarah Wilson",
+        title: "Senior Software Engineer",
+        company: "Google",
+        expertise: ["Web Development", "System Design", "Cloud Architecture"],
+        bio: "15+ years of experience in software development and mentoring. Passionate about helping others grow in their tech careers.",
+        rating: 4.9,
+        totalSessions: 156,
+        availability: "Mon-Thu, 2PM-6PM EST",
+        socials: {
+          linkedin: "linkedin.com/in/sarahwilson",
+          twitter: "@sarahwilsontech",
+          github: "github.com/sarahwilson"
+        },
+        upcomingSessions: [
+          {
+            date: "2024-02-15",
+            time: "2:00 PM EST",
+            topic: "System Design Interview Prep"
+          },
+          {
+            date: "2024-02-22", 
+            time: "3:00 PM EST",
+            topic: "Code Review Workshop"
+          }
+        ]
+      },
+      {
+        id: 2,
+        name: "Michael Chen",
+        title: "Tech Lead",
+        company: "Microsoft",
+        expertise: ["Mobile Development", "Leadership", "Agile Methodologies"],
+        bio: "Tech lead with focus on mobile development and team leadership. Helping mentees navigate both technical and career challenges.",
+        rating: 4.8,
+        totalSessions: 98,
+        availability: "Wed-Fri, 10AM-4PM PST",
+        socials: {
+          linkedin: "linkedin.com/in/michaelchen",
+          twitter: "@michaelchendev",
+          github: "github.com/mchen"
+        },
+        upcomingSessions: [
+          {
+            date: "2024-02-18",
+            time: "11:00 AM PST",
+            topic: "Mobile App Architecture"
+          }
+        ]
+      }
+    ];
+
+    return (
+      <div className="max-w-7xl mx-auto space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>My Mentors</CardTitle>
+            <CardDescription>View and manage your mentorship relationships</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 gap-6">
+              {mentors.map((mentor) => (
+                <Card key={mentor.id} className="hover:shadow-lg transition-shadow">
+                  <CardContent className="pt-6">
+                    <div className="flex gap-4">
+                      <Avatar className="h-16 w-16">
+                        <AvatarFallback className="text-xl">
+                          {mentor.name.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="space-y-1">
+                        <h3 className="font-semibold text-lg">{mentor.name}</h3>
+                        <p className="text-sm text-muted-foreground">{mentor.title} at {mentor.company}</p>
+                        <div className="flex items-center gap-2">
+                          <Star className="h-4 w-4 fill-yellow-400 stroke-yellow-400" />
+                          <span className="text-sm">{mentor.rating} ({mentor.totalSessions} sessions)</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-4">
+                      <h4 className="font-medium mb-2">Expertise</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {mentor.expertise.map((skill, i) => (
+                          <Badge key={i} variant="secondary">{skill}</Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="mt-4">
+                      <h4 className="font-medium mb-2">Upcoming Sessions</h4>
+                      <div className="space-y-2">
+                        {mentor.upcomingSessions.map((session, i) => (
+                          <div key={i} className="text-sm">
+                            <div className="font-medium">{session.topic}</div>
+                            <div className="text-muted-foreground">
+                              {session.date} at {session.time}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="mt-4 pt-4 border-t">
+                      <div className="grid grid-cols-3 gap-4">
+                        <Link 
+                          href={mentor.socials.linkedin} 
+                          className="flex justify-center text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          <Linkedin className="h-5 w-5" />
+                        </Link>
+                        <Link 
+                          href={mentor.socials.twitter} 
+                          className="flex justify-center text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          <Twitter className="h-5 w-5" />
+                        </Link>
+                        <Link 
+                          href={mentor.socials.github} 
+                          className="flex justify-center text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          <Github className="h-5 w-5" />
+                        </Link>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex gap-2">
+                      <Button className="w-full" onClick={() => setSelectedMentor(mentor)}>
+                        View Profile
+                      </Button>
+                      <Button variant="outline" className="w-full">
+                        Schedule Session
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
   
   const DashboardView = () => (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -1613,55 +1792,98 @@ export default function MentorshipPortal() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Learning Resources</CardTitle>
+              <CardTitle>Recent Messages</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-3 gap-4">
-                {[1, 2, 3].map((i) => (
-                  <Card key={i}>
-                    <CardContent className="pt-6">
-                      <h4 className="font-semibold mb-2">Resource {i}</h4>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Essential learning material for your growth
-                      </p>
-                      <Button className="w-full">Access</Button>
-                    </CardContent>
-                  </Card>
+              <div className="space-y-3">
+                {[
+                  {
+                    initials: "SJ",
+                    message: "Great progress on the latest project!",
+                    time: "2h ago"
+                  },
+                  {
+                    initials: "SJ",
+                    message: "Let's discuss the architecture changes in our next session",
+                    time: "1d ago"
+                  },
+                  {
+                    initials: "SJ",
+                    message: "I've shared some resources for the upcoming discussion",
+                    time: "2d ago"
+                  }
+                ].map((message, i) => (
+                  <div key={i} className="flex items-center gap-3 py-2">
+                    <Avatar className="h-8 w-8 flex-shrink-0">
+                      <AvatarFallback>{message.initials}</AvatarFallback>
+                    </Avatar>
+                    <p className="text-sm flex-grow truncate">{message.message}</p>
+                    <span className="text-xs text-muted-foreground flex-shrink-0">{message.time}</span>
+                  </div>
                 ))}
               </div>
+              <Button variant="ghost" className="w-full mt-4" onClick={() => setCurrentView('messages')}>
+                View All Messages
+              </Button>
             </CardContent>
           </Card>
         </div>
 
-        <div className="space-y-6">
-          <Card>
+        <div className="flex flex-col space-y-6 h-full">
+          <Card className="flex-1">
             <CardHeader>
               <CardTitle>My Mentor</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center gap-4">
-                <Avatar className="h-16 w-16">
-                  <AvatarFallback>SJ</AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="font-semibold">Sarah Johnson</p>
-                  <p className="text-sm text-muted-foreground">Senior Software Engineer</p>
-                  <Badge className="mt-2">Available</Badge>
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-16 w-16">
+                    <AvatarFallback>SJ</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-semibold">Sarah Johnson</p>
+                    <p className="text-sm text-muted-foreground">Senior Software Engineer at Google</p>
+                    <Badge className="mt-2">Available</Badge>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Star className="h-4 w-4 text-yellow-400" />
+                    <span className="text-sm">4.9 Rating</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Expertise: React, Node.js, System Design
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Total Sessions: 120+
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button className="flex-1">Message</Button>
+                  <Button variant="outline" className="flex-1">Schedule</Button>
                 </div>
               </div>
-              <Button className="w-full mt-4">Send Message</Button>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="flex-1">
             <CardHeader>
-              <CardTitle>Progress Tracking</CardTitle>
+              <CardTitle>Current Course Progress</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                You've completed 60% of your learning goals
-              </p>
-              <Button className="w-full">View Details</Button>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-medium text-sm">Advanced React Patterns</h3>
+                  <p className="text-sm text-muted-foreground">Current Module: Component Composition</p>
+                  <div className="mt-2 flex items-center gap-2">
+                    <Play className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">Last accessed 2 hours ago</span>
+                  </div>
+                </div>
+                <Button variant="outline" className="w-full" onClick={() => setCurrentView('resources')}>
+                  Continue Learning
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -1692,6 +1914,7 @@ export default function MentorshipPortal() {
         {currentView === 'messages' && <MessagesView />}
         {currentView === 'resources' && <ResourcesView/>}
         {currentView === 'course' && <CourseView/>}
+        {currentView === 'mentor' && <MyMentorView/>}
       </div>
     </div>
   );
