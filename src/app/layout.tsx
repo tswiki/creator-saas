@@ -1,6 +1,10 @@
+
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { headers } from 'next/headers'; // Add this import
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -18,10 +22,6 @@ export const metadata: Metadata = {
   description: "Powered by REVITALISE.IO",
 };
 
-import Header from '@/components/ui/header';
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
-
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -29,7 +29,10 @@ export default async function RootLayout({
 }>) {
   const cookieStore = await cookies();
   const sessionCookie = cookieStore.get('session')?.value;
-  const pathname = new URL(window.location.href).pathname;
+  
+  // Get pathname from headers instead of window.location
+  const headersList = await headers();
+  const pathname = headersList.get('x-pathname') || headersList.get('x-invoke-path') || '';
 
   // Only check auth for cohort routes
   if (pathname.startsWith('/cohort') && !sessionCookie) {
@@ -39,7 +42,6 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {/* <Header /> */}
         {children}
       </body>
     </html>
