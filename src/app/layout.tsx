@@ -18,14 +18,24 @@ export const metadata: Metadata = {
   description: "Powered by REVITALISE.IO",
 };
 
-
 import Header from '@/components/ui/header';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get('session')?.value;
+  const pathname = new URL(window.location.href).pathname;
+
+  // Only check auth for cohort routes
+  if (pathname.startsWith('/cohort') && !sessionCookie) {
+    redirect('/login');
+  }
+
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>

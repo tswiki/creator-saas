@@ -1,16 +1,19 @@
+
 import type { NextConfig } from "next";
+import type { WebpackConfigContext } from 'next/dist/server/config-shared'
 
 const nextConfig: NextConfig = {
-  /* config options here */
-};
-
-export default nextConfig;
-const config: NextConfig = {
-  compilerOptions: {
-    moduleResolution: "node",
-    esModuleInterop: true
+  webpack: (config: any, { buildId, dev, isServer, defaultLoaders, webpack }: WebpackConfigContext) => {
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+    }
+    return config
   },
-  include: ["src", "node_modules"]
-};
+  // Compiler options
+  experimental: {
+    // transpilePackages is no longer a valid experimental option
+  }
+}
 
-module.exports = config;
+export default nextConfig

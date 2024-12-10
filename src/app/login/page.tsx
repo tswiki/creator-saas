@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -6,6 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth } from '../../firebase/firebaseConfig';
+import { useRouter } from 'next/navigation';
 
 function BrandSection() {
   return (
@@ -36,11 +38,37 @@ function BrandSection() {
 function AuthSection() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Add authentication logic here
   };
+
+  const handleGoogleSignIn = async (e: any) => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+
+       // Get the ID token
+    const idToken = await result.user.getIdToken()
+    
+    // Send to your backend to set the cookie
+    const response = await fetch('/api/auth/session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ idToken }),
+    })
+    if (response.ok){
+      router.push('/cohort');
+    }
+
+    } catch (error) {
+      console.error('Error signing in with Google:', error);
+    }
+  }
 
   return (
     <div className="flex items-center justify-center w-full lg:w-1/2 h-screen bg-gray-50 p-8">
@@ -125,7 +153,7 @@ function AuthSection() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline">
+            <Button variant="outline" onClick={handleGoogleSignIn}>
               Google
             </Button>
             <Button variant="outline">
@@ -146,4 +174,3 @@ export default function AuthPage() {
     </div>
   );
 }
-
