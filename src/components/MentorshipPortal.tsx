@@ -333,7 +333,89 @@ export default function MentorshipPortal() {
                   >
                     Schedule Session
                   </Button>
-                  <Button className="w-full" variant="outline">View Resources</Button>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button className="w-full" variant="outline">View Resources</Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-[90vw] max-h-[85vh] w-full h-full">
+                      <DialogHeader>
+                        <DialogTitle>My Resources Library</DialogTitle>
+                        <DialogDescription>
+                          View, manage and interact with your saved resources
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid grid-cols-[2fr,1fr] gap-4 h-[calc(85vh-120px)]">
+                        <ScrollArea className="flex-1">
+                          <div className="grid gap-4 p-4">
+                            {[
+                              {
+                                title: "System Design Interview Guide",
+                                type: "PDF",
+                                addedOn: "2024-01-15",
+                                favorite: true
+                              },
+                              {
+                                title: "Building Scalable Web Apps",
+                                type: "Video",
+                                addedOn: "2024-01-10", 
+                                favorite: true
+                              },
+                              {
+                                title: "Data Structures Cheat Sheet",
+                                type: "Document",
+                                addedOn: "2024-01-05",
+                                favorite: false
+                              }
+                            ].map((resource, i) => (
+                              <Card key={i} className="transition-all hover:shadow-md">
+                                <CardContent className="flex items-center justify-between p-4">
+                                  <div className="flex items-center gap-4">
+                                    <BookOpen className="h-8 w-8 text-muted-foreground" />
+                                    <div>
+                                      <h4 className="font-medium">{resource.title}</h4>
+                                      <p className="text-sm text-muted-foreground">Added on {resource.addedOn}</p>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Badge variant="secondary">{resource.type}</Badge>
+                                    <Star className={`h-4 w-4 cursor-pointer transition-colors ${resource.favorite ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground hover:text-yellow-400"}`} />
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        </ScrollArea>
+
+                        <Card className="h-full flex flex-col">
+                          <CardHeader>
+                            <CardTitle className="text-lg">Resource Assistant</CardTitle>
+                            <CardDescription>Ask questions about your resources</CardDescription>
+                          </CardHeader>
+                          <CardContent className="flex-1 flex flex-col">
+                            <ScrollArea className="flex-1 pr-4">
+                              <div className="space-y-4">
+                                {[
+                                  { role: 'assistant', content: 'How can I help you with your resources today?' }
+                                ].map((message, i) => (
+                                  <div key={i} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                    <div className={`rounded-lg px-4 py-2 max-w-[80%] ${message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+                                      {message.content}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </ScrollArea>
+                            <div className="mt-4 flex gap-2">
+                              <Input placeholder="Ask about your resources..." className="flex-1" />
+                              <Button size="icon">
+                                <Send className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                   <Button className="w-full" variant="outline">Update Goals</Button>
                 </div>
               </CardContent>
@@ -403,8 +485,65 @@ export default function MentorshipPortal() {
                   <CardDescription>Please fill in the details for your mentorship session</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {/* Rest of the session details form remains the same */}
-                  {/* ... */}
+                  <div className="grid gap-4">
+                    <div className="grid gap-2">
+                      <label htmlFor="selected-date" className="text-sm font-medium">Selected Date</label>
+                      <input 
+                        id="selected-date"
+                        type="text"
+                        value={date?.toLocaleDateString()}
+                        disabled
+                        className="flex h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm"
+                      />
+                    </div>
+
+                    <div className="grid gap-2">
+                      <label htmlFor="session-type" className="text-sm font-medium">Session Type</label>
+                      <Select 
+                        onValueChange={(value) => setSelectedType(value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select session type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="technical">Technical Discussion</SelectItem>
+                          <SelectItem value="career">Career Guidance</SelectItem>
+                          <SelectItem value="project">Project Review</SelectItem>
+                          <SelectItem value="general">General Mentorship</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="grid gap-2">
+                      <label htmlFor="session-time" className="text-sm font-medium">Preferred Time</label>
+                      <Select
+                        onValueChange={(value) => setSelectedType(value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select time slot" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="9:00 AM">9:00 AM</SelectItem>
+                          <SelectItem value="10:00 AM">10:00 AM</SelectItem>
+                          <SelectItem value="11:00 AM">11:00 AM</SelectItem>
+                          <SelectItem value="1:00 PM">1:00 PM</SelectItem>
+                          <SelectItem value="2:00 PM">2:00 PM</SelectItem>
+                          <SelectItem value="3:00 PM">3:00 PM</SelectItem>
+                          <SelectItem value="4:00 PM">4:00 PM</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="grid gap-2">
+                      <label htmlFor="session-description" className="text-sm font-medium">Session Goals</label>
+                      <textarea
+                        id="session-description"
+                        className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        placeholder="What would you like to achieve in this session?"
+                        onChange={(e) => new RTCSessionDescription(e.target.value)}
+                      />
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -1776,6 +1915,10 @@ export default function MentorshipPortal() {
 
   const MyMentorView = () => {
     const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
+    const [showMentorDialog, setShowMentorDialog] = useState(false);
+    const [showScheduleDialog, setShowScheduleDialog] = useState(false);
+    const [date, setDate] = useState<Date | undefined>(undefined);
+    const [selectedType, setSelectedType] = useState<string>('');
 
     // Define Mentor type
     type Mentor = {
@@ -1930,10 +2073,23 @@ export default function MentorshipPortal() {
                     </div>
 
                     <div className="mt-4 flex gap-2">
-                      <Button className="w-full" onClick={() => setSelectedMentor(mentor)}>
+                      <Button 
+                        className="w-full" 
+                        onClick={() => {
+                          setSelectedMentor(mentor);
+                          setShowMentorDialog(true);
+                        }}
+                      >
                         View Profile
                       </Button>
-                      <Button variant="outline" className="w-full">
+                      <Button 
+                        variant="outline" 
+                        className="w-full"
+                        onClick={() => {
+                          setSelectedMentor(mentor);
+                          setShowScheduleDialog(true);
+                        }}
+                      >
                         Schedule Session
                       </Button>
                     </div>
@@ -1943,6 +2099,211 @@ export default function MentorshipPortal() {
             </div>
           </CardContent>
         </Card>
+
+        <Dialog open={showMentorDialog} onOpenChange={setShowMentorDialog}>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+            {selectedMentor && (
+              <>
+                <DialogHeader>
+                  <DialogTitle className="text-2xl">{selectedMentor.name}</DialogTitle>
+                  <DialogDescription>{selectedMentor.title} at {selectedMentor.company}</DialogDescription>
+                </DialogHeader>
+
+                <div className="mt-6">
+                  <table className="w-full border-collapse">
+                    <tbody>
+                      <tr className="border-b">
+                        <td className="py-4 font-medium">Rating</td>
+                        <td className="py-4 flex items-center gap-2">
+                          <Star className="h-4 w-4 fill-yellow-400 stroke-yellow-400" />
+                          {selectedMentor.rating} ({selectedMentor.totalSessions} sessions)
+                        </td>
+                      </tr>
+                      <tr className="border-b">
+                        <td className="py-4 font-medium">Availability</td>
+                        <td className="py-4">{selectedMentor.availability}</td>
+                      </tr>
+                      <tr className="border-b">
+                        <td className="py-4 font-medium">Expertise</td>
+                        <td className="py-4">
+                          <div className="flex flex-wrap gap-2">
+                            {selectedMentor.expertise.map((skill, i) => (
+                              <Badge key={i} variant="secondary">{skill}</Badge>
+                            ))}
+                          </div>
+                        </td>
+                      </tr>
+                      <tr className="border-b">
+                        <td className="py-4 font-medium">Bio</td>
+                        <td className="py-4">{selectedMentor.bio}</td>
+                      </tr>
+                      <tr className="border-b">
+                        <td className="py-4 font-medium">Social Links</td>
+                        <td className="py-4">
+                          <div className="flex gap-4">
+                            <Link href={selectedMentor.socials.linkedin} className="text-muted-foreground hover:text-primary">
+                              <Linkedin className="h-5 w-5" />
+                            </Link>
+                            <Link href={selectedMentor.socials.twitter} className="text-muted-foreground hover:text-primary">
+                              <Twitter className="h-5 w-5" />
+                            </Link>
+                            <Link href={selectedMentor.socials.github} className="text-muted-foreground hover:text-primary">
+                              <Github className="h-5 w-5" />
+                            </Link>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="py-4 font-medium">Upcoming Sessions</td>
+                        <td className="py-4">
+                          <Select>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Select a session" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {selectedMentor.upcomingSessions.map((session, i) => (
+                                <SelectItem key={i} value={`session-${i}`}>
+                                  <div className="flex justify-between items-center w-full gap-4">
+                                    <div>
+                                      <div className="font-medium">{session.topic}</div>
+                                      <div className="text-sm text-muted-foreground">
+                                        {session.date} at {session.time}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <div className="mt-4">
+                            <Button 
+                              variant="outline" 
+                              className="w-full"
+                              onClick={() => {
+                                setShowMentorDialog(false);
+                                setShowScheduleDialog(true);
+                              }}
+                            >
+                              Join Selected Session
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
+          <DialogContent className="max-w-5xl">
+            <DialogHeader>
+              <DialogTitle>Schedule a Mentorship Session</DialogTitle>
+            </DialogHeader>
+            
+            <div className="grid md:grid-cols-2 gap-8 items-start justify-items-center">
+              <div className="flex flex-col items-center w-full max-w-[400px]">
+                <h3 className="font-semibold mb-6 text-center text-lg">Select Date</h3>
+                <div className="w-full bg-card rounded-lg p-4 shadow-sm border">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
+                    defaultMonth={date}
+                    fromDate={new Date()}
+                    className="w-full rounded-md mx-auto"
+                    disabled={(date) => 
+                      date < new Date() ||
+                      date.getDay() === 0 ||
+                      date.getDay() === 6
+                    }
+                    initialFocus
+                    classNames={{
+                      months: "w-full",
+                      month: "w-full",
+                      table: "w-full",
+                      head_row: "w-full flex justify-between",
+                      row: "w-full flex justify-between",
+                      cell: "flex-1 text-center",
+                      day: "w-full aspect-square flex items-center justify-center"
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div className="w-full max-w-[400px]">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Session Details</CardTitle>
+                    <CardDescription>Please fill in the details for your mentorship session</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="grid gap-4">
+                      <div className="grid gap-2">
+                        <label htmlFor="selected-date" className="text-sm font-medium">Selected Date</label>
+                        <input 
+                          id="selected-date"
+                          type="text"
+                          value={date?.toLocaleDateString()}
+                          disabled
+                          className="flex h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm"
+                        />
+                      </div>
+
+                      <div className="grid gap-2">
+                        <label htmlFor="session-type" className="text-sm font-medium">Session Type</label>
+                        <Select onValueChange={setSelectedType}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select session type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="technical">Technical Discussion</SelectItem>
+                            <SelectItem value="career">Career Guidance</SelectItem>
+                            <SelectItem value="project">Project Review</SelectItem>
+                            <SelectItem value="general">General Mentorship</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="grid gap-2">
+                        <label htmlFor="session-time" className="text-sm font-medium">Preferred Time</label>
+                        <Select onValueChange={setSelectedType}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select time slot" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="9:00 AM">9:00 AM</SelectItem>
+                            <SelectItem value="10:00 AM">10:00 AM</SelectItem>
+                            <SelectItem value="11:00 AM">11:00 AM</SelectItem>
+                            <SelectItem value="1:00 PM">1:00 PM</SelectItem>
+                            <SelectItem value="2:00 PM">2:00 PM</SelectItem>
+                            <SelectItem value="3:00 PM">3:00 PM</SelectItem>
+                            <SelectItem value="4:00 PM">4:00 PM</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="grid gap-2">
+                        <label htmlFor="session-description" className="text-sm font-medium">Session Goals</label>
+                        <textarea
+                          id="session-description"
+                          className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                          placeholder="What would you like to achieve in this session?"
+                        />
+                      </div>
+
+                      {/* <Button className="w-full mt-4">
+                        Schedule Session
+                      </Button> */}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   };
