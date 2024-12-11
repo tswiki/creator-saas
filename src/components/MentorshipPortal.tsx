@@ -59,10 +59,19 @@ import {
   Linkedin,
   Star,
   Twitter,
-  Hash
+  Hash,
+  Moon,
+  Sun,
+  LogOut
 } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import { Input } from './ui/input';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Label } from '@radix-ui/react-dropdown-menu';
+import { Switch } from '@/components/ui/switch';
+import { useTheme } from 'next-themes';
+import { toast } from '@/hooks/use-toast';
+import { Form, useForm } from 'react-hook-form';
+import { FormField, FormItem, FormLabel, FormControl } from './ui/form';
 
 
 export function HeroVideoDialogDemoTopInBottomOut() {
@@ -101,6 +110,10 @@ export default function MentorshipPortal() {
       goal: ""
     });
 
+    function setTheme(arg0: string): void {
+      throw new Error('Function not implemented.');
+    }
+
     return (
       <div className="h-screen min-h-full w-64 flex flex-col p-4 border-r fixed">
         <div className="font-bold text-2xl mb-6">Mentorship Portal</div>
@@ -127,6 +140,32 @@ export default function MentorshipPortal() {
             Resources
           </Button>
         </div>
+
+        <div className="flex items-center justify-center w-full border-t pt-4 pb-4">
+          <div className="flex items-center justify-center space-x-2 my-auto">
+            <div className="flex items-center justify-center gap-2">
+              <Sun className={`h-[1.2rem] w-[1.2rem] transition-opacity ${localStorage.getItem('theme') === 'dark' ? 'opacity-50' : 'text-yellow-500'}`} />
+            </div>
+            <Switch 
+              id="theme-mode"
+              checked={localStorage.getItem('theme') === 'dark'}
+              onCheckedChange={(checked) => {
+                const newTheme = checked ? 'dark' : 'light';
+                localStorage.setItem('theme', newTheme);
+                document.documentElement.classList.toggle('dark', checked);
+                toast({
+                  title: "Theme Changed",
+                  description: `Switched to ${newTheme} mode`
+                });
+              }}
+              className="my-auto data-[state=checked]:bg-slate-800 data-[state=unchecked]:bg-yellow-500"
+            />
+            <div className="flex items-center justify-center gap-2">
+              <Moon className={`h-[1.2rem] w-[1.2rem] transition-opacity ${localStorage.getItem('theme') === 'dark' ? 'text-slate-200' : 'opacity-50'}`} />
+            </div>
+          </div>
+        </div>
+
 
         <Dialog open={showProfileDialog} onOpenChange={setShowProfileDialog}>
           <DialogTrigger asChild>
@@ -186,7 +225,18 @@ export default function MentorshipPortal() {
                 />
               </div>
             </div>
-            <DialogFooter>
+            <DialogFooter className="flex justify-between items-center">
+              <Button 
+                variant="destructive"
+                onClick={() => {
+                  localStorage.clear();
+                  window.location.href = '/login';
+                }}
+                className="flex items-center gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </Button>
               <Button onClick={() => setShowProfileDialog(false)}>Save changes</Button>
             </DialogFooter>
           </DialogContent>
