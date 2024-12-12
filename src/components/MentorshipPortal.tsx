@@ -96,6 +96,7 @@ export function HeroVideoDialogDemoTopInBottomOut() {
 }
 
 export default function MentorshipPortal() {
+
   const [mobileOpen, setMobileOpen] = useState(false);
   const [currentView, setCurrentView] = useState('dashboard');
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -105,142 +106,139 @@ export default function MentorshipPortal() {
     const [profileData, setProfileData] = useState({
       username: auth.currentUser?.email || "johndoe@example.com",
       bio: "",
-      niche: "",
+      niche: "", 
       mrr: "",
       goal: ""
     });
-
-    function setTheme(arg0: string): void {
-      throw new Error('Function not implemented.');
-    }
+    const { theme, setTheme } = useTheme();
 
     return (
-      <div className="h-screen min-h-full w-64 flex flex-col p-4 border-r fixed">
-        <div className="font-bold text-2xl mb-6">Mentorship Portal</div>
-        
-        <div className="flex flex-col gap-3 flex-1">
-          <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('dashboard')}>
-            <Hash className="mr-2 h-4 w-4" />
-            Spaces
-          </Button>
-          <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('mentor')}>
-            <Users className="mr-2 h-4 w-4" />
-            My Mentor
-          </Button>
-          <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('schedule')}>
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            Schedule
-          </Button>
-          <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('messages')}>
-            <MessageSquare className="mr-2 h-4 w-4" />
-            Messages
-          </Button>
-          <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('resources')}>
-            <BookOpen className="mr-2 h-4 w-4" />
-            Resources
-          </Button>
-        </div>
+      <div className="mt-16 fixed top-0 left-0 bottom-0 w-64"> {/* Fixed position with full height */}
+        <div className="h-full flex flex-col p-4 border-r bg-background"> {/* Added bg-background to ensure content isn't see-through */}
+          {/* <div className="font-bold text-xl mb-6">Mentorship Portal</div> */}
+          
+          <div className="flex flex-col gap-3 flex-1">
+            <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('dashboard')}>
+              <Hash className="mr-2 h-4 w-4" />
+              Spaces
+            </Button>
+            <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('mentor')}>
+              <Users className="mr-2 h-4 w-4" />
+              My Mentor
+            </Button>
+            <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('schedule')}>
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              Schedule
+            </Button>
+            <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('messages')}>
+              <MessageSquare className="mr-2 h-4 w-4" />
+              Messages
+            </Button>
+            <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('resources')}>
+              <BookOpen className="mr-2 h-4 w-4" />
+              Resources
+            </Button>
+          </div>
 
-        <div className="flex items-center justify-center w-full border-t pt-4 pb-4">
-          <div className="flex items-center justify-center space-x-2 my-auto">
-            <div className="flex items-center justify-center gap-2">
-              <Sun className={`h-[1.2rem] w-[1.2rem] transition-opacity ${localStorage.getItem('theme') === 'dark' ? 'opacity-50' : 'text-yellow-500'}`} />
-            </div>
-            <Switch 
-              id="theme-mode"
-              checked={localStorage.getItem('theme') === 'dark'}
-              onCheckedChange={(checked) => {
-                const newTheme = checked ? 'dark' : 'light';
-                localStorage.setItem('theme', newTheme);
-                document.documentElement.classList.toggle('dark', checked);
-                toast({
-                  title: "Theme Changed",
-                  description: `Switched to ${newTheme} mode`
-                });
-              }}
-              className="my-auto data-[state=checked]:bg-slate-800 data-[state=unchecked]:bg-yellow-500"
-            />
-            <div className="flex items-center justify-center gap-2">
-              <Moon className={`h-[1.2rem] w-[1.2rem] transition-opacity ${localStorage.getItem('theme') === 'dark' ? 'text-slate-200' : 'opacity-50'}`} />
+          <div className="flex items-center justify-center w-full border-t pt-3 pb-3">
+            <div className="flex items-center justify-center space-x-2">
+              <div className="flex items-center justify-center gap-2">
+                <Sun className={`h-4 w-4 transition-opacity ${theme === 'dark' ? 'opacity-50' : 'text-yellow-500'}`} />
+              </div>
+              <Switch 
+                id="theme-mode"
+                checked={theme === 'dark'}
+                onCheckedChange={(checked) => {
+                  const newTheme = checked ? 'dark' : 'light';
+                  setTheme(newTheme);
+                  toast({
+                    title: "Theme Changed",
+                    description: `Switched to ${newTheme} mode`
+                  });
+                }}
+                className="data-[state=checked]:bg-slate-800 data-[state=unchecked]:bg-yellow-500"
+              />
+              <div className="flex items-center justify-center gap-2">
+                <Moon className={`h-4 w-4 transition-opacity ${theme === 'dark' ? 'text-slate-200' : 'opacity-50'}`} />
+              </div>
             </div>
           </div>
-        </div>
 
-
-        <Dialog open={showProfileDialog} onOpenChange={setShowProfileDialog}>
-          <DialogTrigger asChild>
-            <Button variant="ghost" className="justify-between w-full mt-auto border-t pt-4">
-              <div className="flex items-center gap-2">
-                <User className="h-4 w-4" />
-                <span className="text-sm text-muted-foreground">{profileData.username}</span>
-              </div>
-              <Settings className="h-4 w-4" />
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Edit Profile</DialogTitle>
-              <DialogDescription>
-                Update your profile information below
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <label htmlFor="username">Username</label>
-                <input
-                  id="username"
-                  value={profileData.username}
-                  onChange={(e) => setProfileData({...profileData, username: e.target.value})}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                />
-              </div>
-              <div className="grid gap-2">
-                <label htmlFor="bio">Bio</label>
-                <textarea
-                  id="bio"
-                  value={profileData.bio}
-                  onChange={(e) => setProfileData({...profileData, bio: e.target.value})}
-                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  placeholder="Tell us about yourself..."
-                />
-              </div>
-              <div className="grid gap-2">
-                <label htmlFor="niche">Niche</label>
-                <input
-                  id="niche"
-                  value={profileData.niche}
-                  onChange={(e) => setProfileData({...profileData, niche: e.target.value})}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  placeholder="Your area of expertise"
-                />
-              </div>
-              <div className="grid gap-2">
-                <label htmlFor="goal">Goal</label>
-                <input
-                  id="goal"
-                  value={profileData.goal}
-                  onChange={(e) => setProfileData({...profileData, goal: e.target.value})}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  placeholder="What's your main goal?"
-                />
-              </div>
-            </div>
-            <DialogFooter className="flex justify-between items-center">
-              <Button 
-                variant="destructive"
-                onClick={() => {
-                  localStorage.clear();
-                  window.location.href = '/login';
-                }}
-                className="flex items-center gap-2"
-              >
-                <LogOut className="h-4 w-4" />
-                Logout
+          <Dialog open={showProfileDialog} onOpenChange={setShowProfileDialog}>
+            <DialogTrigger asChild>
+              <Button variant="ghost" className="justify-between w-full mt-2 border-t pt-3">
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  <span className="text-sm text-muted-foreground">{profileData.username}</span>
+                </div>
+                <Settings className="h-4 w-4" />
               </Button>
-              <Button onClick={() => setShowProfileDialog(false)}>Save changes</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent className="max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Edit Profile</DialogTitle>
+                <DialogDescription>
+                  Update your profile information below
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-3 py-3">
+                <div className="grid gap-2">
+                  <label htmlFor="username">Username</label>
+                  <input
+                    id="username"
+                    value={profileData.username}
+                    onChange={(e) => setProfileData({...profileData, username: e.target.value})}
+                    className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <label htmlFor="bio">Bio</label>
+                  <textarea
+                    id="bio"
+                    value={profileData.bio}
+                    onChange={(e) => setProfileData({...profileData, bio: e.target.value})}
+                    className="flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+                    placeholder="Tell us about yourself..."
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <label htmlFor="niche">Niche</label>
+                  <input
+                    id="niche"
+                    value={profileData.niche}
+                    onChange={(e) => setProfileData({...profileData, niche: e.target.value})}
+                    className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+                    placeholder="Your area of expertise"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <label htmlFor="goal">Goal</label>
+                  <input
+                    id="goal"
+                    value={profileData.goal}
+                    onChange={(e) => setProfileData({...profileData, goal: e.target.value})}
+                    className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+                    placeholder="What's your main goal?"
+                  />
+                </div>
+              </div>
+              <DialogFooter className="flex justify-between items-center">
+                <Button 
+                  variant="destructive"
+                  onClick={() => {
+                    localStorage.clear();
+                    window.location.href = '/login';
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </Button>
+                <Button onClick={() => setShowProfileDialog(false)}>Save changes</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
     );
   };
@@ -248,6 +246,7 @@ export default function MentorshipPortal() {
   const ScheduleView = () => {
     const [date, setDate] = useState<Date | undefined>(new Date());
     const [selectedType, setSelectedType] = useState<string>('');
+    
     const [showSessionDetailsDialog, setShowSessionDetailsDialog] = useState(false);
     const [showScheduleDialog, setShowScheduleDialog] = useState(false);
     const [selectedSession, setSelectedSession] = useState<any>(null);
@@ -255,7 +254,7 @@ export default function MentorshipPortal() {
     const [filterBy, setFilterBy] = useState('all');
 
     return (
-    <div className="space-y-6">
+    <div className="space-y-6 pt-10">
       <Card>
         <CardHeader>
           <CardTitle>Mentorship Dashboard</CardTitle>
@@ -986,6 +985,7 @@ export default function MentorshipPortal() {
 
 
   const ResourcesView = () => {
+
     const [showAddDialog, setShowAddDialog] = useState(false);
     const [newResource, setNewResource] = useState({
       title: '',
@@ -996,7 +996,7 @@ export default function MentorshipPortal() {
     });
 
     return (
-      <div className="space-y-6">
+    <div className="space-y-6 pt-10">
         <Card>
           <CardHeader>
             <div className="flex justify-between items-center">
@@ -1262,7 +1262,7 @@ export default function MentorshipPortal() {
   };
 
   const CourseView = () => (
-    <div className="space-y-6">
+    <div className="space-y-6 pt-10">
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
@@ -1557,6 +1557,7 @@ export default function MentorshipPortal() {
 
 
   const MessagesView = () => {
+    
     const [isCallModalOpen, setIsCallModalOpen] = useState(false);
     const [isVideoEnabled, setIsVideoEnabled] = useState(true);
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
@@ -1659,7 +1660,8 @@ export default function MentorshipPortal() {
     }, []);
 
     return (
-      <div className="flex h-[calc(100vh-4rem)] gap-6">
+
+      <div className="flex h-[calc(100vh-4rem)] gap-6 pt-12">
         {/* Left Card - Chats List */}
         <Card className="w-1/3">
           <CardHeader className="flex flex-row items-center justify-between">
@@ -1999,7 +2001,7 @@ export default function MentorshipPortal() {
     ];
 
     return (
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-6 pt-10">
         <Card>
           <CardHeader>
             <CardTitle>My Mentors</CardTitle>
@@ -2353,7 +2355,7 @@ export default function MentorshipPortal() {
     };
 
     return (
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-6 pt-10">
         <Card>
           <CardContent className="pt-6">
             <div className="flex justify-between items-center">

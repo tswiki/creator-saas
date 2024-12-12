@@ -1,7 +1,7 @@
-
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import React from 'react'
+import Header from '@/components/ui/header'
 
 export default async function CohortLayout({
   children,
@@ -15,5 +15,12 @@ export default async function CohortLayout({
     redirect('/login')
   }
 
-  return <>{children}</>
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-1">
+        {children}
+      </main>
+    </div>
+  )
 }
