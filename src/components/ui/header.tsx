@@ -1,21 +1,64 @@
 'use client';
 
 import Link from 'next/link';
-import { UserCircle, BellRing, Menu, X } from 'lucide-react';
+import { UserCircle, BellRing, Menu, X, Calendar, Users, MessageSquare, Search } from 'lucide-react';
 import { useState } from 'react';
 import Profile from '@/components/ui/profile'
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './dialog';
+import { Button } from './button';
+import { ScrollArea } from './scroll-area';
+import {
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+} from "./command";
 
 interface HeaderProps {
   logoSrc?: string;
   brandName?: string;
 }
 
-export default function Header({ logoSrc, brandName = "" }: HeaderProps) {
-
+export default function Header({ logoSrc, brandName = "ACME.COM" }: HeaderProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const { theme } = useTheme();
+
+  const upcomingEvents = [
+    {
+      title: "Community Meetup",
+      date: "Next Tuesday, 6:00 PM",
+      description: "Join us for our monthly community gathering to network and share ideas"
+    },
+    {
+      title: "Workshop: Advanced React Patterns",
+      date: "This Saturday, 2:00 PM",
+      description: "Learn advanced React patterns and best practices from industry experts"
+    },
+    {
+      title: "Hackathon 2024",
+      date: "March 15-17",
+      description: "48-hour coding challenge with amazing prizes"
+    }
+  ];
+
+  const communityUpdates = [
+    {
+      title: "New Learning Resources Added",
+      description: "Check out our new tutorials on TypeScript and Next.js",
+      time: "2 hours ago"
+    },
+    {
+      title: "Mentorship Program Launch",
+      description: "Applications now open for our Spring 2024 mentorship cohort",
+      time: "1 day ago"
+    }
+  ];
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 border-b dark:bg-slate-900/95 backdrop-blur-sm transition-colors duration-200">
@@ -34,52 +77,125 @@ export default function Header({ logoSrc, brandName = "" }: HeaderProps) {
             <span className="text-xl font-bold text-indigo-600">{brandName}</span>
           </div>
 
-          {/* Center - Navigation */}
-          <nav className="hidden md:flex space-x-8">
-            <Link
-              href="/dashboard"
-              className="text-sm font-medium text-foreground hover:text-indigo-600 dark:text-slate-200"
+          {/* Center - Command Menu */}
+          <div className="hidden md:flex items-center">
+            <Button
+              variant="outline"
+              className="relative w-full justify-start text-sm text-muted-foreground sm:pr-12 md:w-80 lg:w-96"
+              onClick={() => setOpen(true)}
             >
-              Dashboard
-            </Link>
-            <Link
-              href="/cohort"
-              className="text-sm font-medium text-foreground hover:text-indigo-600 dark:text-slate-200"
-            >
-              Cohort
-            </Link>
-            <Link
-              href="/crm"
-              className="text-sm font-medium text-foreground hover:text-indigo-600 dark:text-slate-200"
-            >
-              CRM
-            </Link>
-            <Link
-              href="/product"
-              className="text-sm font-medium text-foreground hover:text-indigo-600 dark:text-slate-200"
-            >
-              Product
-            </Link>
-            <Link
-              href="/store"
-              className="text-sm font-medium text-foreground hover:text-indigo-600 dark:text-slate-200"
-            >
-              Store
-            </Link>
-            <Link
-              href="/chat"
-              className="text-sm font-medium text-foreground hover:text-indigo-600 dark:text-slate-200"
-            >
-              Chat
-            </Link>
-          </nav>
+              <span className="hidden lg:inline-flex">Search commands...</span>
+              <span className="inline-flex lg:hidden">Search...</span>
+              <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+                <span className="text-xs">⌘</span>K
+              </kbd>
+            </Button>
+            <CommandDialog open={open} onOpenChange={setOpen}>
+              <CommandInput placeholder="Type a command or search..." />
+              <CommandList>
+                <CommandEmpty>No results found.</CommandEmpty>
+                <CommandGroup heading="Navigation">
+                  <CommandItem onSelect={() => window.location.href = '/dashboard'}>
+                    Dashboard
+                  </CommandItem>
+                  <CommandItem onSelect={() => window.location.href = '/cohort'}>
+                    Cohort
+                  </CommandItem>
+                  <CommandItem onSelect={() => window.location.href = '/crm'}>
+                    CRM
+                  </CommandItem>
+                  <CommandItem onSelect={() => window.location.href = '/product'}>
+                    Product
+                  </CommandItem>
+                  <CommandItem onSelect={() => window.location.href = '/store'}>
+                    Store
+                  </CommandItem>
+                  <CommandItem onSelect={() => window.location.href = '/chat'}>
+                    Chat
+                  </CommandItem>
+                </CommandGroup>
+                <CommandSeparator />
+                <CommandGroup heading="Quick Actions">
+                  <CommandItem>Create New Post</CommandItem>
+                  <CommandItem>Start Discussion</CommandItem>
+                  <CommandItem>View Calendar</CommandItem>
+                  <CommandItem>Search Members</CommandItem>
+                </CommandGroup>
+              </CommandList>
+            </CommandDialog>
+          </div>
 
-          {/* Right side - User profile */}
+          {/* Right side - Features */}
           <div className="flex items-center space-x-4">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Calendar className="h-5 w-5" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Upcoming Events</DialogTitle>
+                </DialogHeader>
+                <ScrollArea className="h-[400px] pr-4">
+                  <div className="space-y-4">
+                    {upcomingEvents.map((event, i) => (
+                      <div key={i} className="p-4 rounded-lg border">
+                        <h3 className="font-semibold">{event.title}</h3>
+                        <p className="text-sm text-muted-foreground mt-1">{event.date}</p>
+                        <p className="text-sm mt-2">{event.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Users className="h-5 w-5" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Community Updates</DialogTitle>
+                </DialogHeader>
+                <ScrollArea className="h-[400px] pr-4">
+                  <div className="space-y-4">
+                    {communityUpdates.map((update, i) => (
+                      <div key={i} className="p-4 rounded-lg border">
+                        <h3 className="font-semibold">{update.title}</h3>
+                        <p className="text-sm mt-2">{update.description}</p>
+                        <p className="text-xs text-muted-foreground mt-2">{update.time}</p>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <MessageSquare className="h-5 w-5" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Quick Actions</DialogTitle>
+                </DialogHeader>
+                <div className="grid grid-cols-2 gap-4 p-4">
+                  <Button variant="outline" className="w-full">Start Discussion</Button>
+                  <Button variant="outline" className="w-full">Ask Question</Button>
+                  <Button variant="outline" className="w-full">Share Resource</Button>
+                  <Button variant="outline" className="w-full">Give Feedback</Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </div>      
     </header>
   );
 }
-

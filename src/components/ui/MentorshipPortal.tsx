@@ -66,7 +66,8 @@ import {
   Bell,
   BellRing,
   MoreVertical,
-  Plus
+  Plus,
+  Mail
 } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
@@ -76,6 +77,7 @@ import { useTheme } from 'next-themes';
 import { toast } from '@/hooks/use-toast';
 import { Form, useForm } from 'react-hook-form';
 import { FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
+import { Textarea } from './textarea';
 
 
 export function HeroVideoDialogDemoTopInBottomOut() {
@@ -2115,89 +2117,91 @@ export default function MentorshipPortal() {
                   <DialogDescription>{selectedMentor.title} at {selectedMentor.company}</DialogDescription>
                 </DialogHeader>
 
-                <div className="mt-6">
-                  <table className="w-full border-collapse">
-                    <tbody>
-                      <tr className="border-b">
-                        <td className="py-4 font-medium">Rating</td>
-                        <td className="py-4 flex items-center gap-2">
-                          <Star className="h-4 w-4 fill-yellow-400 stroke-yellow-400" />
-                          {selectedMentor.rating} ({selectedMentor.totalSessions} sessions)
-                        </td>
-                      </tr>
-                      <tr className="border-b">
-                        <td className="py-4 font-medium">Availability</td>
-                        <td className="py-4">{selectedMentor.availability}</td>
-                      </tr>
-                      <tr className="border-b">
-                        <td className="py-4 font-medium">Expertise</td>
-                        <td className="py-4">
-                          <div className="flex flex-wrap gap-2">
-                            {selectedMentor.expertise.map((skill, i) => (
-                              <Badge key={i} variant="secondary">{skill}</Badge>
-                            ))}
-                          </div>
-                        </td>
-                      </tr>
-                      <tr className="border-b">
-                        <td className="py-4 font-medium">Bio</td>
-                        <td className="py-4">{selectedMentor.bio}</td>
-                      </tr>
-                      <tr className="border-b">
-                        <td className="py-4 font-medium">Social Links</td>
-                        <td className="py-4">
-                          <div className="flex gap-4">
-                            <Link href={selectedMentor.socials.linkedin} className="text-muted-foreground hover:text-primary">
-                              <Linkedin className="h-5 w-5" />
-                            </Link>
-                            <Link href={selectedMentor.socials.twitter} className="text-muted-foreground hover:text-primary">
-                              <Twitter className="h-5 w-5" />
-                            </Link>
-                            <Link href={selectedMentor.socials.github} className="text-muted-foreground hover:text-primary">
-                              <Github className="h-5 w-5" />
-                            </Link>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="py-4 font-medium">Upcoming Sessions</td>
-                        <td className="py-4">
-                          <Select>
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Select a session" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {selectedMentor.upcomingSessions.map((session, i) => (
-                                <SelectItem key={i} value={`session-${i}`}>
-                                  <div className="flex justify-between items-center w-full gap-4">
-                                    <div>
-                                      <div className="font-medium">{session.topic}</div>
-                                      <div className="text-sm text-muted-foreground">
-                                        {session.date} at {session.time}
+                <Card className="mt-6">
+                  <CardContent className="pt-6">
+                    <table className="w-full border-collapse">
+                      <tbody>
+                        <tr className="border-b">
+                          <td className="py-4 font-medium">Rating</td>
+                          <td className="py-4 flex items-center gap-2">
+                            <Star className="h-4 w-4 fill-yellow-400 stroke-yellow-400" />
+                            {selectedMentor.rating} ({selectedMentor.totalSessions} sessions)
+                          </td>
+                        </tr>
+                        <tr className="border-b">
+                          <td className="py-4 font-medium">Availability</td>
+                          <td className="py-4">{selectedMentor.availability}</td>
+                        </tr>
+                        <tr className="border-b">
+                          <td className="py-4 font-medium">Expertise</td>
+                          <td className="py-4">
+                            <div className="flex flex-wrap gap-2">
+                              {selectedMentor.expertise.map((skill, i) => (
+                                <Badge key={i} variant="secondary">{skill}</Badge>
+                              ))}
+                            </div>
+                          </td>
+                        </tr>
+                        <tr className="border-b">
+                          <td className="py-4 font-medium">Bio</td>
+                          <td className="py-4">{selectedMentor.bio}</td>
+                        </tr>
+                        <tr className="border-b">
+                          <td className="py-4 font-medium">Social Links</td>
+                          <td className="py-4">
+                            <div className="flex gap-4">
+                              <Link href={selectedMentor.socials.linkedin} className="text-muted-foreground hover:text-primary">
+                                <Linkedin className="h-5 w-5" />
+                              </Link>
+                              <Link href={selectedMentor.socials.twitter} className="text-muted-foreground hover:text-primary">
+                                <Twitter className="h-5 w-5" />
+                              </Link>
+                              <Link href={selectedMentor.socials.github} className="text-muted-foreground hover:text-primary">
+                                <Github className="h-5 w-5" />
+                              </Link>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="py-4 font-medium">Upcoming Sessions</td>
+                          <td className="py-4">
+                            <Select>
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select a session" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {selectedMentor.upcomingSessions.map((session, i) => (
+                                  <SelectItem key={i} value={`session-${i}`}>
+                                    <div className="flex justify-between items-center w-full gap-4">
+                                      <div>
+                                        <div className="font-medium">{session.topic}</div>
+                                        <div className="text-sm text-muted-foreground">
+                                          {session.date} at {session.time}
+                                        </div>
                                       </div>
                                     </div>
-                                  </div>
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <div className="mt-4">
-                            <Button 
-                              variant="outline" 
-                              className="w-full"
-                              onClick={() => {
-                                setShowMentorDialog(false);
-                                setShowScheduleDialog(true);
-                              }}
-                            >
-                              Join Selected Session
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <div className="mt-4">
+                              <Button 
+                                variant="outline" 
+                                className="w-full"
+                                onClick={() => {
+                                  setShowMentorDialog(false);
+                                  setShowScheduleDialog(true);
+                                }}
+                              >
+                                Join Selected Session
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </CardContent>
+                </Card>
               </>
             )}
           </DialogContent>
@@ -2438,80 +2442,118 @@ export default function MentorshipPortal() {
                 Stay updated with the latest announcements and notifications
               </CardDescription>
             </div>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  className="relative group hover:bg-accent transition-colors p-3 lg:p-4"
-                >
-                  <BellRing className="h-8 w-8 lg:h-10 lg:w-10 xl:h-12 xl:w-12 transition-transform group-hover:scale-110" />
-                  <span className="absolute -top-2 -right-2 h-6 w-6 lg:h-7 lg:w-7 xl:h-8 xl:w-8 rounded-full bg-red-500 text-xs lg:text-sm font-medium text-white flex items-center justify-center transition-transform group-hover:scale-110">
-                    3
-                  </span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="w-[95vw] max-w-3xl h-[90vh] max-h-[800px] flex flex-col">
-                <DialogHeader className="p-4 lg:p-6">
-                  <DialogTitle className="text-l lg:text-2xl flex items-center gap-3">
-                    <BellRing className="h-6 w-6 lg:h-8 lg:w-8" />
-                    Notifications
-                  </DialogTitle>
-                </DialogHeader>
-                <ScrollArea className="flex-grow px-4 lg:px-6">
-                  <div className="space-y-4 lg:space-y-5 pb-4 lg:pb-6">
-                    {[
-                      {
-                        title: "New Feature Released",
-                        description: "Check out our new video conferencing capabilities! We've added support for screen sharing, HD video, and up to 50 participants.",
-                        time: "2 hours ago",
-                        priority: "high"
-                      },
-                      {
-                        title: "System Maintenance",
-                        description: "Scheduled maintenance this weekend. The platform will be unavailable from Saturday 2 AM to 4 AM EST.",
-                        time: "5 hours ago",
-                        priority: "medium"
-                      },
-                      {
-                        title: "New Mentor Joined",
-                        description: "Welcome Sarah Johnson to our mentorship program! Sarah is an expert in cloud architecture with 15 years of experience.",
-                        time: "1 day ago",
-                        priority: "normal"
-                      }
-                    ].map((notification, index) => (
-                      <div
-                        key={index}
-                        className="flex items-start gap-4 lg:gap-5 rounded-lg border p-4 lg:p-5 transition-all hover:bg-accent/50 animate-in slide-in-from-right cursor-pointer group"
-                        style={{ 
-                          animationDelay: `${index * 150}ms`,
-                          animationDuration: '400ms'
-                        }}
-                      >
-                        <div className={`h-8 w-8 lg:h-10 lg:w-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors
-                          ${notification.priority === 'high' ? 'bg-red-100 text-red-600' : 
-                            notification.priority === 'medium' ? 'bg-yellow-100 text-yellow-600' : 
-                            'bg-blue-100 text-blue-600'}`}>
-                          <Bell className="h-4 w-4 lg:h-5 lg:w-5 transition-transform group-hover:scale-110" />
-                        </div>
-                        <div className="flex-1 space-y-2 min-w-0">
-                          <div className="flex justify-between items-start gap-3">
-                            <p className="font-semibold text-base lg:text-lg leading-tight">
-                              {notification.title}
-                            </p>
-                            <span className="text-xs lg:text-sm text-muted-foreground whitespace-nowrap">
-                              {notification.time}
-                            </span>
-                          </div>
-                          <p className="text-sm lg:text-base text-muted-foreground leading-relaxed">
-                            {notification.description}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
+            <div className="flex gap-3">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button 
+                    variant="ghost"
+                    className="relative group hover:bg-accent transition-colors p-3 lg:p-4"
+                  >
+                    <Mail className="h-8 w-8 lg:h-10 lg:w-10 xl:h-12 xl:w-12 transition-transform group-hover:scale-110" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="w-[95vw] max-w-3xl">
+                  <DialogHeader>
+                    <DialogTitle className="text-l lg:text-2xl flex items-center gap-3">
+                      <Mail className="h-6 w-6 lg:h-8 lg:w-8" />
+                      Send Broadcast Message
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 p-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="subject">Subject</Label>
+                      <Input id="subject" placeholder="Enter message subject..." />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="message">Message</Label>
+                      <Textarea 
+                        id="message" 
+                        placeholder="Type your broadcast message..." 
+                        className="min-h-[200px]"
+                      />
+                    </div>
+                    <DialogFooter>
+                      <Button type="submit">Send to All</Button>
+                    </DialogFooter>
                   </div>
-                </ScrollArea>
-              </DialogContent>
-            </Dialog>
+                </DialogContent>
+              </Dialog>
+
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className="relative group hover:bg-accent transition-colors p-3 lg:p-4"
+                  >
+                    <BellRing className="h-8 w-8 lg:h-10 lg:w-10 xl:h-12 xl:w-12 transition-transform group-hover:scale-110" />
+                    <span className="absolute -top-2 -right-2 h-6 w-6 lg:h-7 lg:w-7 xl:h-8 xl:w-8 rounded-full bg-red-500 text-xs lg:text-sm font-medium text-white flex items-center justify-center transition-transform group-hover:scale-110">
+                      3
+                    </span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="w-[95vw] max-w-3xl h-[90vh] max-h-[800px] flex flex-col">
+                  <DialogHeader className="p-4 lg:p-6">
+                    <DialogTitle className="text-l lg:text-2xl flex items-center gap-3">
+                      <BellRing className="h-6 w-6 lg:h-8 lg:w-8" />
+                      Notifications
+                    </DialogTitle>
+                  </DialogHeader>
+                  <ScrollArea className="flex-grow px-4 lg:px-6">
+                    <div className="space-y-4 lg:space-y-5 pb-4 lg:pb-6">
+                      {[
+                        {
+                          title: "New Feature Released",
+                          description: "Check out our new video conferencing capabilities! We've added support for screen sharing, HD video, and up to 50 participants.",
+                          time: "2 hours ago",
+                          priority: "high"
+                        },
+                        {
+                          title: "System Maintenance",
+                          description: "Scheduled maintenance this weekend. The platform will be unavailable from Saturday 2 AM to 4 AM EST.",
+                          time: "5 hours ago",
+                          priority: "medium"
+                        },
+                        {
+                          title: "New Mentor Joined",
+                          description: "Welcome Sarah Johnson to our mentorship program! Sarah is an expert in cloud architecture with 15 years of experience.",
+                          time: "1 day ago",
+                          priority: "normal"
+                        }
+                      ].map((notification, index) => (
+                        <div
+                          key={index}
+                          className="flex items-start gap-4 lg:gap-5 rounded-lg border p-4 lg:p-5 transition-all hover:bg-accent/50 animate-in slide-in-from-right cursor-pointer group"
+                          style={{ 
+                            animationDelay: `${index * 150}ms`,
+                            animationDuration: '400ms'
+                          }}
+                        >
+                          <div className={`h-8 w-8 lg:h-10 lg:w-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors
+                            ${notification.priority === 'high' ? 'bg-red-100 text-red-600' : 
+                              notification.priority === 'medium' ? 'bg-yellow-100 text-yellow-600' : 
+                              'bg-blue-100 text-blue-600'}`}>
+                            <Bell className="h-4 w-4 lg:h-5 lg:w-5 transition-transform group-hover:scale-110" />
+                          </div>
+                          <div className="flex-1 space-y-2 min-w-0">
+                            <div className="flex justify-between items-start gap-3">
+                              <p className="font-semibold text-base lg:text-lg leading-tight">
+                                {notification.title}
+                              </p>
+                              <span className="text-xs lg:text-sm text-muted-foreground whitespace-nowrap">
+                                {notification.time}
+                              </span>
+                            </div>
+                            <p className="text-sm lg:text-base text-muted-foreground leading-relaxed">
+                              {notification.description}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </DialogContent>
+              </Dialog>
+            </div>
           </CardHeader>
         </Card>
 
