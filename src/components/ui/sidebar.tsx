@@ -70,7 +70,7 @@ import { Switch } from '@/components/ui/switch';
 import { useTheme } from 'next-themes';
 import { toast } from '@/hooks/use-toast';
 import { Form, useForm } from 'react-hook-form';
-import { FormField, FormItem, FormLabel, FormControl } from './ui/form';
+import { FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
 
 
 const Sidebar = () => {
@@ -86,6 +86,10 @@ const Sidebar = () => {
     function setTheme(arg0: string): void {
       throw new Error('Function not implemented.');
     }
+
+  function setCurrentView(arg0: string): void {
+    throw new Error('Function not implemented.');
+  }
 
     return (
       <div className="h-screen min-h-full w-64 flex flex-col p-4 border-r fixed">

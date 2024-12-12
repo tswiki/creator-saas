@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import HeroVideoDialog from "@/components/ui/hero-video-dialog";
-import { auth } from '../firebase/firebaseConfig';
+import { auth } from '@/firebase/firebaseConfig';
 import {
   Dialog,
   DialogContent,
@@ -62,16 +62,20 @@ import {
   Hash,
   Moon,
   Sun,
-  LogOut
+  LogOut,
+  Bell,
+  BellRing,
+  MoreVertical,
+  Plus
 } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
-import { Input } from './ui/input';
+import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Label } from '@radix-ui/react-dropdown-menu';
 import { Switch } from '@/components/ui/switch';
 import { useTheme } from 'next-themes';
 import { toast } from '@/hooks/use-toast';
 import { Form, useForm } from 'react-hook-form';
-import { FormField, FormItem, FormLabel, FormControl } from './ui/form';
+import { FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
 
 
 export function HeroVideoDialogDemoTopInBottomOut() {
@@ -2319,19 +2323,69 @@ export default function MentorshipPortal() {
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
     const [isVideoEnabled, setIsVideoEnabled] = useState(true);
     const [isScreenSharing, setIsScreenSharing] = useState(false);
+    const [showEventsDialog, setShowEventsDialog] = useState(false);
+    const [showVideoDialog, setShowVideoDialog] = useState(false);
+    const [showChatDialog, setShowChatDialog] = useState(false);
+    const [showNewChannelDialog, setShowNewChannelDialog] = useState(false);
+    const [showUserProfileDialog, setShowUserProfileDialog] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<any>(null);
+    const [newChannelName, setNewChannelName] = useState('');
+    const [messages, setMessages] = useState<any[]>([
+      {
+        id: 1,
+        user: "Sarah Johnson",
+        message: "Hey everyone! Who's working on the new React project?",
+        timestamp: "10:30 AM"
+      },
+      {
+        id: 2,
+        user: "Mike Chen",
+        message: "I am! Having some issues with hooks though.",
+        timestamp: "10:32 AM"
+      }
+    ]);
 
-    const channels = [
+    const [channels, setChannels] = useState([
       { id: 'general', name: 'General' },
       { id: 'study-room', name: 'Study Room' },
       { id: 'coding-help', name: 'Coding Help' },
       { id: 'career-advice', name: 'Career Advice' }
-    ];
+    ]);
 
     const onlineUsers = [
-      { id: 1, name: 'Sarah Johnson', status: 'online' },
-      { id: 2, name: 'Mike Chen', status: 'in-call' },
-      { id: 3, name: 'Emma Wilson', status: 'idle' }
+      { 
+        id: 1, 
+        name: 'Sarah Johnson', 
+        status: 'online',
+        role: 'Senior Developer',
+        bio: 'Full-stack developer with 5 years of experience'
+      },
+      { 
+        id: 2, 
+        name: 'Mike Chen', 
+        status: 'in-call',
+        role: 'UX Designer',
+        bio: 'Passionate about creating intuitive user experiences'
+      },
+      { 
+        id: 3, 
+        name: 'Emma Wilson', 
+        status: 'idle',
+        role: 'Product Manager',
+        bio: 'Helping teams build amazing products'
+      }
     ];
+
+    const createNewChannel = () => {
+      if (newChannelName.trim()) {
+        setChannels([
+          ...channels,
+          { id: newChannelName.toLowerCase().replace(/\s+/g, '-'), name: newChannelName }
+        ]);
+        setNewChannelName('');
+        setShowNewChannelDialog(false);
+      }
+    };
 
     const startCall = async () => {
       try {
@@ -2341,6 +2395,7 @@ export default function MentorshipPortal() {
         });
         setLocalStreamRef(stream);
         setIsCallActive(true);
+        setShowVideoDialog(true);
       } catch (error) {
         console.error('Error accessing media devices:', error);
       }
@@ -2352,143 +2407,380 @@ export default function MentorshipPortal() {
         setLocalStreamRef(null);
       }
       setIsCallActive(false);
+      setShowVideoDialog(false);
+      setIsScreenSharing(false);
+    };
+
+    const toggleScreenShare = async () => {
+      try {
+        if (!isScreenSharing) {
+          const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+          setLocalStreamRef(screenStream);
+          setIsScreenSharing(true);
+        } else {
+          const videoStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+          setLocalStreamRef(videoStream);
+          setIsScreenSharing(false);
+        }
+      } catch (error) {
+        console.error('Error toggling screen share:', error);
+      }
     };
 
     return (
       <div className="max-w-7xl mx-auto space-y-6 pt-10">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="text-2xl font-bold">Community Space</h2>
-                <p className="text-muted-foreground">Connect with fellow learners</p>
-              </div>
+
+        <Card className="w-full transition-all">
+          <CardHeader className="flex flex-row items-center justify-between p-4 lg:p-8">
+            <div className="flex-1">
+              <CardTitle className="text-xl lg:text-2xl xl:text-3xl">Announcements</CardTitle>
+              <CardDescription className="text-sm lg:text-base mt-2">
+                Stay updated with the latest announcements and notifications
+              </CardDescription>
             </div>
-          </CardContent>
-        </Card>
-
-        <div className="grid md:grid-cols-12 gap-6">
-          {/* Channels Sidebar */}
-          <div className="md:col-span-3 space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Channels</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {channels.map(channel => (
-                    <Button
-                      key={channel.id}
-                      variant={selectedChannel === channel.id ? "default" : "ghost"}
-                      className="w-full justify-start"
-                      onClick={() => setSelectedChannel(channel.id)}
-                    >
-                      <Hash className="h-4 w-4 mr-2" />
-                      {channel.name}
-                    </Button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Online Users</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {onlineUsers.map(user => (
-                    <div key={user.id} className="flex items-center gap-3">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback>{user.name[0]}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">{user.name}</p>
-                        <p className="text-xs text-muted-foreground capitalize">{user.status}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Main Content Area */}
-          <div className="md:col-span-9">
-            <Card className="h-[600px] flex flex-col">
-              <CardHeader className="border-b">
-                <div className="flex justify-between items-center">
-                  <CardTitle className="flex items-center gap-2">
-                    <Hash className="h-5 w-5" />
-                    {channels.find(c => c.id === selectedChannel)?.name}
-                  </CardTitle>
-                  <div className="flex gap-2">
-                    {!isCallActive ? (
-                      <Button onClick={startCall}>
-                        <Video className="h-4 w-4 mr-2" />
-                        Join Voice
-                      </Button>
-                    ) : (
-                      <Button variant="destructive" onClick={stopCall}>
-                        <PhoneOff className="h-4 w-4 mr-2" />
-                        Leave Call
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </CardHeader>
-              
-              <CardContent className="flex-1 overflow-y-auto p-4">
-                {isCallActive && (
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    {localStreamRef && (
-                      <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
-                        <video
-                          ref={video => {
-                            if (video && localStreamRef) {
-                              video.srcObject = localStreamRef;
-                              video.play();
-                            }
-                          }}
-                          muted
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute bottom-2 right-2 flex gap-2">
-                          <Button
-                            size="sm"
-                            variant={isAudioEnabled ? "default" : "secondary"}
-                            onClick={() => setIsAudioEnabled(!isAudioEnabled)}
-                          >
-                            {isAudioEnabled ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant={isVideoEnabled ? "default" : "secondary"}
-                            onClick={() => setIsVideoEnabled(!isVideoEnabled)}
-                          >
-                            {isVideoEnabled ? <Video className="h-4 w-4" /> : <VideoOff className="h-4 w-4" />}
-                          </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  className="relative group hover:bg-accent transition-colors p-3 lg:p-4"
+                >
+                  <BellRing className="h-8 w-8 lg:h-10 lg:w-10 xl:h-12 xl:w-12 transition-transform group-hover:scale-110" />
+                  <span className="absolute -top-2 -right-2 h-6 w-6 lg:h-7 lg:w-7 xl:h-8 xl:w-8 rounded-full bg-red-500 text-xs lg:text-sm font-medium text-white flex items-center justify-center transition-transform group-hover:scale-110">
+                    3
+                  </span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="w-[95vw] max-w-3xl h-[90vh] max-h-[800px] flex flex-col">
+                <DialogHeader className="p-4 lg:p-6">
+                  <DialogTitle className="text-l lg:text-2xl flex items-center gap-3">
+                    <BellRing className="h-6 w-6 lg:h-8 lg:w-8" />
+                    Notifications
+                  </DialogTitle>
+                </DialogHeader>
+                <ScrollArea className="flex-grow px-4 lg:px-6">
+                  <div className="space-y-4 lg:space-y-5 pb-4 lg:pb-6">
+                    {[
+                      {
+                        title: "New Feature Released",
+                        description: "Check out our new video conferencing capabilities! We've added support for screen sharing, HD video, and up to 50 participants.",
+                        time: "2 hours ago",
+                        priority: "high"
+                      },
+                      {
+                        title: "System Maintenance",
+                        description: "Scheduled maintenance this weekend. The platform will be unavailable from Saturday 2 AM to 4 AM EST.",
+                        time: "5 hours ago",
+                        priority: "medium"
+                      },
+                      {
+                        title: "New Mentor Joined",
+                        description: "Welcome Sarah Johnson to our mentorship program! Sarah is an expert in cloud architecture with 15 years of experience.",
+                        time: "1 day ago",
+                        priority: "normal"
+                      }
+                    ].map((notification, index) => (
+                      <div
+                        key={index}
+                        className="flex items-start gap-4 lg:gap-5 rounded-lg border p-4 lg:p-5 transition-all hover:bg-accent/50 animate-in slide-in-from-right cursor-pointer group"
+                        style={{ 
+                          animationDelay: `${index * 150}ms`,
+                          animationDuration: '400ms'
+                        }}
+                      >
+                        <div className={`h-8 w-8 lg:h-10 lg:w-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors
+                          ${notification.priority === 'high' ? 'bg-red-100 text-red-600' : 
+                            notification.priority === 'medium' ? 'bg-yellow-100 text-yellow-600' : 
+                            'bg-blue-100 text-blue-600'}`}>
+                          <Bell className="h-4 w-4 lg:h-5 lg:w-5 transition-transform group-hover:scale-110" />
+                        </div>
+                        <div className="flex-1 space-y-2 min-w-0">
+                          <div className="flex justify-between items-start gap-3">
+                            <p className="font-semibold text-base lg:text-lg leading-tight">
+                              {notification.title}
+                            </p>
+                            <span className="text-xs lg:text-sm text-muted-foreground whitespace-nowrap">
+                              {notification.time}
+                            </span>
+                          </div>
+                          <p className="text-sm lg:text-base text-muted-foreground leading-relaxed">
+                            {notification.description}
+                          </p>
                         </div>
                       </div>
-                    )}
+                    ))}
                   </div>
-                )}
-                
-                {/* Chat messages would go here */}
-                <div className="space-y-4">
-                  {/* Example messages */}
-                </div>
-              </CardContent>
+                </ScrollArea>
+              </DialogContent>
+            </Dialog>
+          </CardHeader>
+        </Card>
 
-              <div className="p-4 border-t">
-                <div className="flex gap-2">
-                  <Input placeholder="Type a message..." />
-                  <Button>Send</Button>
+        <div className="grid grid-cols-2 gap-6">
+          <Card className="h-full">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Channels</CardTitle>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowNewChannelDialog(true)}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {channels.map(channel => (
+                  <Button
+                    key={channel.id}
+                    variant={selectedChannel === channel.id ? "default" : "ghost"}
+                    className="w-full justify-start"
+                    onClick={() => {
+                      setSelectedChannel(channel.id);
+                      setShowChatDialog(true);
+                    }}
+                  >
+                    <Hash className="h-4 w-4 mr-2" />
+                    {channel.name}
+                  </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle>Online Users</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <table className="w-full">
+                <thead>
+                  <tr className="text-left">
+                    <th className="pb-4">User</th>
+                    <th className="pb-4">Status</th>
+                    <th className="pb-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {onlineUsers.map(user => (
+                    <tr key={user.id} className="border-t">
+                      <td className="py-3">
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-8 w-8">
+                            <AvatarFallback>{user.name[0]}</AvatarFallback>
+                          </Avatar>
+                          <p className="text-sm font-medium">{user.name}</p>
+                        </div>
+                      </td>
+                      <td className="py-3">
+                        <p className="text-xs text-muted-foreground capitalize">{user.status}</p>
+                      </td>
+                      <td className="py-3 text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 w-8 p-0"
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setShowUserProfileDialog(true);
+                            }}
+                          >
+                            <User className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 w-8 p-0"
+                          >
+                            <MessageSquare className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 w-8 p-0"
+                          >
+                            <Video className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
+          <DialogContent className="max-w-4xl h-[80vh]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Hash className="h-5 w-5" />
+                {channels.find(c => c.id === selectedChannel)?.name}
+              </DialogTitle>
+              <Button onClick={startCall} variant="outline" className="absolute right-4 top-4">
+                <Video className="h-4 w-4 mr-2" />
+                Join Call
+              </Button>
+            </DialogHeader>
+            <div className="flex-1 overflow-y-auto p-4">
+              <div className="space-y-4">
+                {messages.map((msg) => (
+                  <div key={msg.id} className="flex gap-3 items-start">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback>{msg.user[0]}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium">{msg.user}</p>
+                        <span className="text-xs text-muted-foreground">{msg.timestamp}</span>
+                      </div>
+                      <p className="text-sm">{msg.message}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="p-4 border-t mt-auto">
+              <div className="flex gap-2">
+                <Input placeholder="Type a message..." />
+                <Button>
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={showNewChannelDialog} onOpenChange={setShowNewChannelDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New Channel</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="channel-name">Channel Name</Label>
+                  <Input
+                    id="channel-name"
+                    value={newChannelName}
+                    onChange={(e) => setNewChannelName(e.target.value)}
+                    placeholder="Enter channel name..."
+                  />
                 </div>
               </div>
-            </Card>
-          </div>
-        </div>
+            </div>
+            <DialogFooter>
+              <Button onClick={createNewChannel}>Create Channel</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={showUserProfileDialog} onOpenChange={setShowUserProfileDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>User Profile</DialogTitle>
+            </DialogHeader>
+            {selectedUser && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-16 w-16">
+                    <AvatarFallback>{selectedUser.name[0]}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="font-medium">{selectedUser.name}</h3>
+                    <p className="text-sm text-muted-foreground">{selectedUser.role}</p>
+                  </div>
+                </div>
+                <Separator />
+                <div>
+                  <h4 className="font-medium mb-2">About</h4>
+                  <p className="text-sm">{selectedUser.bio}</p>
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    className="flex-1 gap-2"
+                    onClick={() => {
+                      setShowUserProfileDialog(false);
+                      // Add message handling logic here
+                    }}
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                    Send Message
+                  </Button>
+                  <Button 
+                    className="flex-1 gap-2" 
+                    variant="outline"
+                    onClick={() => {
+                      setShowUserProfileDialog(false);
+                      // Add meeting scheduling logic here
+                    }}
+                  >
+                    <CalendarIcon className="h-4 w-4" />
+                    Schedule Meeting
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={showVideoDialog} onOpenChange={setShowVideoDialog}>
+          <DialogContent className="max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>Video Conference</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                {localStreamRef && (
+                  <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
+                    <video
+                      ref={video => {
+                        if (video && localStreamRef) {
+                          video.srcObject = localStreamRef;
+                          video.play();
+                        }
+                      }}
+                      muted
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex justify-center gap-4">
+                <Button
+                  size="icon"
+                  variant={isAudioEnabled ? "outline" : "secondary"}
+                  onClick={() => setIsAudioEnabled(!isAudioEnabled)}
+                >
+                  {isAudioEnabled ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
+                </Button>
+                <Button
+                  size="icon"
+                  variant={isVideoEnabled ? "outline" : "secondary"}
+                  onClick={() => setIsVideoEnabled(!isVideoEnabled)}
+                >
+                  {isVideoEnabled ? <Video className="h-4 w-4" /> : <VideoOff className="h-4 w-4" />}
+                </Button>
+                <Button
+                  size="icon"
+                  variant={isScreenSharing ? "secondary" : "outline"}
+                  onClick={toggleScreenShare}
+                >
+                  <MonitorUp className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="destructive"
+                  onClick={stopCall}
+                >
+                  <PhoneOff className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   };

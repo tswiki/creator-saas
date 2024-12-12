@@ -3,7 +3,7 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createSession } from '@/lib/session'
-import MentorshipPortal from '@/components/MentorshipPortal'
+import MentorshipPortal from '@/components/ui/MentorshipPortal'
 
 export default async function CohortPage() {
   
