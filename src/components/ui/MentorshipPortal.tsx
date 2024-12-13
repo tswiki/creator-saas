@@ -67,7 +67,11 @@ import {
   BellRing,
   MoreVertical,
   Plus,
-  Mail
+  Mail,
+  Eye,
+  Pencil,
+  Settings2,
+  Trash2
 } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
@@ -333,7 +337,8 @@ export default function MentorshipPortal() {
               <CardContent>
                 <div className="space-y-4">
                   <Button 
-                    className="w-full" 
+                    className="w-full"
+                    variant="outline"
                     onClick={() => setShowScheduleDialog(true)}
                   >
                     Schedule Session
@@ -1495,7 +1500,7 @@ export default function MentorshipPortal() {
                     <CardTitle className="text-base">Knowledge Check</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       <div className="space-y-4">
                         <div>
                           <label className="block text-sm font-medium mb-2">Question</label>
@@ -1508,45 +1513,104 @@ export default function MentorshipPortal() {
 
                         <div>
                           <label className="block text-sm font-medium mb-2">Answer Type</label>
-                          <select className="w-full rounded-md border border-input px-3 py-2">
-                            <option value="radio">Single Choice (Radio)</option>
-                            <option value="checkbox">Multiple Choice (Checkbox)</option>
-                          </select>
+                          <Select>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select answer type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="radio">Single Choice (Radio)</SelectItem>
+                              <SelectItem value="checkbox">Multiple Choice (Checkbox)</SelectItem>
+                              <SelectItem value="short">Short Text</SelectItem>
+                              <SelectItem value="long">Long Text</SelectItem>
+                              <SelectItem value="truefalse">True/False</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
 
-                        <div>
-                          <label className="block text-sm font-medium mb-2">Answer Options</label>
-                          <div className="space-y-2">
-                            {[1, 2, 3, 4].map((num) => (
-                              <div key={num} className="flex gap-2">
-                                <input
-                                  type="text"
-                                  placeholder={`Option ${num}`}
-                                  className="flex-1 rounded-md border border-input px-3 py-2"
+                        <div className="space-y-4">
+                          <label className="block text-sm font-medium">Answer Options</label>
+                          
+                          <div className="space-y-3">
+                            {/* Dynamic answer options based on type */}
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                placeholder="Enter answer option"
+                                className="flex-1 rounded-md border border-input px-3 py-2"
+                              />
+                              <div className="flex items-center gap-2">
+                                <input 
+                                  type="checkbox"
+                                  id="correct-1"
+                                  className="h-4 w-4 rounded border-gray-300"
                                 />
-                                <div className="flex items-center">
-                                  <input
-                                    type="checkbox"
-                                    id={`correct-${num}`}
-                                    className="mr-2"
-                                  />
-                                  <label htmlFor={`correct-${num}`} className="text-sm">
-                                    Correct Answer
-                                  </label>
-                                </div>
+                                <label htmlFor="correct-1" className="text-sm">
+                                  Correct
+                                </label>
                               </div>
-                            ))}
+                              <Button variant="ghost" size="icon">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </div>
+
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="w-full"
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Answer Option
+                          </Button>
                         </div>
 
-                        <Button className="w-full">Add Question</Button>
+                        <div className="space-y-2">
+                          <label className="block text-sm font-medium">Feedback</label>
+                          <textarea
+                            placeholder="Enter feedback for correct/incorrect answers"
+                            className="w-full rounded-md border border-input px-3 py-2 min-h-[80px]"
+                          />
+                        </div>
+
+                        <div className="flex gap-2">
+                          <Button className="flex-1">
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Question
+                          </Button>
+                          <Button variant="outline">
+                            <Eye className="h-4 w-4 mr-2" />
+                            Preview
+                          </Button>
+                        </div>
                       </div>
 
                       <div className="border-t pt-4">
-                        <h3 className="font-medium mb-4">Preview</h3>
-                        {/* Preview section would render the created questions */}
-                        <div className="text-muted-foreground text-sm text-center py-8">
-                          Questions you create will appear here
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="font-medium">Questions</h3>
+                          <Button variant="outline" size="sm">
+                            <Settings2 className="h-4 w-4 mr-2" />
+                            Quiz Settings
+                          </Button>
+                        </div>
+
+                        <div className="space-y-4">
+                          {/* Question list/preview */}
+                          <div className="border rounded-lg p-4">
+                            <div className="flex items-center justify-between">
+                              <div className="font-medium">Question 1</div>
+                              <div className="flex gap-2">
+                                <Button variant="ghost" size="icon">
+                                  <Pencil className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="icon">
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                            <div className="text-sm text-muted-foreground mt-1">
+                              Multiple Choice • 4 Options
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
