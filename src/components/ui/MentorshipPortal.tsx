@@ -71,7 +71,11 @@ import {
   Eye,
   Pencil,
   Settings2,
-  Trash2
+  Trash2,
+  Paperclip,
+  Phone,
+  CheckCheck,
+  Search
 } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
@@ -82,6 +86,8 @@ import { toast } from '@/hooks/use-toast';
 import { Form, useForm } from 'react-hook-form';
 import { FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
 import { Textarea } from './textarea';
+import { cn } from '@/lib/utils';
+import { format } from 'path';
 
 
 export function HeroVideoDialogDemoTopInBottomOut() {
@@ -1627,47 +1633,117 @@ export default function MentorshipPortal() {
 
 
   const MessagesView = () => {
-    
     const [isCallModalOpen, setIsCallModalOpen] = useState(false);
     const [isVideoEnabled, setIsVideoEnabled] = useState(true);
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
     const [isScreenSharing, setIsScreenSharing] = useState(false);
     const [showNewChatDialog, setShowNewChatDialog] = useState(false);
-    const [selectedContact, setSelectedContact] = useState(null);
+    const [showDiscoverDialog, setShowDiscoverDialog] = useState(false);
+    const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
     const [localStreamRef, setLocalStreamRef] = useState<MediaStream | null>(null);
     const [screenStreamRef, setScreenStreamRef] = useState<MediaStream | null>(null);
     const [peerConnectionRef, setPeerConnectionRef] = useState<RTCPeerConnection | null>(null);
+    const [messageInput, setMessageInput] = useState('');
     const videoRef = useRef<HTMLVideoElement>(null);
 
-    // Mock contacts data - in real app would come from API/database
-    const contacts = [
+    type Contact = {
+      id: number;
+      name: string;
+      role: string;
+      email: string;
+      avatar: string;
+      status?: 'online' | 'offline';
+      lastSeen?: string;
+      expertise?: string[];
+      interests?: string[];
+      goals?: string[];
+      matchScore?: number;
+    };
+
+    type Message = {
+      id: string;
+      sender: 'mentor' | 'mentee';
+      content: string;
+      timestamp: string;
+      type: 'text' | 'file' | 'image' | 'voice';
+      status?: 'sent' | 'delivered' | 'read';
+    };
+
+    const recommendedContacts: Contact[] = [
+      {
+        id: 3,
+        name: "Emma Thompson",
+        role: "Senior Developer",
+        email: "emma.t@example.com",
+        avatar: "ET",
+        expertise: ["React", "TypeScript", "System Design"],
+        interests: ["Mentoring", "Web Development"],
+        goals: ["Technical Leadership", "Architecture"],
+        matchScore: 95
+      },
+      {
+        id: 4,
+        name: "David Liu",
+        role: "Tech Lead",
+        email: "david.l@example.com",
+        avatar: "DL",
+        expertise: ["Cloud Architecture", "DevOps", "Team Leadership"],
+        interests: ["System Design", "Mentoring"],
+        goals: ["Engineering Management", "Cloud Solutions"],
+        matchScore: 88
+      }
+    ];
+
+    const contacts: Contact[] = [
       {
         id: 1,
         name: "Sarah Wilson",
         role: "Mentor",
         email: "sarah.w@example.com",
-        avatar: "SW"
+        avatar: "SW",
+        status: 'online'
       },
       {
         id: 2,
         name: "Michael Chen",
         role: "Mentor",
         email: "michael.c@example.com",
-        avatar: "MC"
-      },
-      {
-        id: 3,
-        name: "Emma Davis",
-        role: "Student",
-        email: "emma.d@example.com",
-        avatar: "ED"
+        avatar: "MC",
+        status: 'offline',
+        lastSeen: '2 hours ago'
       }
     ];
 
-    const handleStartNewChat = (contact: SetStateAction<null>) => {
-      setSelectedContact(contact);
-      setShowNewChatDialog(false);
-      // Here you would typically initialize a new chat with the selected contact
+    const messages: Message[] = [
+      {
+        id: '1',
+        sender: 'mentor',
+        content: "Hi there! How's your progress on the latest project coming along?",
+        timestamp: '10:30 AM',
+        type: 'text',
+        status: 'read'
+      },
+      {
+        id: '2', 
+        sender: 'mentee',
+        content: "Going well! I've implemented the new features we discussed.",
+        timestamp: '10:32 AM',
+        type: 'text',
+        status: 'delivered'
+      }
+    ];
+
+    const handleSendMessage = () => {
+      if (!messageInput.trim()) return;
+      console.log('Sending message:', messageInput);
+      setMessageInput('');
+    };
+
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (file) {
+        console.log('Uploading file:', file);
+      }
     };
 
     const setupVideoStream = async () => {
@@ -1685,299 +1761,195 @@ export default function MentorshipPortal() {
       }
     };
 
-    const startScreenShare = async () => {
-      try {
-        const screenStream = await navigator.mediaDevices.getDisplayMedia({
-          video: true
-        });
-        setScreenStreamRef(screenStream);
-        if (videoRef.current) {
-          videoRef.current.srcObject = screenStream;
-        }
-        setIsScreenSharing(true);
-      } catch (err) {
-        console.error("Error sharing screen:", err);
-      }
-    };
-
-    const stopScreenShare = () => {
-      if (screenStreamRef) {
-        screenStreamRef.getTracks().forEach(track => track.stop());
-        setScreenStreamRef(null);
-        if (videoRef.current && localStreamRef) {
-          videoRef.current.srcObject = localStreamRef;
-        }
-        setIsScreenSharing(false);
-      }
-    };
-
-    const stopAllTracks = () => {
-      if (localStreamRef) {
-        localStreamRef.getTracks().forEach(track => track.stop());
-      }
-      if (screenStreamRef) {
-        screenStreamRef.getTracks().forEach(track => track.stop());
-      }
-      setLocalStreamRef(null);
-      setScreenStreamRef(null);
-      setIsScreenSharing(false);
-    };
-
-    useEffect(() => {
-      return () => {
-        stopAllTracks();
-      };
-    }, []);
-
     return (
-
-      <div className="flex h-[calc(100vh-4rem)] gap-6 pt-12">
-        {/* Left Card - Chats List */}
-        <Card className="w-1/3">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Messages</CardTitle>
-            <Button variant="ghost" size="icon" onClick={() => setShowNewChatDialog(true)}>
-              <PenSquare className="h-5 w-5" />
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[calc(100vh-12rem)]">
-              {[
-                {
-                  name: "Sarah Wilson",
-                  role: "Mentor",
-                  lastMessage: "Let's discuss your progress tomorrow",
-                  time: "2h ago",
-                  unread: true
-                },
-                {
-                  name: "Michael Chen",
-                  role: "Mentor", 
-                  lastMessage: "Great work on the project!",
-                  time: "1d ago",
-                  unread: false
-                }
-              ].map((contact, i, arr) => (
-                <div key={i}>
-                  <div className={`flex items-start gap-3 p-4 hover:bg-accent rounded-lg cursor-pointer ${
-                    contact.unread ? 'bg-accent/50' : ''
-                  }`}>
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-primary text-primary-foreground">
-                        {contact.name.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <div className="flex justify-between">
-                        <div className="font-semibold">{contact.name}</div>
-                        <span className="text-xs text-muted-foreground">{contact.time}</span>
-                      </div>
-                      <p className="text-sm text-muted-foreground truncate">{contact.lastMessage}</p>
-                      {contact.unread && <Badge className="mt-1">New</Badge>}
-                    </div>
-                  </div>
-                  {i < arr.length - 1 && <Separator className="my-1 mx-4" />}
-                </div>
-              ))}
-            </ScrollArea>
-          </CardContent>
-        </Card>
-
-        {/* Right Card - Chat Area */}
-        <Card className="flex-1 flex flex-col">
-          <CardHeader className="border-b">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10">
-                  <AvatarFallback className="bg-primary text-primary-foreground">SW</AvatarFallback>
-                </Avatar>
-                <div>
-                  <div className="font-semibold">Sarah Wilson</div>
-                  <div className="text-sm text-muted-foreground">Online</div>
-                </div>
-              </div>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={async () => {
-                  await setupVideoStream();
-                  setIsCallModalOpen(true);
-                }}
-              >
-                <Video className="h-5 w-5" />
-              </Button>
-            </div>
-          </CardHeader>
-
-          <CardContent className="p-0 flex-1 flex flex-col">
-            <ScrollArea className="flex-1 p-6">
-              <div className="space-y-4">
-                {[
-                  { sender: "mentor", content: "How's your progress on the latest project?", time: "10:30 AM", type: "text" },
-                  { sender: "you", content: "/voice-note-1.mp3", time: "10:31 AM", type: "voice" },
-                  { sender: "mentor", content: "/screenshot.png", time: "10:33 AM", type: "image" },
-                  { sender: "you", content: "Yes, that would be very helpful!", time: "10:36 AM", type: "text" }
-                ].map((msg, i) => (
-                  <div key={i} className={`flex ${msg.sender === 'you' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[70%] rounded-2xl p-3 ${
-                      msg.sender === 'you' 
-                        ? 'bg-blue-500 text-white rounded-br-none' 
-                        : 'bg-gray-100 text-gray-900 rounded-bl-none'
-                    }`}>
-                      {msg.type === 'text' && <p>{msg.content}</p>}
-                      {msg.type === 'voice' && (
-                        <div className="flex items-center gap-2">
-                          <Play className="h-4 w-4" />
-                          <div className="h-4 bg-current/20 rounded-full flex-1" />
-                          <span className="text-xs">0:30</span>
-                        </div>
-                      )}
-                      {msg.type === 'image' && (
-                        <img src={msg.content} alt="" className="rounded-lg max-w-full" />
-                      )}
-                      <span className="text-xs opacity-70 mt-1 block">{msg.time}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
-
-            <div className="border-t p-4 mt-auto">
-              <div className="flex items-center gap-2 bg-accent rounded-full p-2">
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <ImageIcon className="h-5 w-5" />
+      <div className="flex h-[calc(100vh-4rem)] gap-4 p-6 pt-12">
+        <Card className="w-80 flex flex-col">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Messages</CardTitle>
+              <div className="flex gap-2">
+                <Button variant="ghost" size="icon" onClick={() => setShowDiscoverDialog(true)}>
+                  <Users className="h-5 w-5" />
                 </Button>
-                <input 
-                  type="text" 
-                  placeholder="iMessage"
-                  className="flex-1 bg-transparent border-none focus:outline-none text-center"
-                />
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <Mic className="h-5 w-5" />
-                </Button>
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <Send className="h-5 w-5" />
+                <Button variant="ghost" size="icon" onClick={() => setShowNewChatDialog(true)}>
+                  <PenSquare className="h-5 w-5" />
                 </Button>
               </div>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Video Call Dialog */}
-        <Dialog open={isCallModalOpen} onOpenChange={(open) => {
-          if (!open) {
-            stopAllTracks();
-          }
-          setIsCallModalOpen(open);
-        }}>
-          <DialogContent className="sm:max-w-[90vw] h-[80vh]">
-            <DialogHeader>
-              <DialogTitle>Video Call with Sarah Wilson</DialogTitle>
-            </DialogHeader>
-            <div className="grid grid-cols-2 gap-4 h-full">
-              <div className="relative aspect-video bg-slate-900 rounded-lg overflow-hidden">
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className={`w-full h-full ${isScreenSharing ? 'object-contain' : 'object-cover'} ${!isVideoEnabled && !isScreenSharing ? 'hidden' : ''}`}
-                />
-                {!isVideoEnabled && !isScreenSharing && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <User className="h-20 w-20 text-slate-600" />
-                  </div>
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Search messages..." className="pl-8" />
+            </div>
+          </CardHeader>
+          <ScrollArea className="flex-1">
+            {contacts.map((contact) => (
+              <div
+                key={contact.id}
+                className={cn(
+                  "flex items-center gap-3 p-3 cursor-pointer hover:bg-accent/50 transition-colors",
+                  selectedContact?.id === contact.id && "bg-accent"
                 )}
+                onClick={() => setSelectedContact(contact)}
+              >
+                <Avatar>
+                  <AvatarFallback>{contact.avatar}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">{contact.name}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {contact.status === 'online' ? (
+                        <Badge variant="default" className="bg-green-500">Online</Badge>
+                      ) : contact.lastSeen}
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground truncate">{contact.role}</p>
+                </div>
               </div>
-              <div className="aspect-video bg-slate-900 rounded-lg" />
-            </div>
-            <div className="flex justify-center gap-4">
-              <Button 
-                variant={isVideoEnabled ? "default" : "secondary"}
-                size="icon"
-                onClick={() => {
-                  if (localStreamRef) {
-                    const videoTrack = localStreamRef.getVideoTracks()[0];
-                    if (videoTrack) {
-                      videoTrack.enabled = !isVideoEnabled;
-                      setIsVideoEnabled(!isVideoEnabled);
-                    }
-                  }
-                }}
-                disabled={isScreenSharing}
-              >
-                {isVideoEnabled ? <Video /> : <VideoOff />}
-              </Button>
-              <Button
-                variant={isAudioEnabled ? "default" : "secondary"}
-                size="icon"
-                onClick={() => {
-                  if (localStreamRef) {
-                    const audioTrack = localStreamRef.getAudioTracks()[0];
-                    if (audioTrack) {
-                      audioTrack.enabled = !isAudioEnabled;
-                      setIsAudioEnabled(!isAudioEnabled);
-                    }
-                  }
-                }}
-              >
-                {isAudioEnabled ? <Mic /> : <MicOff />}
-              </Button>
-              <Button
-                variant={isScreenSharing ? "default" : "secondary"}
-                size="icon"
-                onClick={() => {
-                  if (isScreenSharing) {
-                    stopScreenShare();
-                  } else {
-                    startScreenShare();
-                  }
-                }}
-              >
-                {isScreenSharing ? <MonitorOff /> : <MonitorUp />}
-              </Button>
-              <Button
-                variant="destructive"
-                size="icon"
-                onClick={() => {
-                  stopAllTracks();
-                  setIsCallModalOpen(false);
-                }}
-              >
-                <PhoneOff />
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+            ))}
+          </ScrollArea>
+        </Card>
 
-        {/* New Chat Dialog */}
-        <Dialog open={showNewChatDialog} onOpenChange={setShowNewChatDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>New Message</DialogTitle>
-            </DialogHeader>
-            <ScrollArea className="h-[400px]">
-              <div className="space-y-2 p-4">
-                {contacts.map((contact) => (
-                  <div
-                    key={contact.id}
-                    className="flex items-center gap-3 p-3 hover:bg-accent rounded-lg cursor-pointer"
-                    onClick={() => setSelectedContact(contact)}
-                  >
+        <Card className="flex-1 flex flex-col">
+          {selectedContact ? (
+            <>
+              <CardHeader className="border-b">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
                     <Avatar>
-                      <AvatarFallback className="bg-primary text-primary-foreground">
-                        {contact.avatar}
-                      </AvatarFallback>
+                      <AvatarFallback>{selectedContact.avatar}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <div className="font-semibold">{contact.name}</div>
-                      <div className="text-sm text-muted-foreground">{contact.role}</div>
-                      <div className="text-sm text-muted-foreground">{contact.email}</div>
+                      <h3 className="font-semibold">{selectedContact.name}</h3>
+                      <p className="text-sm text-muted-foreground">{selectedContact.role}</p>
                     </div>
                   </div>
-                ))}
+                  <div className="flex gap-2">
+                    <Button variant="ghost" size="icon" onClick={setupVideoStream}>
+                      <Video className="h-5 w-5" />
+                    </Button>
+                    <Button variant="ghost" size="icon">
+                      <Phone className="h-5 w-5" />
+                    </Button>
+                    <Button variant="ghost" size="icon">
+                      <MoreVertical className="h-5 w-5" />
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+
+              <ScrollArea className="flex-1 p-4">
+                <div className="space-y-4">
+                  {messages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={cn(
+                        "flex",
+                        message.sender === 'mentee' ? "justify-end" : "justify-start"
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          "max-w-[70%] rounded-lg p-3",
+                          message.sender === 'mentee' 
+                            ? "bg-primary text-primary-foreground" 
+                            : "bg-muted"
+                        )}
+                      >
+                        <p>{message.content}</p>
+                        <div className="flex items-center justify-end gap-1 mt-1">
+                          <span className="text-xs opacity-70">{message.timestamp}</span>
+                          {message.sender === 'mentee' && (
+                            <Check className="h-3 w-3" />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+
+              <div className="border-t p-4">
+                <div className="flex items-center gap-2">
+                  <Input
+                    placeholder="Type a message..."
+                    value={messageInput}
+                    onChange={(e) => setMessageInput(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                    className="flex-1"
+                  />
+                  <input
+                    type="file"
+                    id="file-upload"
+                    className="hidden"
+                    onChange={handleFileUpload}
+                  />
+                  <Button variant="ghost" size="icon" asChild>
+                    <label htmlFor="file-upload">
+                      <Paperclip className="h-5 w-5" />
+                    </label>
+                  </Button>
+                  <Button onClick={handleSendMessage}>
+                    <Send className="h-5 w-5" />
+                  </Button>
+                </div>
               </div>
-            </ScrollArea>
+            </>
+          ) : (
+            <div className="flex-1 flex items-center justify-center text-muted-foreground">
+              Select a conversation to start messaging
+            </div>
+          )}
+        </Card>
+
+        <Dialog open={showDiscoverDialog} onOpenChange={setShowDiscoverDialog}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Discover Mentors & Peers</DialogTitle>
+              <DialogDescription>
+                Connect with mentors and peers who share your interests and goals
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              {recommendedContacts.map((contact) => (
+                <div key={contact.id} className="border rounded-lg p-4">
+                  <div className="flex items-start gap-4">
+                    <Avatar className="h-12 w-12">
+                      <AvatarFallback>{contact.avatar}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-semibold">{contact.name}</h4>
+                        <Badge variant="secondary">{contact.matchScore}% Match</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{contact.role}</p>
+                      <div className="mt-2">
+                        <h5 className="text-sm font-medium">Expertise</h5>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {contact.expertise?.map((skill) => (
+                            <Badge key={skill} variant="outline">{skill}</Badge>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="mt-2">
+                        <h5 className="text-sm font-medium">Goals</h5>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {contact.goals?.map((goal) => (
+                            <Badge key={goal} variant="outline">{goal}</Badge>
+                          ))}
+                        </div>
+                      </div>
+                      <Button className="mt-3" onClick={() => {
+                        setSelectedContact(contact);
+                        setShowDiscoverDialog(false);
+                      }}>
+                        Start Conversation
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </DialogContent>
         </Dialog>
       </div>
