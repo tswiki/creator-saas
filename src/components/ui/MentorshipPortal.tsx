@@ -3,7 +3,7 @@
 
 import { SetStateAction, useEffect, useRef, useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import HeroVideoDialog from "@/components/ui/hero-video-dialog";
@@ -75,11 +75,16 @@ import {
   Paperclip,
   Phone,
   CheckCheck,
-  Search
+  Search,
+  Archive,
+  Trash,
+  UserPlus,
+  MapPin,
+  Globe
 } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Label } from '@radix-ui/react-dropdown-menu';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Label, DropdownMenuSeparator } from '@radix-ui/react-dropdown-menu';
 import { Switch } from '@/components/ui/switch';
 import { useTheme } from 'next-themes';
 import { toast } from '@/hooks/use-toast';
@@ -88,6 +93,7 @@ import { FormField, FormItem, FormLabel, FormControl } from '@/components/ui/for
 import { Textarea } from './textarea';
 import { cn } from '@/lib/utils';
 import { format } from 'path';
+import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarTrigger } from './menubar';
 
 
 export function HeroVideoDialogDemoTopInBottomOut() {
@@ -140,7 +146,7 @@ export default function MentorshipPortal() {
             </Button>
             <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('mentor')}>
               <Users className="mr-2 h-4 w-4" />
-              My Mentor
+              Connect
             </Button>
             <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('schedule')}>
               <CalendarIcon className="mr-2 h-4 w-4" />
@@ -1761,146 +1767,202 @@ export default function MentorshipPortal() {
       }
     };
 
+    function setShowVideoCallDialog(arg0: boolean): void {
+      throw new Error('Function not implemented.');
+    }
+
     return (
       <div className="flex h-[calc(100vh-4rem)] gap-4 p-6 pt-12">
-        <Card className="w-80 flex flex-col">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Messages</CardTitle>
-              <div className="flex gap-2">
-                <Button variant="ghost" size="icon" onClick={() => setShowDiscoverDialog(true)}>
-                  <Users className="h-5 w-5" />
-                </Button>
-                <Button variant="ghost" size="icon" onClick={() => setShowNewChatDialog(true)}>
-                  <PenSquare className="h-5 w-5" />
-                </Button>
-              </div>
-            </div>
-            <div className="relative">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search messages..." className="pl-8" />
-            </div>
-          </CardHeader>
-          <ScrollArea className="flex-1">
-            {contacts.map((contact) => (
-              <div
-                key={contact.id}
-                className={cn(
-                  "flex items-center gap-3 p-3 cursor-pointer hover:bg-accent/50 transition-colors",
-                  selectedContact?.id === contact.id && "bg-accent"
-                )}
-                onClick={() => setSelectedContact(contact)}
-              >
-                <Avatar>
-                  <AvatarFallback>{contact.avatar}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">{contact.name}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {contact.status === 'online' ? (
-                        <Badge variant="default" className="bg-green-500">Online</Badge>
-                      ) : contact.lastSeen}
-                    </span>
-                  </div>
-                  <p className="text-sm text-muted-foreground truncate">{contact.role}</p>
+        <div className="flex flex-1 gap-4 pt-7">
+          <Card className="w-50 h-[calc(100vh-8rem)]">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Messages</CardTitle>
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="icon" onClick={() => setShowDiscoverDialog(true)}>
+                    <Users className="h-5 w-5" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => setShowNewChatDialog(true)}>
+                    <PenSquare className="h-5 w-5" />
+                  </Button>
                 </div>
               </div>
-            ))}
-          </ScrollArea>
-        </Card>
-
-        <Card className="flex-1 flex flex-col">
-          {selectedContact ? (
-            <>
-              <CardHeader className="border-b">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarFallback>{selectedContact.avatar}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h3 className="font-semibold">{selectedContact.name}</h3>
-                      <p className="text-sm text-muted-foreground">{selectedContact.role}</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="ghost" size="icon" onClick={setupVideoStream}>
-                      <Video className="h-5 w-5" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <Phone className="h-5 w-5" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <MoreVertical className="h-5 w-5" />
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-
-              <ScrollArea className="flex-1 p-4">
-                <div className="space-y-4">
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={cn(
-                        "flex",
-                        message.sender === 'mentee' ? "justify-end" : "justify-start"
-                      )}
-                    >
-                      <div
-                        className={cn(
-                          "max-w-[70%] rounded-lg p-3",
-                          message.sender === 'mentee' 
-                            ? "bg-primary text-primary-foreground" 
-                            : "bg-muted"
-                        )}
-                      >
-                        <p>{message.content}</p>
-                        <div className="flex items-center justify-end gap-1 mt-1">
-                          <span className="text-xs opacity-70">{message.timestamp}</span>
-                          {message.sender === 'mentee' && (
-                            <Check className="h-3 w-3" />
-                          )}
+              <div className="relative">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input placeholder="Search messages..." className="pl-8" />
+              </div>
+            </CardHeader>
+            <ScrollArea className="h-[calc(100vh-16rem)]">
+              <div className="p-4 space-y-4">
+                {contacts.map((contact) => (
+                  <div
+                    key={contact.id}
+                    className={cn(
+                      "cursor-pointer hover:border-primary transition-colors p-4 border rounded-lg",
+                      selectedContact?.id === contact.id && "border-primary"
+                    )}
+                    onClick={() => setSelectedContact(contact)}
+                  >
+                    <div className="flex items-center gap-4">
+                      <Avatar>
+                        <AvatarFallback>{contact.avatar}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium">{contact.name}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {contact.status === 'online' ? (
+                              <Badge variant="default" className="bg-green-500">Online</Badge>
+                            ) : contact.lastSeen}
+                          </span>
                         </div>
+                        <p className="text-sm text-muted-foreground truncate mt-1">{contact.role}</p>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </ScrollArea>
-
-              <div className="border-t p-4">
-                <div className="flex items-center gap-2">
-                  <Input
-                    placeholder="Type a message..."
-                    value={messageInput}
-                    onChange={(e) => setMessageInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                    className="flex-1"
-                  />
-                  <input
-                    type="file"
-                    id="file-upload"
-                    className="hidden"
-                    onChange={handleFileUpload}
-                  />
-                  <Button variant="ghost" size="icon" asChild>
-                    <label htmlFor="file-upload">
-                      <Paperclip className="h-5 w-5" />
-                    </label>
-                  </Button>
-                  <Button onClick={handleSendMessage}>
-                    <Send className="h-5 w-5" />
-                  </Button>
-                </div>
+                  </div>
+                ))}
               </div>
-            </>
-          ) : (
-            <div className="flex-1 flex items-center justify-center text-muted-foreground">
-              Select a conversation to start messaging
-            </div>
-          )}
-        </Card>
+            </ScrollArea>
+          </Card>
+
+          <Card className="flex-1 h-[calc(100vh-8rem)]">
+            {selectedContact ? (
+              <div className="flex flex-col h-full">
+                <CardContent className="flex-1 p-4">
+                  <Card className="h-full flex flex-col">
+                    <div className="flex justify-end p-4">
+                      <Menubar className="border-none bg-transparent">
+                        <MenubarMenu>
+                          <MenubarTrigger className="rounded-full w-10 h-10 flex items-center justify-center text-lg font-medium data-[state=open]:bg-accent">
+                            {selectedContact.name.split(' ').map(n => n[0]).join('')}
+                          </MenubarTrigger>
+                          <MenubarContent>
+                            <MenubarItem onClick={() => setShowVideoCallDialog(true)}>
+                              <Video className="mr-2 h-4 w-4" />
+                              <span>Video Call</span>
+                            </MenubarItem>
+                            <MenubarItem>
+                              <UserPlus className="mr-2 h-4 w-4" />
+                              <span>Share Contact</span>
+                            </MenubarItem>
+                            <MenubarItem>
+                              <Archive className="mr-2 h-4 w-4" />
+                              <span>Archive Chat</span>
+                            </MenubarItem>
+                            <MenubarSeparator />
+                            <MenubarItem className="text-destructive">
+                              <Trash className="mr-2 h-4 w-4" />
+                              <span>Delete Chat</span>
+                            </MenubarItem>
+                          </MenubarContent>
+                        </MenubarMenu>
+                      </Menubar>
+                    </div>
+                    <ScrollArea className="flex-1 p-4">
+                      <div className="space-y-4">
+                        {messages.map((message) => (
+                          <div
+                            key={message.id}
+                            className={cn(
+                              "flex",
+                              message.sender === 'mentee' ? "justify-end" : "justify-start"
+                            )}
+                          >
+                            <div
+                              className={cn(
+                                "max-w-[70%] rounded-lg p-3",
+                                message.sender === 'mentee' 
+                                  ? "bg-primary text-primary-foreground" 
+                                  : "bg-muted"
+                              )}
+                            >
+                              <p>{message.content}</p>
+                              <div className="flex items-center justify-end gap-1 mt-1">
+                                <span className="text-xs opacity-70">{message.timestamp}</span>
+                                {message.sender === 'mentee' && (
+                                  <Check className="h-3 w-3" />
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                    <div className="p-4 pt-10">
+                      <div className="flex items-center gap-2">
+                        <Input
+                          placeholder="Type a message..."
+                          value={messageInput}
+                          onChange={(e) => setMessageInput(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                          className="flex-1"
+                        />
+                        <input
+                          type="file"
+                          id="file-upload"
+                          className="hidden"
+                          onChange={handleFileUpload}
+                        />
+                        <Button variant="ghost" size="icon" asChild>
+                          <label htmlFor="file-upload">
+                            <Paperclip className="h-5 w-5" />
+                          </label>
+                        </Button>
+                        <Button onClick={handleSendMessage}>
+                          <Send className="h-5 w-5" />
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                </CardContent>
+              </div>
+            ) : (
+              <Card className="">
+                <CardContent className="">
+                  <div className="flex-1 flex flex-col items-center justify-center p-9">
+                    <MessageSquare className="h-8 w-8 text-muted-foreground" />
+                    <div className="text-center mt-3">
+                      <h3 className="font-semibold text-base">No Conversation Selected</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Select a conversation or connect with recommended mentors below
+                      </p>
+                    </div>
+                    
+                    <div className="w-full max-w-lg mt-6 space-y-3">
+                      <h4 className="font-medium text-s">Recommended Matches</h4>
+                      {recommendedContacts
+                        .sort((a, b) => (b.matchScore ?? 0) - (a.matchScore ?? 0))
+                        .slice(0, 2)
+                        .map((contact) => (
+                          <div key={contact.id} className="border rounded-lg p-3">
+                            <div className="flex items-center gap-2">
+                              <Avatar className="h-8 w-8">
+                                <AvatarFallback>{contact.avatar}</AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-2">
+                                  <h5 className="font-medium text-sm truncate">{contact.name}</h5>
+                                  <Badge variant="secondary" className="text-xs">{contact.matchScore}% Match</Badge>
+                                </div>
+                                <p className="text-xs text-muted-foreground truncate">{contact.role}</p>
+                              </div>
+                            </div>
+                            <Button 
+                              variant="outline" 
+                              className="w-full mt-2 h-8 text-xs"
+                              onClick={() => setSelectedContact(contact)}
+                            >
+                              Start Chat
+                            </Button>
+                          </div>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </Card>
+        </div>
 
         <Dialog open={showDiscoverDialog} onOpenChange={setShowDiscoverDialog}>
           <DialogContent className="sm:max-w-[600px]">
@@ -1958,86 +2020,87 @@ export default function MentorshipPortal() {
 
 
   const MyMentorView = () => {
-    const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
-    const [showMentorDialog, setShowMentorDialog] = useState(false);
-    const [showScheduleDialog, setShowScheduleDialog] = useState(false);
-    const [date, setDate] = useState<Date | undefined>(undefined);
-    const [selectedType, setSelectedType] = useState<string>('');
+    const [selectedMember, setSelectedMember] = useState<CommunityMember | null>(null);
+    const [showProfileDialog, setShowProfileDialog] = useState(false);
 
-    // Define Mentor type
-    type Mentor = {
+    type CommunityMember = {
       id: number;
       name: string;
-      title: string; 
-      company: string;
+      role: string;
+      type: 'mentor' | 'member';
+      company?: string;
       expertise: string[];
       bio: string;
-      rating: number;
-      totalSessions: number;
-      availability: string;
+      yearsOfExperience: number;
+      interests: string[];
       socials: {
-        linkedin: string;
-        twitter: string;
-        github: string;
+        linkedin?: string;
+        twitter?: string;
+        github?: string;
+        website?: string;
       };
-      upcomingSessions: {
-        date: string;
-        time: string;
-        topic: string;
-      }[];
+      achievements: string[];
     };
 
-    // Mock mentor data - would come from API/database in real app
-    const mentors: Mentor[] = [
+    const communityMembers: CommunityMember[] = [
       {
         id: 1,
         name: "Dr. Sarah Wilson",
-        title: "Senior Software Engineer",
+        role: "Senior Software Engineer",
+        type: "mentor",
         company: "Google",
         expertise: ["Web Development", "System Design", "Cloud Architecture"],
         bio: "15+ years of experience in software development and mentoring. Passionate about helping others grow in their tech careers.",
-        rating: 4.9,
-        totalSessions: 156,
-        availability: "Mon-Thu, 2PM-6PM EST",
+        yearsOfExperience: 15,
+        interests: ["Teaching", "Open Source", "Cloud Computing"],
         socials: {
           linkedin: "linkedin.com/in/sarahwilson",
           twitter: "@sarahwilsontech",
-          github: "github.com/sarahwilson"
+          github: "github.com/sarahwilson",
+          website: "sarahwilson.dev"
         },
-        upcomingSessions: [
-          {
-            date: "2024-02-15",
-            time: "2:00 PM EST",
-            topic: "System Design Interview Prep"
-          },
-          {
-            date: "2024-02-22", 
-            time: "3:00 PM EST",
-            topic: "Code Review Workshop"
-          }
+        achievements: [
+          "Led 200+ successful mentorship sessions",
+          "Published author on system design",
+          "Google Developer Expert"
         ]
       },
       {
         id: 2,
-        name: "Michael Chen",
-        title: "Tech Lead",
-        company: "Microsoft",
-        expertise: ["Mobile Development", "Leadership", "Agile Methodologies"],
-        bio: "Tech lead with focus on mobile development and team leadership. Helping mentees navigate both technical and career challenges.",
-        rating: 4.8,
-        totalSessions: 98,
-        availability: "Wed-Fri, 10AM-4PM PST",
+        name: "Alex Rivera",
+        role: "Frontend Developer",
+        type: "member",
+        company: "Startup XYZ",
+        expertise: ["React", "TypeScript", "UI/UX"],
+        bio: "Passionate about creating beautiful and accessible web experiences. Always eager to learn and share knowledge.",
+        yearsOfExperience: 3,
+        interests: ["Web Accessibility", "Design Systems", "JavaScript"],
         socials: {
-          linkedin: "linkedin.com/in/michaelchen",
-          twitter: "@michaelchendev",
-          github: "github.com/mchen"
+          github: "github.com/arivera",
+          twitter: "@arivera_dev"
         },
-        upcomingSessions: [
-          {
-            date: "2024-02-18",
-            time: "11:00 AM PST",
-            topic: "Mobile App Architecture"
-          }
+        achievements: [
+          "Created popular React component library",
+          "Regular speaker at local tech meetups"
+        ]
+      },
+      {
+        id: 3,
+        name: "Emily Chen",
+        role: "Machine Learning Engineer",
+        type: "mentor",
+        company: "Tesla",
+        expertise: ["AI/ML", "Python", "Data Science"],
+        bio: "Working on cutting-edge ML applications. Love to mentor aspiring data scientists and ML engineers.",
+        yearsOfExperience: 8,
+        interests: ["AI Ethics", "Neural Networks", "Computer Vision"],
+        socials: {
+          linkedin: "linkedin.com/in/emilychen",
+          github: "github.com/echen"
+        },
+        achievements: [
+          "Published ML research papers",
+          "Built autonomous systems used in production"
         ]
       }
     ];
@@ -2046,97 +2109,70 @@ export default function MentorshipPortal() {
       <div className="max-w-7xl mx-auto space-y-6 pt-10">
         <Card>
           <CardHeader>
-            <CardTitle>My Mentors</CardTitle>
-            <CardDescription>View and manage your mentorship relationships</CardDescription>
+            <CardTitle>Community Members</CardTitle>
+            <CardDescription>Connect with mentors and fellow developers in our community</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid md:grid-cols-2 gap-6">
-              {mentors.map((mentor) => (
-                <Card key={mentor.id} className="hover:shadow-lg transition-shadow">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {communityMembers.map((member) => (
+                <Card key={member.id} className="hover:shadow-lg transition-shadow">
                   <CardContent className="pt-6">
                     <div className="flex gap-4">
                       <Avatar className="h-16 w-16">
                         <AvatarFallback className="text-xl">
-                          {mentor.name.split(' ').map(n => n[0]).join('')}
+                          {member.name.split(' ').map(n => n[0]).join('')}
                         </AvatarFallback>
                       </Avatar>
                       <div className="space-y-1">
-                        <h3 className="font-semibold text-lg">{mentor.name}</h3>
-                        <p className="text-sm text-muted-foreground">{mentor.title} at {mentor.company}</p>
-                        <div className="flex items-center gap-2">
-                          <Star className="h-4 w-4 fill-yellow-400 stroke-yellow-400" />
-                          <span className="text-sm">{mentor.rating} ({mentor.totalSessions} sessions)</span>
-                        </div>
+                        <h3 className="font-semibold text-lg">{member.name}</h3>
+                        <p className="text-sm text-muted-foreground">{member.role}</p>
+                        {member.company && (
+                          <p className="text-sm text-muted-foreground">at {member.company}</p>
+                        )}
+                        <Badge variant={member.type === 'mentor' ? 'default' : 'secondary'}>
+                          {member.type === 'mentor' ? 'Mentor' : 'Member'}
+                        </Badge>
                       </div>
                     </div>
 
                     <div className="mt-4">
                       <h4 className="font-medium mb-2">Expertise</h4>
                       <div className="flex flex-wrap gap-2">
-                        {mentor.expertise.map((skill, i) => (
-                          <Badge key={i} variant="secondary">{skill}</Badge>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="mt-4">
-                      <h4 className="font-medium mb-2">Upcoming Sessions</h4>
-                      <div className="space-y-2">
-                        {mentor.upcomingSessions.map((session, i) => (
-                          <div key={i} className="text-sm">
-                            <div className="font-medium">{session.topic}</div>
-                            <div className="text-muted-foreground">
-                              {session.date} at {session.time}
-                            </div>
-                          </div>
+                        {member.expertise.slice(0, 3).map((skill, i) => (
+                          <Badge key={i} variant="outline">{skill}</Badge>
                         ))}
                       </div>
                     </div>
 
                     <div className="mt-4 pt-4 border-t">
-                      <div className="grid grid-cols-3 gap-4">
-                        <Link 
-                          href={mentor.socials.linkedin} 
-                          className="flex justify-center text-muted-foreground hover:text-primary transition-colors"
-                        >
-                          <Linkedin className="h-5 w-5" />
-                        </Link>
-                        <Link 
-                          href={mentor.socials.twitter} 
-                          className="flex justify-center text-muted-foreground hover:text-primary transition-colors"
-                        >
-                          <Twitter className="h-5 w-5" />
-                        </Link>
-                        <Link 
-                          href={mentor.socials.github} 
-                          className="flex justify-center text-muted-foreground hover:text-primary transition-colors"
-                        >
-                          <Github className="h-5 w-5" />
-                        </Link>
+                      <div className="flex gap-4 justify-center">
+                        {member.socials.github && (
+                          <Link href={member.socials.github} className="text-muted-foreground hover:text-primary">
+                            <Github className="h-5 w-5" />
+                          </Link>
+                        )}
+                        {member.socials.twitter && (
+                          <Link href={member.socials.twitter} className="text-muted-foreground hover:text-primary">
+                            <Twitter className="h-5 w-5" />
+                          </Link>
+                        )}
+                        {member.socials.linkedin && (
+                          <Link href={member.socials.linkedin} className="text-muted-foreground hover:text-primary">
+                            <Linkedin className="h-5 w-5" />
+                          </Link>
+                        )}
                       </div>
                     </div>
 
-                    <div className="mt-4 flex gap-2">
-                      <Button 
-                        className="w-full" 
-                        onClick={() => {
-                          setSelectedMentor(mentor);
-                          setShowMentorDialog(true);
-                        }}
-                      >
-                        View Profile
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        className="w-full"
-                        onClick={() => {
-                          setSelectedMentor(mentor);
-                          setShowScheduleDialog(true);
-                        }}
-                      >
-                        Schedule Session
-                      </Button>
-                    </div>
+                    <Button 
+                      className="w-full mt-4" 
+                      onClick={() => {
+                        setSelectedMember(member);
+                        setShowProfileDialog(true);
+                      }}
+                    >
+                      View Profile
+                    </Button>
                   </CardContent>
                 </Card>
               ))}
@@ -2144,210 +2180,76 @@ export default function MentorshipPortal() {
           </CardContent>
         </Card>
 
-        <Dialog open={showMentorDialog} onOpenChange={setShowMentorDialog}>
-          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-            {selectedMentor && (
+        <Dialog open={showProfileDialog} onOpenChange={setShowProfileDialog}>
+          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+            {selectedMember && (
               <>
                 <DialogHeader>
-                  <DialogTitle className="text-2xl">{selectedMentor.name}</DialogTitle>
-                  <DialogDescription>{selectedMentor.title} at {selectedMentor.company}</DialogDescription>
+                  <DialogTitle className="text-2xl flex items-center gap-2">
+                    {selectedMember.name}
+                    <Badge variant={selectedMember.type === 'mentor' ? 'default' : 'secondary'}>
+                      {selectedMember.type === 'mentor' ? 'Mentor' : 'Member'}
+                    </Badge>
+                  </DialogTitle>
+                  <DialogDescription>
+                    {selectedMember.role} {selectedMember.company && `at ${selectedMember.company}`}
+                  </DialogDescription>
                 </DialogHeader>
 
-                <Card className="mt-6">
-                  <CardContent className="pt-6">
-                    <table className="w-full border-collapse">
-                      <tbody>
-                        <tr className="border-b">
-                          <td className="py-4 font-medium">Rating</td>
-                          <td className="py-4 flex items-center gap-2">
-                            <Star className="h-4 w-4 fill-yellow-400 stroke-yellow-400" />
-                            {selectedMentor.rating} ({selectedMentor.totalSessions} sessions)
-                          </td>
-                        </tr>
-                        <tr className="border-b">
-                          <td className="py-4 font-medium">Availability</td>
-                          <td className="py-4">{selectedMentor.availability}</td>
-                        </tr>
-                        <tr className="border-b">
-                          <td className="py-4 font-medium">Expertise</td>
-                          <td className="py-4">
-                            <div className="flex flex-wrap gap-2">
-                              {selectedMentor.expertise.map((skill, i) => (
-                                <Badge key={i} variant="secondary">{skill}</Badge>
-                              ))}
-                            </div>
-                          </td>
-                        </tr>
-                        <tr className="border-b">
-                          <td className="py-4 font-medium">Bio</td>
-                          <td className="py-4">{selectedMentor.bio}</td>
-                        </tr>
-                        <tr className="border-b">
-                          <td className="py-4 font-medium">Social Links</td>
-                          <td className="py-4">
-                            <div className="flex gap-4">
-                              <Link href={selectedMentor.socials.linkedin} className="text-muted-foreground hover:text-primary">
-                                <Linkedin className="h-5 w-5" />
-                              </Link>
-                              <Link href={selectedMentor.socials.twitter} className="text-muted-foreground hover:text-primary">
-                                <Twitter className="h-5 w-5" />
-                              </Link>
-                              <Link href={selectedMentor.socials.github} className="text-muted-foreground hover:text-primary">
-                                <Github className="h-5 w-5" />
-                              </Link>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="py-4 font-medium">Upcoming Sessions</td>
-                          <td className="py-4">
-                            <Select>
-                              <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select a session" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {selectedMentor.upcomingSessions.map((session, i) => (
-                                  <SelectItem key={i} value={`session-${i}`}>
-                                    <div className="flex justify-between items-center w-full gap-4">
-                                      <div>
-                                        <div className="font-medium">{session.topic}</div>
-                                        <div className="text-sm text-muted-foreground">
-                                          {session.date} at {session.time}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <div className="mt-4">
-                              <Button 
-                                variant="outline" 
-                                className="w-full"
-                                onClick={() => {
-                                  setShowMentorDialog(false);
-                                  setShowScheduleDialog(true);
-                                }}
-                              >
-                                Join Selected Session
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </CardContent>
-                </Card>
+                <div className="space-y-6 mt-6">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">About</h3>
+                    <p className="text-muted-foreground">{selectedMember.bio}</p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Expertise</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedMember.expertise.map((skill, i) => (
+                        <Badge key={i} variant="outline">{skill}</Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Interests</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedMember.interests.map((interest, i) => (
+                        <Badge key={i} variant="secondary">{interest}</Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Achievements</h3>
+                    <ul className="list-disc pl-5 space-y-1">
+                      {selectedMember.achievements.map((achievement, i) => (
+                        <li key={i} className="text-muted-foreground">{achievement}</li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="pt-4 border-t">
+                    <div className="flex gap-4 justify-center">
+                      {Object.entries(selectedMember.socials).map(([platform, url]) => (
+                        url && (
+                          <Link 
+                            key={platform}
+                            href={url} 
+                            className="text-muted-foreground hover:text-primary"
+                          >
+                            {platform === 'github' && <Github className="h-5 w-5" />}
+                            {platform === 'twitter' && <Twitter className="h-5 w-5" />}
+                            {platform === 'linkedin' && <Linkedin className="h-5 w-5" />}
+                            {platform === 'website' && <Globe className="h-5 w-5" />}
+                          </Link>
+                        )
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </>
             )}
-          </DialogContent>
-        </Dialog>
-
-        <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
-          <DialogContent className="max-w-5xl">
-            <DialogHeader>
-              <DialogTitle>Schedule a Mentorship Session</DialogTitle>
-            </DialogHeader>
-            
-            <div className="grid md:grid-cols-2 gap-8 items-start justify-items-center">
-              <div className="flex flex-col items-center w-full max-w-[400px]">
-                <h3 className="font-semibold mb-6 text-center text-lg">Select Date</h3>
-                <div className="w-full bg-card rounded-lg p-4 shadow-sm border">
-                  <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={setDate}
-                    defaultMonth={date}
-                    fromDate={new Date()}
-                    className="w-full rounded-md mx-auto"
-                    disabled={(date) => 
-                      date < new Date() ||
-                      date.getDay() === 0 ||
-                      date.getDay() === 6
-                    }
-                    initialFocus
-                    classNames={{
-                      months: "w-full",
-                      month: "w-full",
-                      table: "w-full",
-                      head_row: "w-full flex justify-between",
-                      row: "w-full flex justify-between",
-                      cell: "flex-1 text-center",
-                      day: "w-full aspect-square flex items-center justify-center"
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div className="w-full max-w-[400px]">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Session Details</CardTitle>
-                    <CardDescription>Please fill in the details for your mentorship session</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="grid gap-4">
-                      <div className="grid gap-2">
-                        <label htmlFor="selected-date" className="text-sm font-medium">Selected Date</label>
-                        <input 
-                          id="selected-date"
-                          type="text"
-                          value={date?.toLocaleDateString()}
-                          disabled
-                          className="flex h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm"
-                        />
-                      </div>
-
-                      <div className="grid gap-2">
-                        <label htmlFor="session-type" className="text-sm font-medium">Session Type</label>
-                        <Select onValueChange={setSelectedType}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select session type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="technical">Technical Discussion</SelectItem>
-                            <SelectItem value="career">Career Guidance</SelectItem>
-                            <SelectItem value="project">Project Review</SelectItem>
-                            <SelectItem value="general">General Mentorship</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="grid gap-2">
-                        <label htmlFor="session-time" className="text-sm font-medium">Preferred Time</label>
-                        <Select onValueChange={setSelectedType}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select time slot" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="9:00 AM">9:00 AM</SelectItem>
-                            <SelectItem value="10:00 AM">10:00 AM</SelectItem>
-                            <SelectItem value="11:00 AM">11:00 AM</SelectItem>
-                            <SelectItem value="1:00 PM">1:00 PM</SelectItem>
-                            <SelectItem value="2:00 PM">2:00 PM</SelectItem>
-                            <SelectItem value="3:00 PM">3:00 PM</SelectItem>
-                            <SelectItem value="4:00 PM">4:00 PM</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="grid gap-2">
-                        <label htmlFor="session-description" className="text-sm font-medium">Session Goals</label>
-                        <textarea
-                          id="session-description"
-                          className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                          placeholder="What would you like to achieve in this session?"
-                        />
-                      </div>
-
-                      {/* <Button className="w-full mt-4">
-                        Schedule Session
-                      </Button> */}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
           </DialogContent>
         </Dialog>
       </div>
