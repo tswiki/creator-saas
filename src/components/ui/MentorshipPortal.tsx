@@ -97,7 +97,7 @@ import { FormField, FormItem, FormLabel, FormControl } from '@/components/ui/for
 import { Textarea } from './textarea';
 import { cn } from '@/lib/utils';
 import { format } from 'path';
-import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarTrigger } from './menubar';
+import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarTrigger } from './menubar';
 
 
 export function HeroVideoDialogDemoTopInBottomOut() {
@@ -2028,6 +2028,7 @@ export default function MentorshipPortal() {
     const [showProfileDialog, setShowProfileDialog] = useState(false);
 
     type CommunityMember = {
+      email: any;
       id: number;
       name: string;
       role: string;
@@ -2089,7 +2090,8 @@ export default function MentorshipPortal() {
             text: "Amazing mentor! Helped me land my dream job.",
             rating: 5
           }
-        ]
+        ],
+        email: undefined
       },
       {
         id: 2,
@@ -2110,7 +2112,8 @@ export default function MentorshipPortal() {
           "Regular speaker at local tech meetups"
         ],
         location: "Austin, TX",
-        timezone: "CST"
+        timezone: "CST",
+        email: undefined
       },
       {
         id: 3,
@@ -2134,7 +2137,8 @@ export default function MentorshipPortal() {
         languages: ["English", "Mandarin"],
         location: "Boston, MA",
         timezone: "EST",
-        rating: 4.8
+        rating: 4.8,
+        email: undefined
       },
       {
         id: 4,
@@ -2159,7 +2163,8 @@ export default function MentorshipPortal() {
         languages: ["English"],
         location: "London, UK",
         timezone: "GMT",
-        rating: 4.7
+        rating: 4.7,
+        email: undefined
       }
     ];
 
@@ -2216,26 +2221,6 @@ export default function MentorshipPortal() {
                       </div>
                     )}
 
-                    <div className="mt-4 pt-4 border-t">
-                      <div className="flex gap-4 justify-center">
-                        {member.socials.github && (
-                          <Link href={member.socials.github} className="text-muted-foreground hover:text-primary">
-                            <Github className="h-5 w-5" />
-                          </Link>
-                        )}
-                        {member.socials.twitter && (
-                          <Link href={member.socials.twitter} className="text-muted-foreground hover:text-primary">
-                            <Twitter className="h-5 w-5" />
-                          </Link>
-                        )}
-                        {member.socials.linkedin && (
-                          <Link href={member.socials.linkedin} className="text-muted-foreground hover:text-primary">
-                            <Linkedin className="h-5 w-5" />
-                          </Link>
-                        )}
-                      </div>
-                    </div>
-
                     <Button 
                       className="w-full mt-4" 
                       onClick={() => {
@@ -2253,15 +2238,15 @@ export default function MentorshipPortal() {
         </Card>
 
         <Dialog open={showProfileDialog} onOpenChange={setShowProfileDialog}>
-          <DialogContent className="w-[90vw] max-w-4xl max-h-[85vh] overflow-hidden">
-            <DialogHeader className="p-4 border-b">
-              <DialogTitle className="text-xl font-bold flex items-center gap-2">
+          <DialogContent className="w-[95vw] max-w-7xl">
+            <DialogHeader className="p-6 border-b">
+              <DialogTitle className="text-2xl font-bold flex items-center gap-3">
                 {selectedMember?.name}
                 {selectedMember?.type === 'mentor' && (
                   <Badge variant="secondary">Mentor</Badge>
                 )}
               </DialogTitle>
-              <DialogDescription className="text-base flex items-center gap-2 flex-wrap">
+              <DialogDescription className="text-lg flex items-center gap-2">
                 <span>{selectedMember?.role}</span>
                 {selectedMember?.company && (
                   <>
@@ -2281,17 +2266,19 @@ export default function MentorshipPortal() {
               </DialogDescription>
             </DialogHeader>
 
-            <ScrollArea className="flex-1">
-              <div className="p-4 space-y-6">
-                {/* About Section */}
-                <section className="bg-card rounded-lg p-4">
-                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    About
-                  </h3>
-                  <div className="space-y-3">
-                    <p className="text-muted-foreground text-sm leading-relaxed">{selectedMember?.bio}</p>
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* About Card */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <User className="h-5 w-5" />
+                      About
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p className="text-muted-foreground leading-relaxed">{selectedMember?.bio}</p>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
                         {selectedMember?.yearsOfExperience} years experience
@@ -2303,16 +2290,18 @@ export default function MentorshipPortal() {
                         </div>
                       )}
                     </div>
-                  </div>
-                </section>
+                  </CardContent>
+                </Card>
 
-                {/* Skills & Expertise Section */}
-                <section className="bg-card rounded-lg p-4">
-                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                    <Wrench className="h-4 w-4" />
-                    Skills & Expertise
-                  </h3>
-                  <div className="space-y-3">
+                {/* Skills & Expertise Card */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Wrench className="h-5 w-5" />
+                      Skills & Expertise
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
                     <div className="flex flex-wrap gap-2">
                       {selectedMember?.expertise.map((skill, i) => (
                         <Badge key={i} variant="secondary">{skill}</Badge>
@@ -2328,16 +2317,18 @@ export default function MentorshipPortal() {
                         </div>
                       </div>
                     )}
-                  </div>
-                </section>
+                  </CardContent>
+                </Card>
 
-                {/* Objectives & Goals Section */}
-                <section className="bg-card rounded-lg p-4">
-                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                    <Target className="h-4 w-4" />
-                    Objectives & Goals
-                  </h3>
-                  <div className="space-y-3">
+                {/* Objectives & Goals Card */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Target className="h-5 w-5" />
+                      Objectives & Goals
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
                     <div className="flex flex-wrap gap-2">
                       {selectedMember?.interests.map((interest, i) => (
                         <Badge key={i} variant="secondary">{interest}</Badge>
@@ -2346,60 +2337,114 @@ export default function MentorshipPortal() {
                     {selectedMember?.achievements && (
                       <div className="space-y-2">
                         <h4 className="text-sm font-medium">Key Achievements</h4>
-                        <div className="grid gap-2">
-                          {selectedMember.achievements.map((achievement, i) => (
-                            <div key={i} className="flex items-center gap-2 text-sm">
-                              <Trophy className="h-4 w-4 text-yellow-500 flex-shrink-0" />
-                              <span>{achievement}</span>
-                            </div>
-                          ))}
-                        </div>
+                        {selectedMember.achievements.map((achievement, i) => (
+                          <div key={i} className="flex items-center gap-2 text-sm">
+                            <Trophy className="h-4 w-4 text-yellow-500" />
+                            <span>{achievement}</span>
+                          </div>
+                        ))}
                       </div>
                     )}
-                  </div>
-                </section>
-
-                {/* Preferences Section */}
-                <section className="bg-card rounded-lg p-4">
-                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                    <Settings className="h-4 w-4" />
-                    Preferences & Availability
-                  </h3>
-                  <div className="space-y-3">
-                    {selectedMember?.availability && (
-                      <div>
-                        <h4 className="text-sm font-medium mb-2">Available Times</h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {selectedMember.availability.map((slot, i) => (
-                            <div key={i} className="flex items-center gap-2 text-sm">
-                              <Calendar className="h-4 w-4 flex-shrink-0" />
-                              <span>{slot}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    <div className="flex flex-wrap gap-3 pt-2">
+                  </CardContent>
+                </Card>
+              </div>
+              
+              <div className="mt-6 flex justify-end gap-4">
+                <Menubar className="border-none bg-transparent p-0">
+                  <MenubarMenu>
+                    <MenubarTrigger className="flex cursor-default select-none items-center rounded-sm px-3 py-2 text-sm font-medium outline-none focus:bg-neutral-100 focus:text-neutral-900 data-[state=open]:bg-neutral-100 data-[state=open]:text-neutral-900 dark:focus:bg-neutral-800 dark:focus:text-neutral-50 dark:data-[state=open]:bg-neutral-800 dark:data-[state=open]:text-neutral-50">
+                      Actions
+                    </MenubarTrigger>
+                    <MenubarContent className="min-w-[12rem] overflow-hidden rounded-md border border-neutral-200 bg-white p-1 text-neutral-950 shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-50">
                       {Object.entries(selectedMember?.socials || {}).map(([platform, url]) => (
                         url && (
-                          <Link 
-                            key={platform}
-                            href={url}
-                            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+                          <MenubarItem 
+                            key={platform} 
+                            className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-neutral-100 focus:text-neutral-900 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 dark:focus:bg-neutral-800 dark:focus:text-neutral-50"
+                            onClick={() => window.open(url, '_blank')}
                           >
-                            {platform === 'github' && <Github className="h-4 w-4" />}
-                            {platform === 'twitter' && <Twitter className="h-4 w-4" />}
-                            {platform === 'linkedin' && <Linkedin className="h-4 w-4" />}
-                            {platform === 'website' && <Globe className="h-4 w-4" />}
-                            {platform.charAt(0).toUpperCase() + platform.slice(1)}
-                          </Link>
+                            <div className="flex items-center gap-2">
+                              {platform === 'github' && <Github className="h-4 w-4" />}
+                              {platform === 'twitter' && <Twitter className="h-4 w-4" />}
+                              {platform === 'linkedin' && <Linkedin className="h-4 w-4" />}
+                              {platform === 'website' && <Globe className="h-4 w-4" />}
+                              {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                            </div>
+                          </MenubarItem>
                         )
                       ))}
-                    </div>
-                  </div>
-                </section>
+                      <MenubarSeparator className="-mx-1 my-1 h-px bg-neutral-100 dark:bg-neutral-800"/>
+                      <MenubarSub>
+                        <MenubarSubTrigger>
+                          <MessageSquare className="h-4 w-4 mr-2" />
+                          Contact Options
+                        </MenubarSubTrigger>
+                        <MenubarSubContent>
+                          <MenubarItem 
+                            onClick={() => {
+                              // Handle direct message
+                              if (selectedMember) {
+                                toast({
+                                  title: "Message Started",
+                                  description: `Starting chat with ${selectedMember.name}`,
+                                  duration: 3000,
+                                })
+                              }
+                            }}
+                          >
+                            Direct Message
+                          </MenubarItem>
+                          <MenubarItem
+                            onClick={() => {
+                              // Handle email
+                              if (selectedMember?.email) {
+                                window.location.href = `mailto:${selectedMember.email}`
+                              }
+                            }}
+                          >
+                            Send Email
+                          </MenubarItem>
+                        </MenubarSubContent>
+                      </MenubarSub>
+                      <MenubarSub>
+                        <MenubarSubTrigger>
+                          <UserPlus className="h-4 w-4 mr-2" />
+                          Mentorship
+                        </MenubarSubTrigger>
+                        <MenubarSubContent>
+                          <MenubarItem 
+                            onClick={() => {
+                              if (selectedMember) {
+                                toast({
+                                  title: "Mentorship Request Sent",
+                                  description: `Your request has been sent to ${selectedMember.name}`,
+                                  duration: 3000,
+                                })
+                              }
+                            }}
+                          >
+                            Request Mentorship
+                          </MenubarItem>
+                          <MenubarItem
+                            onClick={() => {
+                              if (selectedMember) {
+                                toast({
+                                  title: "Schedule Meeting",
+                                  description: "Opening calendar to schedule a meeting",
+                                  duration: 3000,
+                                })
+                              }
+                            }}
+                          >
+                            Schedule Meeting
+                          </MenubarItem>
+                        </MenubarSubContent>
+                      </MenubarSub>
+                    </MenubarContent>
+                  </MenubarMenu>
+                </Menubar>
               </div>
-            </ScrollArea>
+            </div>
           </DialogContent>
         </Dialog>
       </div>
