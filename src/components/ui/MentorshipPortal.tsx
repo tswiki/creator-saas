@@ -84,7 +84,12 @@ import {
   CheckCircle2,
   Trophy,
   Target,
-  Wrench
+  Wrench,
+  Save,
+  Instagram,
+  ArrowLeft,
+  ArrowRight,
+  LayoutDashboard
 } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
@@ -144,7 +149,11 @@ export default function MentorshipPortal() {
           {/* <div className="font-bold text-xl mb-6">Mentorship Portal</div> */}
           
           <div className="flex flex-col gap-3 flex-1">
-            <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('dashboard')}>
+          <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('dashboard')}>
+              <LayoutDashboard className="mr-2 h-4 w-4" />
+              Dashboard
+            </Button>
+            <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('spaces')}>
               <Hash className="mr-2 h-4 w-4" />
               Spaces
             </Button>
@@ -190,80 +199,447 @@ export default function MentorshipPortal() {
             </div>
           </div>
 
-          <Dialog open={showProfileDialog} onOpenChange={setShowProfileDialog}>
-            <DialogTrigger asChild>
-              <Button variant="ghost" className="justify-between w-full mt-2 border-t pt-3">
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  <span className="text-sm text-muted-foreground">{profileData.username}</span>
+          <Button variant="ghost" className="justify-between w-full mt-2 border-t pt-3" onClick={() => setCurrentView('profile')}>
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              <span className="text-sm text-muted-foreground">{profileData.username}</span>
+            </div>
+            <Settings className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+
+  const DashboardView = () => {
+    const [todos, setTodos] = useState([
+      { id: 1, title: "Complete React Tutorial", description: "Finish chapters 4-6", dueDate: "2024-02-01", priority: "High" },
+      { id: 2, title: "Review Pull Request", description: "Review team's code changes", dueDate: "2024-02-03", priority: "Medium" }
+    ]);
+
+    const [inProgress, setInProgress] = useState([
+      { id: 3, title: "Build Portfolio Project", description: "Working on the frontend", dueDate: "2024-02-05", priority: "High" }
+    ]);
+
+    const [completed, setCompleted] = useState([
+      { id: 4, title: "Setup Development Environment", description: "Install necessary tools", dueDate: "2024-01-30", priority: "Low" }
+    ]);
+
+    const [showNewTaskDialog, setShowNewTaskDialog] = useState(false);
+    const [newTask, setNewTask] = useState({ title: "", description: "", dueDate: "", priority: "Medium" });
+
+    const addNewTask = () => {
+      const task = {
+        id: Date.now(),
+        ...newTask
+      };
+      setTodos([...todos, task]);
+      setNewTask({ title: "", description: "", dueDate: "", priority: "Medium" });
+      setShowNewTaskDialog(false);
+    };
+
+    const moveTask = (taskId: number, from: any[], setFrom: Function, to: any[], setTo: Function) => {
+      const taskIndex = from.findIndex(task => task.id === taskId);
+      if (taskIndex !== -1) {
+        const task = from[taskIndex];
+        setFrom(from.filter(t => t.id !== taskId));
+        setTo([...to, task]);
+      }
+    };
+
+    const TaskColumn = ({ title, tasks, onMoveLeft, onMoveRight, leftLabel, rightLabel }: any) => (
+      <Card className="flex-1">
+        <CardHeader>
+          <CardTitle className="flex justify-between items-center">
+            <span>{title}</span>
+            <Badge variant="secondary">{tasks.length}</Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {tasks.map((task: any) => (
+            <Card key={task.id} className="p-4 space-y-2">
+              <div className="flex justify-between items-start">
+                <h4 className="font-semibold">{task.title}</h4>
+                <Badge>{task.priority}</Badge>
+              </div>
+              <p className="text-sm text-muted-foreground">{task.description}</p>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-muted-foreground">Due: {task.dueDate}</span>
+                <div className="flex gap-2">
+                  {onMoveLeft && (
+                    <Button size="sm" variant="ghost" onClick={() => onMoveLeft(task.id)}>
+                      <ArrowLeft className="h-4 w-4" />
+                      <span className="sr-only">{leftLabel}</span>
+                    </Button>
+                  )}
+                  {onMoveRight && (
+                    <Button size="sm" variant="ghost" onClick={() => onMoveRight(task.id)}>
+                      <ArrowRight className="h-4 w-4" />
+                      <span className="sr-only">{rightLabel}</span>
+                    </Button>
+                  )}
                 </div>
-                <Settings className="h-4 w-4" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-h-[80vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Edit Profile</DialogTitle>
-                <DialogDescription>
-                  Update your profile information below
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-3 py-3">
-                <div className="grid gap-2">
-                  <label htmlFor="username">Username</label>
-                  <input
-                    id="username"
-                    value={profileData.username}
-                    onChange={(e) => setProfileData({...profileData, username: e.target.value})}
-                    className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+              </div>
+            </Card>
+          ))}
+        </CardContent>
+      </Card>
+    );
+
+    return (
+      <div className="space-y-6 pt-12">
+        <div className="flex justify-between items-center">
+          <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+          <Button onClick={() => setShowNewTaskDialog(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add New Task
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <TaskColumn
+            title="To Do"
+            tasks={todos}
+            onMoveRight={(id: number) => moveTask(id, todos, setTodos, inProgress, setInProgress)}
+            rightLabel="Move to In Progress"
+          />
+          <TaskColumn
+            title="In Progress"
+            tasks={inProgress}
+            onMoveLeft={(id: number) => moveTask(id, inProgress, setInProgress, todos, setTodos)}
+            onMoveRight={(id: number) => moveTask(id, inProgress, setInProgress, completed, setCompleted)}
+            leftLabel="Move to Todo"
+            rightLabel="Move to Completed"
+          />
+          <TaskColumn
+            title="Completed"
+            tasks={completed}
+            onMoveLeft={(id: number) => moveTask(id, completed, setCompleted, inProgress, setInProgress)}
+            leftLabel="Move to In Progress"
+          />
+        </div>
+
+        <Dialog open={showNewTaskDialog} onOpenChange={setShowNewTaskDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New Task</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="title">Title</Label>
+                <Input
+                  id="title"
+                  value={newTask.title}
+                  onChange={(e) => setNewTask({...newTask, title: e.target.value})}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={newTask.description}
+                  onChange={(e) => setNewTask({...newTask, description: e.target.value})}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="dueDate">Due Date</Label>
+                  <Input
+                    id="dueDate"
+                    type="date"
+                    value={newTask.dueDate}
+                    onChange={(e) => setNewTask({...newTask, dueDate: e.target.value})}
                   />
                 </div>
-                <div className="grid gap-2">
-                  <label htmlFor="bio">Bio</label>
-                  <textarea
-                    id="bio"
-                    value={profileData.bio}
-                    onChange={(e) => setProfileData({...profileData, bio: e.target.value})}
-                    className="flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
-                    placeholder="Tell us about yourself..."
-                  />
+                <div className="space-y-2">
+                  <Label htmlFor="priority">Priority</Label>
+                  <Select onValueChange={(value) => setNewTask({...newTask, priority: value})}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select priority" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Low">Low</SelectItem>
+                      <SelectItem value="Medium">Medium</SelectItem>
+                      <SelectItem value="High">High</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div className="grid gap-2">
-                  <label htmlFor="niche">Niche</label>
-                  <input
-                    id="niche"
-                    value={profileData.niche}
-                    onChange={(e) => setProfileData({...profileData, niche: e.target.value})}
-                    className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
-                    placeholder="Your area of expertise"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <label htmlFor="goal">Goal</label>
-                  <input
-                    id="goal"
+              </div>
+            </div>
+            <DialogFooter>
+              <Button onClick={addNewTask}>Add Task</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  };
+
+  
+  const ProfileView = () => {
+    const [profileData, setProfileData] = useState({
+      username: auth.currentUser?.email || "johndoe@example.com",
+      bio: "",
+      skills: [],
+      achievements: [],
+      niche: "",
+      goal: "",
+      isGoogleConnected: false,
+      isInstagramConnected: false,
+      isDiscordConnected: false,
+      isLinkedInConnected: false,
+      isTwitterConnected: false,
+      isTikTokConnected: false
+    });
+
+    const handleConnect = (service: string) => {
+      // OAuth integration would go here for each service
+      setProfileData(prev => ({
+        ...prev,
+        [`is${service}Connected`]: true
+      }));
+      toast({
+        title: "Success",
+        description: `Connected to ${service}`
+      });
+    };
+
+    return (
+      <div className="space-y-6 pt-10">
+        {/* Profile Information Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Profile Information</CardTitle>
+            <CardDescription>
+              Update your basic profile information
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-2">
+              <label htmlFor="username">Username</label>
+              <input
+                id="username"
+                value={profileData.username}
+                onChange={(e) => setProfileData({...profileData, username: e.target.value})}
+                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+              />
+            </div>
+            <div className="grid gap-2">
+              <label htmlFor="bio">Bio</label>
+              <textarea
+                id="bio"
+                value={profileData.bio}
+                onChange={(e) => setProfileData({...profileData, bio: e.target.value})}
+                className="flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+                placeholder="Tell us about yourself..."
+              />
+            </div>
+            <div className="grid gap-2">
+              <label htmlFor="skills">Skills</label>
+              <Select
+                onValueChange={(value) => setProfileData(prev => ({
+                  ...prev,
+                  skills: [...prev.skills, value]
+                }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Add a skill" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="javascript">JavaScript</SelectItem>
+                  <SelectItem value="react">React</SelectItem>
+                  <SelectItem value="node">Node.js</SelectItem>
+                  <SelectItem value="python">Python</SelectItem>
+                </SelectContent>
+              </Select>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {profileData.skills.map((skill, index) => (
+                  <Badge key={index} variant="secondary" className="px-2 py-1">
+                    {skill}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="ml-2 h-4 w-4 p-0"
+                      onClick={() => setProfileData(prev => ({
+                        ...prev,
+                        skills: prev.skills.filter((_, i) => i !== index)
+                      }))}
+                    >
+                      ×
+                    </Button>
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Achievements Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Achievements</CardTitle>
+            <CardDescription>
+              Add your certifications and accomplishments
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <input
+                  placeholder="Add new achievement"
+                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      const target = e.target as HTMLInputElement;
+                      setProfileData(prev => ({
+                        ...prev,
+                        achievements: [...prev.achievements, target.value]
+                      }));
+                      target.value = '';
+                    }
+                  }}
+                />
+              </div>
+              <div className="space-y-2">
+                {profileData.achievements.map((achievement, index) => (
+                  <div key={index} className="flex items-center justify-between p-2 border rounded-md">
+                    <span>{achievement}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setProfileData(prev => ({
+                        ...prev,
+                        achievements: prev.achievements.filter((_, i) => i !== index)
+                      }))}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Connected Services Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Profile Details</CardTitle>
+            <CardDescription>
+              Enhance your profile with additional information
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid grid-cols-2 gap-6">
+            {/* Left Column */}
+            <div className="space-y-6">
+              {/* About Section */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg">About</h3>
+                <Textarea 
+                  placeholder="Tell us about yourself, your background, and what drives you..."
+                  className="min-h-[100px]"
+                  value={profileData.bio} // Using existing bio field
+                  onChange={(e) => setProfileData(prev => ({
+                    ...prev,
+                    bio: e.target.value
+                  }))}
+                />
+              </div>
+
+              {/* Objectives & Goals Section */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg">Objectives & Goals</h3>
+                <div className="space-y-2">
+                  <Textarea
+                    placeholder="Define your learning objectives and career goals..."
+                    className="min-h-[100px]"
                     value={profileData.goal}
-                    onChange={(e) => setProfileData({...profileData, goal: e.target.value})}
-                    className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
-                    placeholder="What's your main goal?"
+                    onChange={(e) => setProfileData(prev => ({
+                      ...prev,
+                      goal: e.target.value
+                    }))}
                   />
                 </div>
               </div>
-              <DialogFooter className="flex justify-between items-center">
-                <Button 
-                  variant="destructive"
-                  onClick={() => {
-                    localStorage.clear();
-                    window.location.href = '/login';
-                  }}
-                  className="flex items-center gap-2"
-                >
-                  <LogOut className="h-4 w-4" />
-                  Logout
-                </Button>
-                <Button onClick={() => setShowProfileDialog(false)}>Save changes</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+            </div>
+
+            {/* Right Column - Connected Services */}
+            <div className="space-y-4">
+              <h3 className="font-semibold text-lg">Connected Services</h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-2 border rounded-md">
+                  <div className="flex items-center gap-2">
+                    <CalendarIcon className="h-5 w-5" />
+                    <span>Google</span>
+                  </div>
+                  <Button
+                    variant={profileData.isGoogleConnected ? "secondary" : "default"}
+                    onClick={() => handleConnect('Google')}
+                  >
+                    {profileData.isGoogleConnected ? "Connected" : "Connect"}
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between p-2 border rounded-md">
+                  <div className="flex items-center gap-2">
+                    <Instagram className="h-5 w-5" />
+                    <span>Instagram</span>
+                  </div>
+                  <Button
+                    variant={profileData.isInstagramConnected ? "secondary" : "default"}
+                    onClick={() => handleConnect('Instagram')}
+                  >
+                    {profileData.isInstagramConnected ? "Connected" : "Connect"}
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between p-2 border rounded-md">
+                  <div className="flex items-center gap-2">
+                    <MessageSquare className="h-5 w-5" />
+                    <span>Discord</span>
+                  </div>
+                  <Button
+                    variant={profileData.isDiscordConnected ? "secondary" : "default"}
+                    onClick={() => handleConnect('Discord')}
+                  >
+                    {profileData.isDiscordConnected ? "Connected" : "Connect"}
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between p-2 border rounded-md">
+                  <div className="flex items-center gap-2">
+                    <Linkedin className="h-5 w-5" />
+                    <span>LinkedIn</span>
+                  </div>
+                  <Button
+                    variant={profileData.isLinkedInConnected ? "secondary" : "default"}
+                    onClick={() => handleConnect('LinkedIn')}
+                  >
+                    {profileData.isLinkedInConnected ? "Connected" : "Connect"}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="flex justify-between">
+          <Button 
+            variant="destructive"
+            onClick={() => {
+              localStorage.clear();
+              window.location.href = '/login';
+            }}
+            className="flex items-center gap-2"
+          >
+            <LogOut className="h-4 w-4" />
+            Logout
+          </Button>
+          <Button 
+            onClick={() => toast({ title: "Profile updated successfully" })}
+            className="flex items-center gap-2"
+          >
+            <Save className="h-4 w-4" />
+            Save Changes
+          </Button>
         </div>
       </div>
     );
@@ -2452,7 +2828,7 @@ export default function MentorshipPortal() {
   };
 
   
-  const DashboardView = () => {
+  const SpacesView = () => {
     const [selectedChannel, setSelectedChannel] = useState('general');
     const [isCallActive, setIsCallActive] = useState(false);
     const [participants, setParticipants] = useState<string[]>([]);
@@ -2979,11 +3355,14 @@ export default function MentorshipPortal() {
 
       <div className="flex-1 p-6">
         {currentView === 'dashboard' && <DashboardView />}
+        {currentView === 'spaces' && <SpacesView />}
         {currentView === 'schedule' && <ScheduleView />}
         {currentView === 'messages' && <MessagesView />}
         {currentView === 'resources' && <ResourcesView/>}
         {currentView === 'course' && <CourseView/>}
         {currentView === 'mentor' && <MyMentorView/>}
+        {currentView === 'profile' && <ProfileView/>}
+
       </div>
     </div>
   );
