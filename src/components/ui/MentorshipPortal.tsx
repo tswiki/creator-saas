@@ -80,7 +80,11 @@ import {
   Trash,
   UserPlus,
   MapPin,
-  Globe
+  Globe,
+  CheckCircle2,
+  Trophy,
+  Target,
+  Wrench
 } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
@@ -2040,6 +2044,16 @@ export default function MentorshipPortal() {
         website?: string;
       };
       achievements: string[];
+      availability?: string[];
+      languages?: string[];
+      location?: string;
+      timezone?: string;
+      rating?: number;
+      reviews?: {
+        author: string;
+        text: string;
+        rating: number;
+      }[];
     };
 
     const communityMembers: CommunityMember[] = [
@@ -2063,6 +2077,18 @@ export default function MentorshipPortal() {
           "Led 200+ successful mentorship sessions",
           "Published author on system design",
           "Google Developer Expert"
+        ],
+        availability: ["Mon 9-5 PST", "Wed 1-6 PST", "Fri 9-3 PST"],
+        languages: ["English", "Spanish"],
+        location: "San Francisco, CA",
+        timezone: "PST",
+        rating: 4.9,
+        reviews: [
+          {
+            author: "John Doe",
+            text: "Amazing mentor! Helped me land my dream job.",
+            rating: 5
+          }
         ]
       },
       {
@@ -2082,7 +2108,9 @@ export default function MentorshipPortal() {
         achievements: [
           "Created popular React component library",
           "Regular speaker at local tech meetups"
-        ]
+        ],
+        location: "Austin, TX",
+        timezone: "CST"
       },
       {
         id: 3,
@@ -2101,7 +2129,37 @@ export default function MentorshipPortal() {
         achievements: [
           "Published ML research papers",
           "Built autonomous systems used in production"
-        ]
+        ],
+        availability: ["Tue 10-6 EST", "Thu 1-5 EST"],
+        languages: ["English", "Mandarin"],
+        location: "Boston, MA",
+        timezone: "EST",
+        rating: 4.8
+      },
+      {
+        id: 4,
+        name: "Marcus Johnson",
+        role: "DevOps Engineer",
+        type: "mentor",
+        company: "Amazon",
+        expertise: ["Kubernetes", "AWS", "CI/CD", "Docker"],
+        bio: "Specializing in cloud infrastructure and DevOps practices. Love helping teams improve their deployment processes.",
+        yearsOfExperience: 10,
+        interests: ["Infrastructure as Code", "Site Reliability", "Automation"],
+        socials: {
+          linkedin: "linkedin.com/in/marcusj",
+          github: "github.com/mjohnson"
+        },
+        achievements: [
+          "AWS Certified Solutions Architect",
+          "Kubernetes Certified Administrator",
+          "Built scalable infrastructure for unicorn startups"
+        ],
+        availability: ["Mon-Thu 6-9pm GMT"],
+        languages: ["English"],
+        location: "London, UK",
+        timezone: "GMT",
+        rating: 4.7
       }
     ];
 
@@ -2129,9 +2187,16 @@ export default function MentorshipPortal() {
                         {member.company && (
                           <p className="text-sm text-muted-foreground">at {member.company}</p>
                         )}
-                        <Badge variant={member.type === 'mentor' ? 'default' : 'secondary'}>
-                          {member.type === 'mentor' ? 'Mentor' : 'Member'}
-                        </Badge>
+                        <div className="flex gap-2 items-center">
+                          <Badge variant={member.type === 'mentor' ? 'default' : 'secondary'}>
+                            {member.type === 'mentor' ? 'Mentor' : 'Member'}
+                          </Badge>
+                          {member.rating && (
+                            <Badge variant="outline">
+                              ⭐ {member.rating}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
 
@@ -2143,6 +2208,13 @@ export default function MentorshipPortal() {
                         ))}
                       </div>
                     </div>
+
+                    {member.location && (
+                      <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+                        <MapPin className="h-4 w-4" />
+                        <span>{member.location}</span>
+                      </div>
+                    )}
 
                     <div className="mt-4 pt-4 border-t">
                       <div className="flex gap-4 justify-center">
@@ -2181,75 +2253,153 @@ export default function MentorshipPortal() {
         </Card>
 
         <Dialog open={showProfileDialog} onOpenChange={setShowProfileDialog}>
-          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-            {selectedMember && (
-              <>
-                <DialogHeader>
-                  <DialogTitle className="text-2xl flex items-center gap-2">
-                    {selectedMember.name}
-                    <Badge variant={selectedMember.type === 'mentor' ? 'default' : 'secondary'}>
-                      {selectedMember.type === 'mentor' ? 'Mentor' : 'Member'}
-                    </Badge>
-                  </DialogTitle>
-                  <DialogDescription>
-                    {selectedMember.role} {selectedMember.company && `at ${selectedMember.company}`}
-                  </DialogDescription>
-                </DialogHeader>
+          <DialogContent className="w-[90vw] max-w-4xl max-h-[85vh] overflow-hidden">
+            <DialogHeader className="p-4 border-b">
+              <DialogTitle className="text-xl font-bold flex items-center gap-2">
+                {selectedMember?.name}
+                {selectedMember?.type === 'mentor' && (
+                  <Badge variant="secondary">Mentor</Badge>
+                )}
+              </DialogTitle>
+              <DialogDescription className="text-base flex items-center gap-2 flex-wrap">
+                <span>{selectedMember?.role}</span>
+                {selectedMember?.company && (
+                  <>
+                    <span>•</span>
+                    <span>{selectedMember.company}</span>
+                  </>
+                )}
+                {selectedMember?.location && (
+                  <>
+                    <span>•</span>
+                    <span className="flex items-center gap-1">
+                      <MapPin className="h-4 w-4" />
+                      {selectedMember.location}
+                    </span>
+                  </>
+                )}
+              </DialogDescription>
+            </DialogHeader>
 
-                <div className="space-y-6 mt-6">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">About</h3>
-                    <p className="text-muted-foreground">{selectedMember.bio}</p>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">Expertise</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedMember.expertise.map((skill, i) => (
-                        <Badge key={i} variant="outline">{skill}</Badge>
-                      ))}
+            <ScrollArea className="flex-1">
+              <div className="p-4 space-y-6">
+                {/* About Section */}
+                <section className="bg-card rounded-lg p-4">
+                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    About
+                  </h3>
+                  <div className="space-y-3">
+                    <p className="text-muted-foreground text-sm leading-relaxed">{selectedMember?.bio}</p>
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-4 w-4" />
+                        {selectedMember?.yearsOfExperience} years experience
+                      </div>
+                      {selectedMember?.timezone && (
+                        <div className="flex items-center gap-1">
+                          <Globe className="h-4 w-4" />
+                          {selectedMember.timezone}
+                        </div>
+                      )}
                     </div>
                   </div>
+                </section>
 
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">Interests</h3>
+                {/* Skills & Expertise Section */}
+                <section className="bg-card rounded-lg p-4">
+                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <Wrench className="h-4 w-4" />
+                    Skills & Expertise
+                  </h3>
+                  <div className="space-y-3">
                     <div className="flex flex-wrap gap-2">
-                      {selectedMember.interests.map((interest, i) => (
+                      {selectedMember?.expertise.map((skill, i) => (
+                        <Badge key={i} variant="secondary">{skill}</Badge>
+                      ))}
+                    </div>
+                    {selectedMember?.languages && (
+                      <div>
+                        <h4 className="text-sm font-medium mb-2">Languages</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedMember.languages.map((language, i) => (
+                            <Badge key={i} variant="outline">{language}</Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </section>
+
+                {/* Objectives & Goals Section */}
+                <section className="bg-card rounded-lg p-4">
+                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <Target className="h-4 w-4" />
+                    Objectives & Goals
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex flex-wrap gap-2">
+                      {selectedMember?.interests.map((interest, i) => (
                         <Badge key={i} variant="secondary">{interest}</Badge>
                       ))}
                     </div>
+                    {selectedMember?.achievements && (
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium">Key Achievements</h4>
+                        <div className="grid gap-2">
+                          {selectedMember.achievements.map((achievement, i) => (
+                            <div key={i} className="flex items-center gap-2 text-sm">
+                              <Trophy className="h-4 w-4 text-yellow-500 flex-shrink-0" />
+                              <span>{achievement}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
+                </section>
 
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">Achievements</h3>
-                    <ul className="list-disc pl-5 space-y-1">
-                      {selectedMember.achievements.map((achievement, i) => (
-                        <li key={i} className="text-muted-foreground">{achievement}</li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="pt-4 border-t">
-                    <div className="flex gap-4 justify-center">
-                      {Object.entries(selectedMember.socials).map(([platform, url]) => (
+                {/* Preferences Section */}
+                <section className="bg-card rounded-lg p-4">
+                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <Settings className="h-4 w-4" />
+                    Preferences & Availability
+                  </h3>
+                  <div className="space-y-3">
+                    {selectedMember?.availability && (
+                      <div>
+                        <h4 className="text-sm font-medium mb-2">Available Times</h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {selectedMember.availability.map((slot, i) => (
+                            <div key={i} className="flex items-center gap-2 text-sm">
+                              <Calendar className="h-4 w-4 flex-shrink-0" />
+                              <span>{slot}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex flex-wrap gap-3 pt-2">
+                      {Object.entries(selectedMember?.socials || {}).map(([platform, url]) => (
                         url && (
                           <Link 
                             key={platform}
-                            href={url} 
-                            className="text-muted-foreground hover:text-primary"
+                            href={url}
+                            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
                           >
-                            {platform === 'github' && <Github className="h-5 w-5" />}
-                            {platform === 'twitter' && <Twitter className="h-5 w-5" />}
-                            {platform === 'linkedin' && <Linkedin className="h-5 w-5" />}
-                            {platform === 'website' && <Globe className="h-5 w-5" />}
+                            {platform === 'github' && <Github className="h-4 w-4" />}
+                            {platform === 'twitter' && <Twitter className="h-4 w-4" />}
+                            {platform === 'linkedin' && <Linkedin className="h-4 w-4" />}
+                            {platform === 'website' && <Globe className="h-4 w-4" />}
+                            {platform.charAt(0).toUpperCase() + platform.slice(1)}
                           </Link>
                         )
                       ))}
                     </div>
                   </div>
-                </div>
-              </>
-            )}
+                </section>
+              </div>
+            </ScrollArea>
           </DialogContent>
         </Dialog>
       </div>
