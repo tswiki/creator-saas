@@ -739,11 +739,11 @@ export default function MentorshipPortal() {
                   </Button>
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button className="w-full" variant="outline">View Resources</Button>
+                      <Button className="w-full" variant="outline">Library</Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-[90vw] max-h-[85vh] w-full h-full">
                       <DialogHeader>
-                        <DialogTitle>My Resources Library</DialogTitle>
+                        <DialogTitle>Collections</DialogTitle>
                         <DialogDescription>
                           Browse your collections and uploaded resources
                         </DialogDescription>
@@ -3002,6 +3002,52 @@ export default function MentorshipPortal() {
                     variant="ghost"
                     className="relative group hover:bg-accent transition-colors p-3 lg:p-4"
                   >
+                    <Users className="h-8 w-8 lg:h-10 lg:w-10 xl:h-12 xl:w-12 transition-transform group-hover:scale-110" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Online Users</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    {onlineUsers.map(user => (
+                      <div key={user.id} className="flex items-center justify-between p-2 hover:bg-secondary rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-8 w-8">
+                            <AvatarFallback>{user.name[0]}</AvatarFallback>
+                          </Avatar>
+                          <p className="font-medium">{user.name}</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setShowUserProfileDialog(true);
+                            }}
+                          >
+                            <User className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <MessageSquare className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <Video className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button 
+                    variant="ghost"
+                    className="relative group hover:bg-accent transition-colors p-3 lg:p-4"
+                  >
                     <Mail className="h-8 w-8 lg:h-10 lg:w-10 xl:h-12 xl:w-12 transition-transform group-hover:scale-110" />
                   </Button>
                 </DialogTrigger>
@@ -3110,7 +3156,59 @@ export default function MentorshipPortal() {
           </CardHeader>
         </Card>
 
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
+            <Card className="h-full">
+              <CardHeader>
+                <CardTitle>Community Highlights</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="w-full">
+                      View Highlights
+                      <Star className="h-4 w-4 ml-2" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Community Highlights</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      {[
+                        {
+                          title: "Outstanding Achievement",
+                          user: "Sarah Chen",
+                          description: "Completed advanced system design project",
+                          date: "2 days ago"
+                        },
+                        {
+                          title: "Mentorship Excellence",
+                          user: "David Kim",
+                          description: "Helped 5 mentees achieve their career goals",
+                          date: "1 week ago"
+                        }
+                      ].map((highlight, index) => (
+                        <Card key={index}>
+                          <CardContent className="pt-6">
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between">
+                                <h4 className="font-semibold">{highlight.title}</h4>
+                                <Badge variant="secondary">{highlight.date}</Badge>
+                              </div>
+                              <p className="text-sm text-muted-foreground">{highlight.description}</p>
+                              <p className="text-sm font-medium">By {highlight.user}</p>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </CardContent>
+            </Card>
+          </div>
+
           <Card className="h-full">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Channels</CardTitle>
@@ -3139,69 +3237,6 @@ export default function MentorshipPortal() {
                   </Button>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle>Online Users</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <table className="w-full">
-                <thead>
-                  <tr className="text-left">
-                    <th className="pb-4">User</th>
-                    <th className="pb-4">Status</th>
-                    <th className="pb-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {onlineUsers.map(user => (
-                    <tr key={user.id} className="border-t">
-                      <td className="py-3">
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-8 w-8">
-                            <AvatarFallback>{user.name[0]}</AvatarFallback>
-                          </Avatar>
-                          <p className="text-sm font-medium">{user.name}</p>
-                        </div>
-                      </td>
-                      <td className="py-3">
-                        <p className="text-xs text-muted-foreground capitalize">{user.status}</p>
-                      </td>
-                      <td className="py-3 text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-8 w-8 p-0"
-                            onClick={() => {
-                              setSelectedUser(user);
-                              setShowUserProfileDialog(true);
-                            }}
-                          >
-                            <User className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-8 w-8 p-0"
-                          >
-                            <MessageSquare className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-8 w-8 p-0"
-                          >
-                            <Video className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </CardContent>
           </Card>
         </div>
