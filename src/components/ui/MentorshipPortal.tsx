@@ -94,7 +94,9 @@ import {
   MonitorPlay,
   Heart,
   MessageCircle,
-  Share
+  Share,
+  Forward,
+  ReplyIcon
 } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
@@ -233,6 +235,7 @@ export default function MentorshipPortal() {
     ]);
 
     const [showNewTaskDialog, setShowNewTaskDialog] = useState(false);
+    const [selectedColumn, setSelectedColumn] = useState('');
     const [newTask, setNewTask] = useState({ title: "", description: "", dueDate: "", priority: "Medium" });
 
     const addNewTask = () => {
@@ -240,7 +243,19 @@ export default function MentorshipPortal() {
         id: Date.now(),
         ...newTask
       };
-      setTodos([...todos, task]);
+      
+      switch(selectedColumn) {
+        case 'todo':
+          setTodos([...todos, task]);
+          break;
+        case 'inProgress':
+          setInProgress([...inProgress, task]);
+          break;
+        case 'completed':
+          setCompleted([...completed, task]);
+          break;
+      }
+      
       setNewTask({ title: "", description: "", dueDate: "", priority: "Medium" });
       setShowNewTaskDialog(false);
     };
@@ -254,7 +269,7 @@ export default function MentorshipPortal() {
       }
     };
 
-    const TaskColumn = ({ title, tasks, onMoveLeft, onMoveRight, leftLabel, rightLabel }: any) => (
+    const TaskColumn = ({ title, tasks, onMoveLeft, onMoveRight, leftLabel, rightLabel, columnType }: any) => (
       <Card className="flex-1">
         <CardHeader>
           <CardTitle className="flex justify-between items-center">
@@ -262,7 +277,7 @@ export default function MentorshipPortal() {
             <Badge variant="secondary">{tasks.length}</Badge>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 relative">
           {tasks.map((task: any) => (
             <Card key={task.id} className="p-4 space-y-2">
               <div className="flex justify-between items-start">
@@ -289,17 +304,35 @@ export default function MentorshipPortal() {
               </div>
             </Card>
           ))}
+          
+          <Button 
+            variant="ghost" 
+            className="w-full mt-4 border-2 border-dashed"
+            onClick={() => {
+              setSelectedColumn(columnType);
+              setShowNewTaskDialog(true);
+            }}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Card
+          </Button>
         </CardContent>
       </Card>
     );
+
+    const [showMailboxDialog, setShowMailboxDialog] = useState(false);
+    const [emails] = useState([
+      { id: 1, subject: "Project Update", from: "team@company.com", date: "2024-02-01", content: "Latest project updates..." },
+      { id: 2, subject: "Meeting Notes", from: "manager@company.com", date: "2024-02-02", content: "Notes from today's meeting..." }
+    ]);
 
     return (
       <div className="space-y-6 pt-12">
         <div className="flex justify-between items-center">
           <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-          <Button onClick={() => setShowNewTaskDialog(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add New Task
+          <Button onClick={() => setShowMailboxDialog(true)}>
+            <Mail className="h-4 w-4 mr-1" />
+            Mailbox
           </Button>
         </div>
 
@@ -309,6 +342,7 @@ export default function MentorshipPortal() {
             tasks={todos}
             onMoveRight={(id: number) => moveTask(id, todos, setTodos, inProgress, setInProgress)}
             rightLabel="Move to In Progress"
+            columnType="todo"
           />
           <TaskColumn
             title="In Progress"
@@ -317,12 +351,14 @@ export default function MentorshipPortal() {
             onMoveRight={(id: number) => moveTask(id, inProgress, setInProgress, completed, setCompleted)}
             leftLabel="Move to Todo"
             rightLabel="Move to Completed"
+            columnType="inProgress"
           />
           <TaskColumn
             title="Completed"
             tasks={completed}
             onMoveLeft={(id: number) => moveTask(id, completed, setCompleted, inProgress, setInProgress)}
             leftLabel="Move to In Progress"
+            columnType="completed"
           />
         </div>
 
@@ -377,6 +413,101 @@ export default function MentorshipPortal() {
               <Button onClick={addNewTask}>Add Task</Button>
             </DialogFooter>
           </DialogContent>
+        </Dialog>
+
+        <Dialog open={showMailboxDialog} onOpenChange={setShowMailboxDialog}>
+          {(() => {
+            const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
+            
+            return (
+              <DialogContent className="max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>
+                    {selectedEmailId ? (
+                      <Button 
+                        variant="ghost" 
+                        className="p-0 hover:bg-transparent" 
+                        onClick={() => setSelectedEmailId(null)}
+                      >
+                        <ArrowLeft className="h-4 w-4 mr-2" />
+                        Back to Inbox
+                      </Button>
+                    ) : 
+                      "Mailbox"
+                    }
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  {!selectedEmailId ? (
+                    // Inbox View
+                    emails.map(email => (
+                      <Card 
+                        key={email.id} 
+                        className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                        onClick={() => setSelectedEmailId(email.id)}
+                      >
+                        <div className="flex justify-between items-start">
+                          <h4 className="font-semibold">{email.subject}</h4>
+                          <span className="text-sm text-muted-foreground">{email.date}</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">From: {email.from}</p>
+                        <p className="text-sm mt-2 line-clamp-2">{email.content}</p>
+                      </Card>
+                    ))
+                  ) : (
+                    // Email Detail View
+                    (() => {
+                      const email = emails.find(e => e.id === selectedEmailId);
+                      if (!email) return null;
+                      return (
+                        <div className="space-y-6">
+                          <div className="space-y-4">
+                            <h3 className="text-xl font-semibold">{email.subject}</h3>
+                            <div className="flex justify-between text-sm text-muted-foreground">
+                              <span>From: {email.from}</span>
+                              <span>{email.date}</span>
+                            </div>
+                          </div>
+                          <Separator />
+                          <div className="prose dark:prose-invert max-w-none">
+                            {email.content}
+                          </div>
+                          <div className="flex justify-end space-x-2">
+                            <Button 
+                              variant="outline" 
+                              onClick={() => {
+                                // Handle reply logic
+                                toast({
+                                  title: "Reply sent",
+                                  description: "Your reply has been sent successfully"
+                                });
+                              }}
+                            >
+                              <ReplyIcon className="h-4 w-4 mr-2" />
+                              Reply
+                            </Button>
+                            <Button 
+                              variant="outline"
+                              onClick={() => {
+                                // Handle forward logic
+                                toast({
+                                  title: "Email forwarded",
+                                  description: "The email has been forwarded"
+                                });
+                              }}
+                            >
+                              <Forward className="h-4 w-4 mr-2" />
+                              Forward
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })()
+                  )}
+                </div>
+              </DialogContent>
+            );
+          })()}
         </Dialog>
       </div>
     );
@@ -3107,44 +3238,51 @@ export default function MentorshipPortal() {
             </div>
 
             <div className="flex-1 flex flex-col h-full">
-              <div className="flex-1 p-4 overflow-y-auto">
-                <div className="space-y-4">
-                  {messages.map((msg) => (
-                    <div key={msg.id} className="flex gap-3 items-start">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback>{msg.user[0]}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <p className="font-medium">{msg.user}</p>
-                          <span className="text-xs text-muted-foreground">{msg.timestamp}</span>
+              <Card className="flex-1 flex flex-col h-full">
+                <CardHeader className="pb-2">
+                  <CardTitle>{selectedChannel || "Chat"}</CardTitle>
+                </CardHeader>
+                <CardContent className="flex-1 p-4 overflow-hidden">
+                  <Card className="h-full flex flex-col">
+                    <CardContent className="flex-1 space-y-4 p-4 overflow-y-auto">
+                      {messages.map((msg) => (
+                        <div key={msg.id} className="flex gap-3 items-start">
+                          <Avatar className="h-8 w-8">
+                            <AvatarFallback>{msg.user[0]}</AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium">{msg.user}</p>
+                              <span className="text-xs text-muted-foreground">{msg.timestamp}</span>
+                            </div>
+                            <p className="text-sm">{msg.message}</p>
+                          </div>
                         </div>
-                        <p className="text-sm">{msg.message}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                </CardContent>
 
-              <div className="p-4 border-t">
-                <div className="flex gap-2">
-                  <div className="flex-1 relative">
-                    <Input placeholder="Type a message..." />
-                    <label htmlFor="file-upload" className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer">
-                      <Paperclip className="h-4 w-4 text-muted-foreground" />
-                      <input
-                        id="file-upload"
-                        type="file"
-                        className="hidden"
-                        onChange={handleFileUpload}
-                      />
-                    </label>
+                <CardFooter className="p-4 border-t mt-auto">
+                  <div className="flex gap-2 w-full">
+                    <div className="flex-1 relative">
+                      <Input placeholder="Type a message..." />
+                      <label htmlFor="file-upload" className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer">
+                        <Paperclip className="h-4 w-4 text-muted-foreground" />
+                        <input
+                          id="file-upload"
+                          type="file"
+                          className="hidden"
+                          onChange={handleFileUpload}
+                        />
+                      </label>
+                    </div>
+                    <Button>
+                      <Send className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <Button>
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
+                </CardFooter>
+              </Card>
             </div>
           </div>
         </Card>
