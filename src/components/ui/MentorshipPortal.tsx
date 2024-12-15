@@ -2945,13 +2945,13 @@ export default function MentorshipPortal() {
     return (
       <div className="max-w-7xl mx-auto space-y-6 pt-10">
         <Card className="w-full">
-          <CardHeader className="flex flex-row items-center justify-between p-4">
-            <div className="flex items-center gap-4">
+          <div className="flex">
+            <div className="w-64 border-r p-4 flex flex-col gap-4">
               <Select
                 value={selectedChannel}
                 onValueChange={setSelectedChannel}
               >
-                <SelectTrigger className="w-[200px]">
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select channel" />
                 </SelectTrigger>
                 <SelectContent>
@@ -2968,7 +2968,7 @@ export default function MentorshipPortal() {
 
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button variant="outline">
+                  <Button variant="outline" className="w-full">
                     View Highlights
                     <Star className="h-4 w-4 ml-2" />
                   </Button>
@@ -3010,46 +3010,46 @@ export default function MentorshipPortal() {
               </Dialog>
 
               {!isCallActive ? (
-                <Button onClick={startCall} variant="outline">
+                <Button onClick={startCall} variant="outline" className="w-full">
                   <Video className="h-4 w-4 mr-2" />
                   Join Voice
                 </Button>
               ) : (
-                <Button onClick={stopCall} variant="destructive">
+                <Button onClick={stopCall} variant="destructive" className="w-full">
                   <PhoneOff className="h-4 w-4 mr-2" />
                   Leave Call
                 </Button>
               )}
             </div>
-          </CardHeader>
 
-          <CardContent>
-            <div className="space-y-4">
-              {messages.map((msg) => (
-                <div key={msg.id} className="flex gap-3 items-start">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback>{msg.user[0]}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium">{msg.user}</p>
-                      <span className="text-xs text-muted-foreground">{msg.timestamp}</span>
+            <div className="flex-1 p-4">
+              <div className="space-y-4">
+                {messages.map((msg) => (
+                  <div key={msg.id} className="flex gap-3 items-start">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback>{msg.user[0]}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium">{msg.user}</p>
+                        <span className="text-xs text-muted-foreground">{msg.timestamp}</span>
+                      </div>
+                      <p className="text-sm">{msg.message}</p>
                     </div>
-                    <p className="text-sm">{msg.message}</p>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
 
-            <div className="pt-4 mt-4 border-t">
-              <div className="flex gap-2">
-                <Input placeholder="Type a message..." />
-                <Button>
-                  <Send className="h-4 w-4" />
-                </Button>
+              <div className="pt-4 mt-4 border-t">
+                <div className="flex gap-2">
+                  <Input placeholder="Type a message..." />
+                  <Button>
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
-          </CardContent>
+          </div>
         </Card>
 
         <Dialog open={showVideoDialog} onOpenChange={setShowVideoDialog}>
