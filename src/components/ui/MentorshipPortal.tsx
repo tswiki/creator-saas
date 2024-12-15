@@ -1,7 +1,7 @@
 
 'use client';
 
-import { SetStateAction, useEffect, useRef, useState } from 'react';
+import { AwaitedReactNode, JSXElementConstructor, Key, ReactElement, ReactNode, SetStateAction, useEffect, useRef, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -90,7 +90,11 @@ import {
   ArrowLeft,
   ArrowRight,
   LayoutDashboard,
-  Upload
+  Upload,
+  MonitorPlay,
+  Heart,
+  MessageCircle,
+  Share
 } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
@@ -2902,6 +2906,13 @@ export default function MentorshipPortal() {
       { id: 'career-advice', name: 'Career Advice' }
     ]);
 
+    const [timeline, setTimeline] = useState([
+      { time: '9:00 AM', event: 'Daily Standup' },
+      { time: '11:00 AM', event: 'Code Review' },
+      { time: '2:00 PM', event: 'Mentorship Session' },
+      { time: '4:00 PM', event: 'Team Meeting' }
+    ]);
+
     const startCall = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -2942,11 +2953,19 @@ export default function MentorshipPortal() {
       }
     };
 
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (file) {
+        // Handle file upload logic here
+        console.log('File selected:', file);
+      }
+    };
+
     return (
-      <div className="max-w-7xl mx-auto space-y-6 pt-10">
-        <Card className="w-full">
-          <div className="flex">
-            <div className="w-64 border-r p-4 flex flex-col gap-4">
+      <div className="h-[calc(100vh-4rem)] pt-10">
+        <Card className="h-full">
+          <div className="flex h-full">
+            <div className="w-72 border-r p-4 flex flex-col gap-4">
               <Select
                 value={selectedChannel}
                 onValueChange={setSelectedChannel}
@@ -2973,42 +2992,95 @@ export default function MentorshipPortal() {
                     <Star className="h-4 w-4 ml-2" />
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Channel Highlights</DialogTitle>
+                <DialogContent className="w-[90vw] max-w-[500px] h-[90vh] max-h-[800px] p-0">
+                  <DialogHeader className="absolute top-0 left-0 right-0 z-10 bg-black/50 p-4">
+                    <DialogTitle className="text-white">Channel Highlights</DialogTitle>
                   </DialogHeader>
-                  <div className="space-y-4">
-                    {[
-                      {
-                        title: "Outstanding Achievement",
-                        user: "Sarah Chen",
-                        description: "Completed advanced system design project",
-                        date: "2 days ago"
-                      },
-                      {
-                        title: "Mentorship Excellence", 
-                        user: "David Kim",
-                        description: "Helped 5 mentees achieve their career goals",
-                        date: "1 week ago"
-                      }
-                    ].map((highlight, index) => (
-                      <Card key={index}>
-                        <CardContent className="pt-6">
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                              <h4 className="font-semibold">{highlight.title}</h4>
-                              <Badge variant="secondary">{highlight.date}</Badge>
-                            </div>
-                            <p className="text-sm text-muted-foreground">{highlight.description}</p>
-                            <p className="text-sm font-medium">By {highlight.user}</p>
+                  <div className="w-full h-full relative overflow-hidden bg-black">
+                    <div className="absolute inset-0 overflow-y-auto snap-y snap-mandatory">
+                      {[
+                        {
+                          type: 'video' as const,
+                          url: '/sample-video.mp4',
+                          description: 'Weekly Mentorship Session Highlights',
+                          likes: 245,
+                          comments: 12
+                        },
+                        {
+                          type: 'image' as const,
+                          url: '/project-showcase.jpg',
+                          description: 'Student Project Showcase',
+                          likes: 189,
+                          comments: 8
+                        },
+                        {
+                          type: 'text' as const,
+                          description: 'Key learning outcomes from this week\'s sessions',
+                          likes: 156,
+                          comments: 5
+                        }
+                      ].map((content, index) => (
+                        <div key={index} className="w-full h-full snap-start relative">
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            {content.type === 'video' ? (
+                              <video 
+                                src={content.url}
+                                className="w-full h-full object-cover"
+                                controls
+                                loop
+                                autoPlay
+                                muted
+                              />
+                            ) : content.type === 'image' ? (
+                              <img
+                                src={content.url} 
+                                alt={content.description}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-purple-600 to-blue-600 p-8">
+                                <p className="text-2xl text-white text-center">{content.description}</p>
+                              </div>
+                            )}
                           </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
+                            <p className="text-white text-lg mb-2">{content.description}</p>
+                            <div className="flex gap-4">
+                              <button className="flex items-center gap-2 text-white">
+                                <Heart className="h-6 w-6" />
+                                {content.likes}
+                              </button>
+                              <button className="flex items-center gap-2 text-white">
+                                <MessageCircle className="h-6 w-6" />
+                                {content.comments}
+                              </button>
+                              <button className="flex items-center gap-2 text-white ml-auto">
+                                <Share className="h-6 w-6" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </DialogContent>
               </Dialog>
 
+              <div className="mt-6 flex-1 overflow-y-auto">
+                <h3 className="font-semibold mb-4">Today's Timeline</h3>
+                <div className="space-y-4">
+                  {timeline.map((item, index) => (
+                    <div key={index} className="flex items-center gap-3">
+                      <div className="w-20 text-sm text-muted-foreground">
+                        {item.time}
+                      </div>
+                      <div className="flex-1 text-sm bg-muted p-2 rounded-md">
+                        {item.event}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
               {!isCallActive ? (
                 <Button onClick={startCall} variant="outline" className="w-full">
                   <Video className="h-4 w-4 mr-2" />
@@ -3022,27 +3094,40 @@ export default function MentorshipPortal() {
               )}
             </div>
 
-            <div className="flex-1 p-4">
-              <div className="space-y-4">
-                {messages.map((msg) => (
-                  <div key={msg.id} className="flex gap-3 items-start">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback>{msg.user[0]}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium">{msg.user}</p>
-                        <span className="text-xs text-muted-foreground">{msg.timestamp}</span>
+            <div className="flex-1 flex flex-col h-full">
+              <div className="flex-1 p-4 overflow-y-auto">
+                <div className="space-y-4">
+                  {messages.map((msg) => (
+                    <div key={msg.id} className="flex gap-3 items-start">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback>{msg.user[0]}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium">{msg.user}</p>
+                          <span className="text-xs text-muted-foreground">{msg.timestamp}</span>
+                        </div>
+                        <p className="text-sm">{msg.message}</p>
                       </div>
-                      <p className="text-sm">{msg.message}</p>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
 
-              <div className="pt-4 mt-4 border-t">
+              <div className="p-4 border-t">
                 <div className="flex gap-2">
-                  <Input placeholder="Type a message..." />
+                  <div className="flex-1 relative">
+                    <Input placeholder="Type a message..." />
+                    <label htmlFor="file-upload" className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer">
+                      <Paperclip className="h-4 w-4 text-muted-foreground" />
+                      <input
+                        id="file-upload"
+                        type="file"
+                        className="hidden"
+                        onChange={handleFileUpload}
+                      />
+                    </label>
+                  </div>
                   <Button>
                     <Send className="h-4 w-4" />
                   </Button>
@@ -3054,56 +3139,112 @@ export default function MentorshipPortal() {
 
         <Dialog open={showVideoDialog} onOpenChange={setShowVideoDialog}>
           <DialogContent className="max-w-4xl">
-            <DialogHeader>
-              <DialogTitle>Video Conference</DialogTitle>
-            </DialogHeader>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 {localStreamRef && (
-                  <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
+                  <div className="relative">
                     <video
-                      ref={video => {
-                        if (video && localStreamRef) {
-                          video.srcObject = localStreamRef;
-                          video.play();
-                        }
+                      ref={(video) => {
+                        if (video) video.srcObject = localStreamRef;
                       }}
+                      autoPlay
                       muted
-                      className="w-full h-full object-cover"
+                      className="w-full rounded-lg"
                     />
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                      <Button
+                        size="sm"
+                        variant={isAudioEnabled ? "default" : "destructive"}
+                        onClick={() => {
+                          if (localStreamRef) {
+                            localStreamRef.getAudioTracks().forEach(track => {
+                              track.enabled = !isAudioEnabled;
+                            });
+                            setIsAudioEnabled(!isAudioEnabled);
+                          }
+                        }}
+                      >
+                        {isAudioEnabled ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
+                      </Button>
+                      
+                      <Button
+                        size="sm"
+                        variant={isVideoEnabled ? "default" : "destructive"}
+                        onClick={() => {
+                          if (localStreamRef) {
+                            localStreamRef.getVideoTracks().forEach(track => {
+                              track.enabled = !isVideoEnabled;
+                            });
+                            setIsVideoEnabled(!isVideoEnabled);
+                          }
+                        }}
+                      >
+                        {isVideoEnabled ? <Video className="h-4 w-4" /> : <VideoOff className="h-4 w-4" />}
+                      </Button>
+
+                      <Button
+                        size="sm"
+                        variant={isScreenSharing ? "destructive" : "default"}
+                        onClick={async () => {
+                          try {
+                            if (!isScreenSharing) {
+                              const screenStream = await navigator.mediaDevices.getDisplayMedia({
+                                video: true
+                              });
+                              const videoTrack = screenStream.getVideoTracks()[0];
+                              videoTrack.onended = () => {
+                                setIsScreenSharing(false);
+                                if (localStreamRef) {
+                                  const originalVideoTrack = localStreamRef.getVideoTracks()[0];
+                                  if (originalVideoTrack) originalVideoTrack.enabled = true;
+                                }
+                              };
+                              setIsScreenSharing(true);
+                              if (localStreamRef) {
+                                const originalVideoTrack = localStreamRef.getVideoTracks()[0];
+                                if (originalVideoTrack) originalVideoTrack.enabled = false;
+                                localStreamRef.addTrack(videoTrack);
+                              }
+                            } else {
+                              const screenTrack = localStreamRef?.getVideoTracks().find(track => track.label.includes('screen'));
+                              if (screenTrack) {
+                                screenTrack.stop();
+                                localStreamRef?.removeTrack(screenTrack);
+                              }
+                              if (localStreamRef) {
+                                const originalVideoTrack = localStreamRef.getVideoTracks()[0];
+                                if (originalVideoTrack) originalVideoTrack.enabled = true;
+                              }
+                              setIsScreenSharing(false);
+                            }
+                          } catch (error) {
+                            console.error('Error sharing screen:', error);
+                          }
+                        }}
+                      >
+                        {isScreenSharing ? <MonitorOff className="h-4 w-4" /> : <MonitorPlay className="h-4 w-4" />}
+                      </Button>
+
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => {
+                          if (localStreamRef) {
+                            localStreamRef.getTracks().forEach(track => track.stop());
+                            setLocalStreamRef(null);
+                          }
+                          setIsCallActive(false);
+                          setShowVideoDialog(false);
+                          setIsAudioEnabled(true);
+                          setIsVideoEnabled(true);
+                          setIsScreenSharing(false);
+                        }}
+                      >
+                        <PhoneOff className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 )}
-              </div>
-              
-              <div className="flex justify-center gap-4">
-                <Button
-                  size="icon"
-                  variant={isAudioEnabled ? "outline" : "secondary"}
-                  onClick={() => setIsAudioEnabled(!isAudioEnabled)}
-                >
-                  {isAudioEnabled ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
-                </Button>
-                <Button
-                  size="icon"
-                  variant={isVideoEnabled ? "outline" : "secondary"}
-                  onClick={() => setIsVideoEnabled(!isVideoEnabled)}
-                >
-                  {isVideoEnabled ? <Video className="h-4 w-4" /> : <VideoOff className="h-4 w-4" />}
-                </Button>
-                <Button
-                  size="icon"
-                  variant={isScreenSharing ? "secondary" : "outline"}
-                  onClick={toggleScreenShare}
-                >
-                  <MonitorUp className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="icon"
-                  variant="destructive"
-                  onClick={stopCall}
-                >
-                  <PhoneOff className="h-4 w-4" />
-                </Button>
               </div>
             </div>
           </DialogContent>
