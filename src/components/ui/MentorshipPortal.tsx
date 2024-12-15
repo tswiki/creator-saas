@@ -2997,7 +2997,16 @@ export default function MentorshipPortal() {
                     <DialogTitle className="text-white">Channel Highlights</DialogTitle>
                   </DialogHeader>
                   <div className="w-full h-full relative overflow-hidden bg-black">
-                    <div className="absolute inset-0 overflow-y-auto snap-y snap-mandatory">
+                    <div 
+                      className="absolute inset-0 overflow-y-auto snap-y snap-mandatory"
+                      style={{
+                        scrollbarWidth: 'none',
+                        msOverflowStyle: 'none',
+                        '::-webkit-scrollbar': {
+                          display: 'none'
+                        }
+                      }}
+                    >
                       {[
                         {
                           type: 'video' as const,
@@ -3020,52 +3029,54 @@ export default function MentorshipPortal() {
                           comments: 5
                         }
                       ].map((content, index) => (
-                        <div key={index} className="w-full h-full snap-start relative">
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            {content.type === 'video' ? (
-                              <video 
-                                src={content.url}
-                                className="w-full h-full object-cover"
-                                controls
-                                loop
-                                autoPlay
-                                muted
-                              />
-                            ) : content.type === 'image' ? (
-                              <img
-                                src={content.url} 
-                                alt={content.description}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-purple-600 to-blue-600 p-8">
-                                <p className="text-2xl text-white text-center">{content.description}</p>
+                          <div 
+                            key={index} 
+                            className="w-full h-full snap-start relative bg-gradient-to-br from-gray-900 to-black"
+                          >
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              {content.type === 'video' ? (
+                                <video 
+                                  src={content.url}
+                                  className="w-full h-full object-cover"
+                                  controls
+                                  loop
+                                  autoPlay
+                                  muted
+                                />
+                              ) : content.type === 'image' ? (
+                                <img
+                                  src={content.url} 
+                                  alt={content.description}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-purple-600 to-blue-600 p-8">
+                                  <p className="text-2xl text-white text-center">{content.description}</p>
+                                </div>
+                              )}
+                            </div>
+                            <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
+                              <p className="text-white text-xl font-medium mb-3">{content.description}</p>
+                              <div className="flex gap-6">
+                                <button className="flex items-center gap-2 text-white hover:text-pink-500 transition-colors">
+                                  <Heart className="h-6 w-6" />
+                                  {content.likes}
+                                </button>
+                                <button className="flex items-center gap-2 text-white hover:text-blue-500 transition-colors">
+                                  <MessageCircle className="h-6 w-6" />
+                                  {content.comments}
+                                </button>
+                                <button className="flex items-center gap-2 text-white hover:text-green-500 transition-colors ml-auto">
+                                  <Share className="h-6 w-6" />
+                                </button>
                               </div>
-                            )}
-                          </div>
-                          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
-                            <p className="text-white text-lg mb-2">{content.description}</p>
-                            <div className="flex gap-4">
-                              <button className="flex items-center gap-2 text-white">
-                                <Heart className="h-6 w-6" />
-                                {content.likes}
-                              </button>
-                              <button className="flex items-center gap-2 text-white">
-                                <MessageCircle className="h-6 w-6" />
-                                {content.comments}
-                              </button>
-                              <button className="flex items-center gap-2 text-white ml-auto">
-                                <Share className="h-6 w-6" />
-                              </button>
                             </div>
                           </div>
-                        </div>
                       ))}
                     </div>
                   </div>
                 </DialogContent>
               </Dialog>
-            
 
               <div className="mt-6 flex-1 overflow-y-auto">
                 <h3 className="font-semibold mb-4">Today's Timeline</h3>
