@@ -89,7 +89,8 @@ import {
   Instagram,
   ArrowLeft,
   ArrowRight,
-  LayoutDashboard
+  LayoutDashboard,
+  Upload
 } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
@@ -103,6 +104,7 @@ import { Textarea } from './textarea';
 import { cn } from '@/lib/utils';
 import { format } from 'path';
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarTrigger } from './menubar';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@radix-ui/react-tabs';
 
 
 export function HeroVideoDialogDemoTopInBottomOut() {
@@ -743,75 +745,117 @@ export default function MentorshipPortal() {
                       <DialogHeader>
                         <DialogTitle>My Resources Library</DialogTitle>
                         <DialogDescription>
-                          View, manage and interact with your saved resources
+                          Browse your collections and uploaded resources
                         </DialogDescription>
                       </DialogHeader>
                       <div className="grid grid-cols-[2fr,1fr] gap-4 h-[calc(85vh-120px)]">
-                        <ScrollArea className="flex-1">
-                          <div className="grid gap-4 p-4">
-                            {[
-                              {
-                                title: "System Design Interview Guide",
-                                type: "PDF",
-                                addedOn: "2024-01-15",
-                                favorite: true
-                              },
-                              {
-                                title: "Building Scalable Web Apps",
-                                type: "Video",
-                                addedOn: "2024-01-10", 
-                                favorite: true
-                              },
-                              {
-                                title: "Data Structures Cheat Sheet",
-                                type: "Document",
-                                addedOn: "2024-01-05",
-                                favorite: false
-                              }
-                            ].map((resource, i) => (
-                              <Card key={i} className="transition-all hover:shadow-md">
-                                <CardContent className="flex items-center justify-between p-4">
-                                  <div className="flex items-center gap-4">
-                                    <BookOpen className="h-8 w-8 text-muted-foreground" />
-                                    <div>
-                                      <h4 className="font-medium">{resource.title}</h4>
-                                      <p className="text-sm text-muted-foreground">Added on {resource.addedOn}</p>
-                                    </div>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <Badge variant="secondary">{resource.type}</Badge>
-                                    <Star className={`h-4 w-4 cursor-pointer transition-colors ${resource.favorite ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground hover:text-yellow-400"}`} />
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            ))}
+                        <div className="flex flex-col gap-4">
+                          <div className="flex items-center gap-4">
+                            <Input placeholder="Search resources..." className="flex-1" />
+                            <Select defaultValue="all">
+                              <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder="Filter by type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">All Resources</SelectItem>
+                                <SelectItem value="pdf">PDFs</SelectItem>
+                                <SelectItem value="video">Videos</SelectItem>
+                                <SelectItem value="document">Documents</SelectItem>
+                              </SelectContent>
+                            </Select>
                           </div>
-                        </ScrollArea>
+
+                          <Tabs defaultValue="all" className="flex-1">
+                            <TabsList>
+                              <TabsTrigger value="all">All</TabsTrigger>
+                              <TabsTrigger value="collections">Collections</TabsTrigger>
+                              <TabsTrigger value="favorites">Favorites</TabsTrigger>
+                              <TabsTrigger value="recent">Recently Added</TabsTrigger>
+                            </TabsList>
+
+                            <TabsContent value="all" className="mt-4">
+                              <ScrollArea className="h-[calc(85vh-250px)]">
+                                <div className="grid gap-4 p-4">
+                                  {[
+                                    {
+                                      title: "System Design Interview Guide",
+                                      type: "PDF",
+                                      addedOn: "2024-01-15",
+                                      favorite: true,
+                                      collection: "Interview Prep"
+                                    },
+                                    {
+                                      title: "Building Scalable Web Apps",
+                                      type: "Video",
+                                      addedOn: "2024-01-10",
+                                      favorite: true,
+                                      collection: "System Design"
+                                    },
+                                    {
+                                      title: "Data Structures Cheat Sheet",
+                                      type: "Document", 
+                                      addedOn: "2024-01-05",
+                                      favorite: false,
+                                      collection: "DSA"
+                                    }
+                                  ].map((resource, i) => (
+                                    <Card key={i} className="transition-all hover:shadow-md">
+                                      <CardContent className="flex items-center justify-between p-4">
+                                        <div className="flex items-center gap-4">
+                                          <BookOpen className="h-8 w-8 text-muted-foreground" />
+                                          <div>
+                                            <h4 className="font-medium">{resource.title}</h4>
+                                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                              <span>Added on {resource.addedOn}</span>
+                                              <span>•</span>
+                                              <span>Collection: {resource.collection}</span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <Badge variant="secondary">{resource.type}</Badge>
+                                          <Button variant="ghost" size="icon">
+                                            <MoreVertical className="h-4 w-4" />
+                                          </Button>
+                                          <Star className={`h-4 w-4 cursor-pointer transition-colors ${resource.favorite ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground hover:text-yellow-400"}`} />
+                                        </div>
+                                      </CardContent>
+                                    </Card>
+                                  ))}
+                                </div>
+                              </ScrollArea>
+                            </TabsContent>
+                          </Tabs>
+                        </div>
 
                         <Card className="h-full flex flex-col">
                           <CardHeader>
-                            <CardTitle className="text-lg">Resource Assistant</CardTitle>
-                            <CardDescription>Ask questions about your resources</CardDescription>
+                            <CardTitle className="text-lg">Upload Resources</CardTitle>
+                            <CardDescription>Add new files to your library</CardDescription>
                           </CardHeader>
-                          <CardContent className="flex-1 flex flex-col">
-                            <ScrollArea className="flex-1 pr-4">
-                              <div className="space-y-4">
-                                {[
-                                  { role: 'assistant', content: 'How can I help you with your resources today?' }
-                                ].map((message, i) => (
-                                  <div key={i} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                    <div className={`rounded-lg px-4 py-2 max-w-[80%] ${message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                                      {message.content}
-                                    </div>
-                                  </div>
-                                ))}
+                          <CardContent className="flex-1">
+                            <div className="space-y-4">
+                              <div className="border-2 border-dashed rounded-lg p-6 text-center">
+                                <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                                <p className="text-sm text-muted-foreground">
+                                  Drag and drop files here or click to browse
+                                </p>
                               </div>
-                            </ScrollArea>
-                            <div className="mt-4 flex gap-2">
-                              <Input placeholder="Ask about your resources..." className="flex-1" />
-                              <Button size="icon">
-                                <Send className="h-4 w-4" />
-                              </Button>
+                              <div className="space-y-2">
+                                <Label>Add to Collection</Label>
+                                <Select>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select collection" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="interview">Interview Prep</SelectItem>
+                                    <SelectItem value="system">System Design</SelectItem>
+                                    <SelectItem value="dsa">DSA</SelectItem>
+                                    <SelectItem value="new">Create New Collection...</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <Button className="w-full">Upload Files</Button>
                             </div>
                           </CardContent>
                         </Card>
