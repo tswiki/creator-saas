@@ -601,23 +601,6 @@ export default function MentorshipPortal() {
                     </div>
                   </CardContent>
                 </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Goals & Objectives</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Textarea
-                      placeholder="Define your learning objectives and career goals..."
-                      className="min-h-[100px]"
-                      value={profileData.goal}
-                      onChange={(e) => setProfileData(prev => ({
-                        ...prev,
-                        goal: e.target.value
-                      }))}
-                    />
-                  </CardContent>
-                </Card>
               </div>
 
               <div className="flex justify-between mt-6">
