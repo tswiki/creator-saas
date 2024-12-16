@@ -96,7 +96,8 @@ import {
   MessageCircle,
   Share,
   Forward,
-  ReplyIcon
+  ReplyIcon,
+  X
 } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
@@ -246,75 +247,97 @@ export default function MentorshipPortal() {
 
           <Dialog open={showProfileDialog} onOpenChange={setShowProfileDialog}>
             <DialogContent className="w-[70vw] max-w-[1000px] h-[80vh] max-h-[800px] overflow-y-auto">
-              <DialogHeader className="flex flex-row items-center justify-between border-b pb-4">
-                <div className="flex items-center gap-4">
-                  <Avatar className="h-16 w-16">
-                    <AvatarImage src={profileData.photoURL} alt={profileData.fullName} />
-                    <AvatarFallback>{profileData.fullName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <DialogTitle className="text-2xl">{profileData.fullName}</DialogTitle>
-                    <DialogDescription className="text-base">
-                      {profileData.email}
-                    </DialogDescription>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant={currentProfileView === 'details' ? "secondary" : "ghost"}
-                    onClick={() => setCurrentProfileView('details')}
-                    className="flex items-center gap-2"
-                  >
-                    <User className="h-4 w-4" />
-                    Profile Details
-                  </Button>
-                  <Button
-                    variant={currentProfileView === 'integrations' ? "secondary" : "ghost"}
-                    onClick={() => setCurrentProfileView('integrations')}
-                    className="flex items-center gap-2"
-                  >
-                    <Link className="h-4 w-4" />
-                    Integrations
-                  </Button>
-                </div>
-              </DialogHeader>
+              <div className="space-y-6 mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Personal Information</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="flex items-center gap-4 mb-6">
+                      <Avatar className="h-20 w-20">
+                        <AvatarImage src={profileData.photoURL} alt={profileData.fullName} />
+                        <AvatarFallback>{profileData.fullName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                      </Avatar>
+                      <Button variant="outline">Change Photo</Button>
+                    </div>
 
-              {currentProfileView === 'details' ? (
-                <div className="space-y-6 mt-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Basic Information</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="flex items-center gap-4 mb-6">
-                        <Avatar className="h-20 w-20">
-                          <AvatarImage src={profileData.photoURL} alt={profileData.fullName} />
-                          <AvatarFallback>{profileData.fullName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                        </Avatar>
-                        <Button variant="outline">Change Photo</Button>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="grid gap-2">
-                          <label htmlFor="fullName">Full Name</label>
-                          <input
-                            id="fullName"
-                            value={profileData.fullName}
-                            onChange={(e) => setProfileData({...profileData, fullName: e.target.value})}
-                            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
-                          />
-                        </div>
-                        <div className="grid gap-2">
-                          <label htmlFor="email">Email</label>
-                          <input
-                            id="email"
-                            value={profileData.email}
-                            onChange={(e) => setProfileData({...profileData, email: e.target.value})}
-                            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
-                          />
-                        </div>
-                      </div>
+                    <div className="grid gap-4">
                       <div className="grid gap-2">
-                        <label htmlFor="bio">Bio</label>
+                        <label htmlFor="fullName">Full Name</label>
+                        <input
+                          id="fullName"
+                          value={profileData.fullName}
+                          onChange={(e) => setProfileData({...profileData, fullName: e.target.value})}
+                          className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+                        />
+                      </div>
+
+                      <div className="grid gap-2">
+                        <label htmlFor="email">Email</label>
+                        <input
+                          id="email"
+                          value={profileData.email}
+                          onChange={(e) => setProfileData({...profileData, email: e.target.value})}
+                          className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+                        />
+                      </div>
+
+                      <div className="grid gap-2">
+                        <label htmlFor="phone">Phone Number</label>
+                        <div className="flex gap-2">
+                          <Select
+                            onValueChange={(value) => setProfileData(prev => ({
+                              ...prev,
+                              countryCode: value
+                            }))}
+                          >
+                            <SelectTrigger className="w-[140px]">
+                              <SelectValue placeholder="Code" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="+1">+1 (US/CA)</SelectItem>
+                              <SelectItem value="+44">+44 (UK)</SelectItem>
+                              <SelectItem value="+61">+61 (AU)</SelectItem>
+                              <SelectItem value="+91">+91 (IN)</SelectItem>
+                              <SelectItem value="+86">+86 (CN)</SelectItem>
+                              <SelectItem value="+81">+81 (JP)</SelectItem>
+                              <SelectItem value="+49">+49 (DE)</SelectItem>
+                              <SelectItem value="+33">+33 (FR)</SelectItem>
+                              <SelectItem value="+55">+55 (BR)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <input
+                            id="phone"
+                            type="tel"
+                            value={profileData.phone}
+                            onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
+                            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+                            placeholder="Enter phone number"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid gap-2">
+                        <label htmlFor="role">Role</label>
+                        <Select
+                          onValueChange={(value) => setProfileData(prev => ({
+                            ...prev,
+                            role: value
+                          }))}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select role" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="mentor">Mentor</SelectItem>
+                            <SelectItem value="mentee">Mentee</SelectItem>
+                            <SelectItem value="admin">Admin</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="grid gap-2">
+                        <label htmlFor="bio">About</label>
                         <textarea
                           id="bio"
                           value={profileData.bio}
@@ -323,142 +346,279 @@ export default function MentorshipPortal() {
                           placeholder="Tell us about yourself..."
                         />
                       </div>
-                    </CardContent>
-                  </Card>
 
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Skills & Achievements</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                      <div className="space-y-4">
-                        <h3 className="font-semibold">Skills</h3>
-                        <Select
-                          onValueChange={(value) => setProfileData(prev => ({
-                            ...prev,
-                            skills: [...prev.skills, value]
-                          }))}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Add a skill" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="javascript">JavaScript</SelectItem>
-                            <SelectItem value="react">React</SelectItem>
-                            <SelectItem value="node">Node.js</SelectItem>
-                            <SelectItem value="python">Python</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <div className="flex flex-wrap gap-2">
-                          {profileData.skills.map((skill, index) => (
-                            <Badge key={index} variant="secondary">
-                              {skill}
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="ml-1 h-4 w-4 p-0"
-                                onClick={() => setProfileData(prev => ({
-                                  ...prev,
-                                  skills: prev.skills.filter((_, i) => i !== index)
-                                }))}
-                              >
-                                ×
-                              </Button>
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
+                      <div className="grid gap-2">
+                        <label>Connected Services</label>
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-2 gap-4">
+                            <Button 
+                              variant={profileData.isGoogleConnected ? "default" : "outline"}
+                              className="flex items-center gap-2 justify-start relative"
+                              onClick={() => handleConnect('Google')}
+                            >
+                              <CalendarIcon className="h-4 w-4" />
+                              <span>Google</span>
+                              <div className="absolute right-2 flex items-center">
+                                {profileData.isGoogleConnected ? 
+                                  <div className="flex items-center text-green-500">
+                                    <Check className="h-4 w-4 mr-1" />
+                                    <span className="text-xs">Integrated</span>
+                                  </div> :
+                                  <div className="flex items-center text-gray-400">
+                                    <X className="h-4 w-4 mr-1" />
+                                    <span className="text-xs">Not Connected</span>
+                                  </div>
+                                }
+                              </div>
+                            </Button>
 
-                      <div className="space-y-4">
-                        <h3 className="font-semibold">Achievements</h3>
-                        <div className="flex gap-2">
-                          <Input
-                            placeholder="Add new achievement"
-                            onKeyPress={(e) => {
-                              if (e.key === 'Enter') {
-                                const target = e.target as HTMLInputElement;
-                                setProfileData(prev => ({
-                                  ...prev,
-                                  achievements: [...prev.achievements, target.value]
-                                }));
-                                target.value = '';
-                              }
-                            }}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          {profileData.achievements.map((achievement, index) => (
-                            <div key={index} className="flex items-center justify-between p-2 border rounded-md">
-                              <span>{achievement}</span>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setProfileData(prev => ({
-                                  ...prev,
-                                  achievements: prev.achievements.filter((_, i) => i !== index)
-                                }))}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                            <Button
+                              variant={profileData.isInstagramConnected ? "default" : "outline"} 
+                              className="flex items-center gap-2 justify-start relative"
+                              onClick={() => handleConnect('Instagram')}
+                            >
+                              <Instagram className="h-4 w-4" />
+                              <span>Instagram</span>
+                              <div className="absolute right-2 flex items-center">
+                                {profileData.isInstagramConnected ? 
+                                  <div className="flex items-center text-green-500">
+                                    <Check className="h-4 w-4 mr-1" />
+                                    <span className="text-xs">Integrated</span>
+                                  </div> :
+                                  <div className="flex items-center text-gray-400">
+                                    <X className="h-4 w-4 mr-1" />
+                                    <span className="text-xs">Not Connected</span>
+                                  </div>
+                                }
+                              </div>
+                            </Button>
 
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Goals & Objectives</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <Textarea
-                        placeholder="Define your learning objectives and career goals..."
-                        className="min-h-[100px]"
-                        value={profileData.goal}
-                        onChange={(e) => setProfileData(prev => ({
-                          ...prev,
-                          goal: e.target.value
-                        }))}
-                      />
-                    </CardContent>
-                  </Card>
-                </div>
-              ) : (
-                <div className="space-y-6 mt-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Connected Services</CardTitle>
-                      <CardDescription>
-                        Manage your external service connections
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="grid grid-cols-2 gap-4">
-                      {[
-                        { name: 'Google', icon: CalendarIcon, key: 'isGoogleConnected' },
-                        { name: 'Instagram', icon: Instagram, key: 'isInstagramConnected' },
-                        { name: 'Discord', icon: MessageSquare, key: 'isDiscordConnected' },
-                        { name: 'LinkedIn', icon: Linkedin, key: 'isLinkedInConnected' },
-                        { name: 'Twitter', icon: Twitter, key: 'isTwitterConnected' },
-                        { name: 'TikTok', icon: Video, key: 'isTikTokConnected' }
-                      ].map((service) => (
-                        <div key={service.key} className="flex items-center justify-between p-4 border rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <service.icon className="h-5 w-5" />
-                            <span>{service.name}</span>
+                            <Button
+                              variant={profileData.isDiscordConnected ? "default" : "outline"}
+                              className="flex items-center gap-2 justify-start relative"
+                              onClick={() => handleConnect('Discord')}
+                            >
+                              <MessageSquare className="h-4 w-4" />
+                              <span>Discord</span>
+                              <div className="absolute right-2 flex items-center">
+                                {profileData.isDiscordConnected ? 
+                                  <div className="flex items-center text-green-500">
+                                    <Check className="h-4 w-4 mr-1" />
+                                    <span className="text-xs">Integrated</span>
+                                  </div> :
+                                  <div className="flex items-center text-gray-400">
+                                    <X className="h-4 w-4 mr-1" />
+                                    <span className="text-xs">Not Connected</span>
+                                  </div>
+                                }
+                              </div>
+                            </Button>
+
+                            <Button
+                              variant={profileData.isLinkedInConnected ? "default" : "outline"}
+                              className="flex items-center gap-2 justify-start relative"
+                              onClick={() => handleConnect('LinkedIn')}
+                            >
+                              <Linkedin className="h-4 w-4" />
+                              <span>LinkedIn</span>
+                              <div className="absolute right-2 flex items-center">
+                                {profileData.isLinkedInConnected ? 
+                                  <div className="flex items-center text-green-500">
+                                    <Check className="h-4 w-4 mr-1" />
+                                    <span className="text-xs">Integrated</span>
+                                  </div> :
+                                  <div className="flex items-center text-gray-400">
+                                    <X className="h-4 w-4 mr-1" />
+                                    <span className="text-xs">Not Connected</span>
+                                  </div>
+                                }
+                              </div>
+                            </Button>
+
+                            <Button
+                              variant={profileData.isTwitterConnected ? "default" : "outline"}
+                              className="flex items-center gap-2 justify-start relative"
+                              onClick={() => handleConnect('Twitter')}
+                            >
+                              <Twitter className="h-4 w-4" />
+                              <span>Twitter</span>
+                              <div className="absolute right-2 flex items-center">
+                                {profileData.isTwitterConnected ? 
+                                  <div className="flex items-center text-green-500">
+                                    <Check className="h-4 w-4 mr-1" />
+                                    <span className="text-xs">Integrated</span>
+                                  </div> :
+                                  <div className="flex items-center text-gray-400">
+                                    <X className="h-4 w-4 mr-1" />
+                                    <span className="text-xs">Not Connected</span>
+                                  </div>
+                                }
+                              </div>
+                            </Button>
+
+                            <Button
+                              variant={profileData.isTikTokConnected ? "default" : "outline"}
+                              className="flex items-center gap-2 justify-start relative"
+                              onClick={() => handleConnect('TikTok')}
+                            >
+                              <Video className="h-4 w-4" />
+                              <span>TikTok</span>
+                              <div className="absolute right-2 flex items-center">
+                                {profileData.isTikTokConnected ? 
+                                  <div className="flex items-center text-green-500">
+                                    <Check className="h-4 w-4 mr-1" />
+                                    <span className="text-xs">Integrated</span>
+                                  </div> :
+                                  <div className="flex items-center text-gray-400">
+                                    <X className="h-4 w-4 mr-1" />
+                                    <span className="text-xs">Not Connected</span>
+                                  </div>
+                                }
+                              </div>
+                            </Button>
                           </div>
-                          <Button
-                            variant={profileData[service.key] ? "secondary" : "default"}
-                            onClick={() => handleConnect(service.name)}
-                          >
-                            {profileData[service.key] ? "Connected" : "Connect"}
-                          </Button>
+
+                          <div className="space-y-2">
+                            {Object.entries(profileData)
+                              .filter(([key]) => key.startsWith('is') && key.endsWith('Connected') && profileData[key as keyof typeof profileData])
+                              .map(([key]) => {
+                                const serviceName = key.replace('is', '').replace('Connected', '');
+                                return (
+                                  <div key={key} className="flex items-center justify-between p-2 border rounded-md">
+                                    <div className="flex items-center gap-2">
+                                      {serviceName === 'Google' && <CalendarIcon className="h-4 w-4" />}
+                                      {serviceName === 'Instagram' && <Instagram className="h-4 w-4" />}
+                                      {serviceName === 'Discord' && <MessageSquare className="h-4 w-4" />}
+                                      {serviceName === 'LinkedIn' && <Linkedin className="h-4 w-4" />}
+                                      {serviceName === 'Twitter' && <Twitter className="h-4 w-4" />}
+                                      {serviceName === 'TikTok' && <Video className="h-4 w-4" />}
+                                      <span>{serviceName}</span>
+                                      <Badge variant="success" className="ml-2">Integrated</Badge>
+                                    </div>
+                                    <Button
+                                      variant="destructive"
+                                      size="sm"
+                                      onClick={() => {
+                                        setProfileData(prev => ({
+                                          ...prev,
+                                          [`is${serviceName}Connected`]: false
+                                        }));
+                                        toast({
+                                          title: "Disconnected",
+                                          description: `Disconnected from ${serviceName}`
+                                        });
+                                      }}
+                                    >
+                                      Disconnect
+                                    </Button>
+                                  </div>
+                                );
+                            })}
+                          </div>
                         </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                </div>
-              )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Skills & Achievements</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-4">
+                      <h3 className="font-semibold">Skills</h3>
+                      <Select
+                        onValueChange={(value) => setProfileData(prev => ({
+                          ...prev,
+                          skills: [...prev.skills, value]
+                        }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Add a skill" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="javascript">JavaScript</SelectItem>
+                          <SelectItem value="react">React</SelectItem>
+                          <SelectItem value="node">Node.js</SelectItem>
+                          <SelectItem value="python">Python</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <div className="flex flex-wrap gap-2">
+                        {profileData.skills.map((skill, index) => (
+                          <Badge key={index} variant="secondary">
+                            {skill}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="ml-1 h-4 w-4 p-0"
+                              onClick={() => setProfileData(prev => ({
+                                ...prev,
+                                skills: prev.skills.filter((_, i) => i !== index)
+                              }))}
+                            >
+                              ×
+                            </Button>
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h3 className="font-semibold">Achievements</h3>
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Add new achievement"
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              const target = e.target as HTMLInputElement;
+                              setProfileData(prev => ({
+                                ...prev,
+                                achievements: [...prev.achievements, target.value]
+                              }));
+                              target.value = '';
+                            }
+                          }}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        {profileData.achievements.map((achievement, index) => (
+                          <div key={index} className="flex items-center justify-between p-2 border rounded-md">
+                            <span>{achievement}</span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setProfileData(prev => ({
+                                ...prev,
+                                achievements: prev.achievements.filter((_, i) => i !== index)
+                              }))}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Goals & Objectives</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Textarea
+                      placeholder="Define your learning objectives and career goals..."
+                      className="min-h-[100px]"
+                      value={profileData.goal}
+                      onChange={(e) => setProfileData(prev => ({
+                        ...prev,
+                        goal: e.target.value
+                      }))}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
 
               <div className="flex justify-between mt-6">
                 <Button 
