@@ -7,12 +7,9 @@ import { adminAuth } from '@/firebase/admin-config'
 export async function POST(request: Request) {
   try {
     const { idToken } = await request.json()
-    
-    // Verify the ID token
-    const decodedToken = await adminAuth.verifyIdToken(idToken)
-    
-    // Create session cookie
-    const expiresIn = 60 * 60 * 24 * 5 * 1000 // 5 days
+        
+    // Create session cookie with 6 hour expiration
+    const expiresIn = 60 * 60 * 6 * 1000 // 6 hours
     const sessionCookie = await adminAuth.createSessionCookie(idToken, { expiresIn })
     
     // Set the cookie

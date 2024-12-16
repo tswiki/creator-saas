@@ -142,22 +142,42 @@ export default function MentorshipPortal() {
 
   const Sidebar = () => {
     const [showProfileDialog, setShowProfileDialog] = useState(false);
+    const [currentProfileView, setCurrentProfileView] = useState('details');
     const [profileData, setProfileData] = useState({
       username: auth.currentUser?.email || "johndoe@example.com",
+      fullName: auth.currentUser?.displayName || "John Doe",
+      email: auth.currentUser?.email || "johndoe@example.com",
+      photoURL: auth.currentUser?.photoURL || "/default-avatar.png",
       bio: "",
-      niche: "", 
-      mrr: "",
-      goal: ""
+      skills: [] as string[],
+      achievements: [] as string[],
+      niche: "",
+      goal: "",
+      isGoogleConnected: false,
+      isInstagramConnected: false,
+      isDiscordConnected: false,
+      isLinkedInConnected: false,
+      isTwitterConnected: false,
+      isTikTokConnected: false
     });
     const { theme, setTheme } = useTheme();
 
+    const handleConnect = (service: string) => {
+      setProfileData(prev => ({
+        ...prev,
+        [`is${service}Connected`]: true
+      }));
+      toast({
+        title: "Success",
+        description: `Connected to ${service}`
+      });
+    };
+
     return (
-      <div className="mt-16 fixed top-0 left-0 bottom-0 w-64"> {/* Fixed position with full height */}
-        <div className="h-full flex flex-col p-4 border-r bg-background"> {/* Added bg-background to ensure content isn't see-through */}
-          {/* <div className="font-bold text-xl mb-6">Mentorship Portal</div> */}
-          
+      <div className="mt-16 fixed top-0 left-0 bottom-0 w-64">
+        <div className="h-full flex flex-col p-4 border-r bg-background">
           <div className="flex flex-col gap-3 flex-1">
-          <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('dashboard')}>
+            <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('dashboard')}>
               <LayoutDashboard className="mr-2 h-4 w-4" />
               Dashboard
             </Button>
@@ -207,18 +227,268 @@ export default function MentorshipPortal() {
             </div>
           </div>
 
-          <Button variant="ghost" className="justify-between w-full mt-2 border-t pt-3" onClick={() => setCurrentView('profile')}>
+          <Button variant="ghost" className="justify-between w-full mt-2 border-t pt-3" onClick={() => {
+            setShowProfileDialog(true);
+            setCurrentProfileView('details');
+          }}>
             <div className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              <span className="text-sm text-muted-foreground">{profileData.username}</span>
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={profileData.photoURL} alt={profileData.fullName} />
+                <AvatarFallback>{profileData.fullName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col items-start">
+                <span className="text-sm font-medium">{profileData.fullName}</span>
+                <span className="text-xs text-muted-foreground">{profileData.email}</span>
+              </div>
             </div>
             <Settings className="h-4 w-4" />
           </Button>
+
+          <Dialog open={showProfileDialog} onOpenChange={setShowProfileDialog}>
+            <DialogContent className="w-[70vw] max-w-[1000px] h-[80vh] max-h-[800px] overflow-y-auto">
+              <DialogHeader className="flex flex-row items-center justify-between border-b pb-4">
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-16 w-16">
+                    <AvatarImage src={profileData.photoURL} alt={profileData.fullName} />
+                    <AvatarFallback>{profileData.fullName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <DialogTitle className="text-2xl">{profileData.fullName}</DialogTitle>
+                    <DialogDescription className="text-base">
+                      {profileData.email}
+                    </DialogDescription>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={currentProfileView === 'details' ? "secondary" : "ghost"}
+                    onClick={() => setCurrentProfileView('details')}
+                    className="flex items-center gap-2"
+                  >
+                    <User className="h-4 w-4" />
+                    Profile Details
+                  </Button>
+                  <Button
+                    variant={currentProfileView === 'integrations' ? "secondary" : "ghost"}
+                    onClick={() => setCurrentProfileView('integrations')}
+                    className="flex items-center gap-2"
+                  >
+                    <Link className="h-4 w-4" />
+                    Integrations
+                  </Button>
+                </div>
+              </DialogHeader>
+
+              {currentProfileView === 'details' ? (
+                <div className="space-y-6 mt-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Basic Information</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center gap-4 mb-6">
+                        <Avatar className="h-20 w-20">
+                          <AvatarImage src={profileData.photoURL} alt={profileData.fullName} />
+                          <AvatarFallback>{profileData.fullName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                        </Avatar>
+                        <Button variant="outline">Change Photo</Button>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="grid gap-2">
+                          <label htmlFor="fullName">Full Name</label>
+                          <input
+                            id="fullName"
+                            value={profileData.fullName}
+                            onChange={(e) => setProfileData({...profileData, fullName: e.target.value})}
+                            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <label htmlFor="email">Email</label>
+                          <input
+                            id="email"
+                            value={profileData.email}
+                            onChange={(e) => setProfileData({...profileData, email: e.target.value})}
+                            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid gap-2">
+                        <label htmlFor="bio">Bio</label>
+                        <textarea
+                          id="bio"
+                          value={profileData.bio}
+                          onChange={(e) => setProfileData({...profileData, bio: e.target.value})}
+                          className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+                          placeholder="Tell us about yourself..."
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Skills & Achievements</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="space-y-4">
+                        <h3 className="font-semibold">Skills</h3>
+                        <Select
+                          onValueChange={(value) => setProfileData(prev => ({
+                            ...prev,
+                            skills: [...prev.skills, value]
+                          }))}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Add a skill" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="javascript">JavaScript</SelectItem>
+                            <SelectItem value="react">React</SelectItem>
+                            <SelectItem value="node">Node.js</SelectItem>
+                            <SelectItem value="python">Python</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <div className="flex flex-wrap gap-2">
+                          {profileData.skills.map((skill, index) => (
+                            <Badge key={index} variant="secondary">
+                              {skill}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="ml-1 h-4 w-4 p-0"
+                                onClick={() => setProfileData(prev => ({
+                                  ...prev,
+                                  skills: prev.skills.filter((_, i) => i !== index)
+                                }))}
+                              >
+                                ×
+                              </Button>
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <h3 className="font-semibold">Achievements</h3>
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="Add new achievement"
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter') {
+                                const target = e.target as HTMLInputElement;
+                                setProfileData(prev => ({
+                                  ...prev,
+                                  achievements: [...prev.achievements, target.value]
+                                }));
+                                target.value = '';
+                              }
+                            }}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          {profileData.achievements.map((achievement, index) => (
+                            <div key={index} className="flex items-center justify-between p-2 border rounded-md">
+                              <span>{achievement}</span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setProfileData(prev => ({
+                                  ...prev,
+                                  achievements: prev.achievements.filter((_, i) => i !== index)
+                                }))}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Goals & Objectives</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Textarea
+                        placeholder="Define your learning objectives and career goals..."
+                        className="min-h-[100px]"
+                        value={profileData.goal}
+                        onChange={(e) => setProfileData(prev => ({
+                          ...prev,
+                          goal: e.target.value
+                        }))}
+                      />
+                    </CardContent>
+                  </Card>
+                </div>
+              ) : (
+                <div className="space-y-6 mt-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Connected Services</CardTitle>
+                      <CardDescription>
+                        Manage your external service connections
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="grid grid-cols-2 gap-4">
+                      {[
+                        { name: 'Google', icon: CalendarIcon, key: 'isGoogleConnected' },
+                        { name: 'Instagram', icon: Instagram, key: 'isInstagramConnected' },
+                        { name: 'Discord', icon: MessageSquare, key: 'isDiscordConnected' },
+                        { name: 'LinkedIn', icon: Linkedin, key: 'isLinkedInConnected' },
+                        { name: 'Twitter', icon: Twitter, key: 'isTwitterConnected' },
+                        { name: 'TikTok', icon: Video, key: 'isTikTokConnected' }
+                      ].map((service) => (
+                        <div key={service.key} className="flex items-center justify-between p-4 border rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <service.icon className="h-5 w-5" />
+                            <span>{service.name}</span>
+                          </div>
+                          <Button
+                            variant={profileData[service.key] ? "secondary" : "default"}
+                            onClick={() => handleConnect(service.name)}
+                          >
+                            {profileData[service.key] ? "Connected" : "Connect"}
+                          </Button>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+
+              <div className="flex justify-between mt-6">
+                <Button 
+                  variant="destructive"
+                  onClick={() => {
+                    localStorage.clear();
+                    window.location.href = '/login';
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </Button>
+                <Button 
+                  onClick={() => {
+                    toast({ title: "Profile updated successfully" });
+                    setShowProfileDialog(false);
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <Save className="h-4 w-4" />
+                  Save Changes
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     );
   };
-
 
   const DashboardView = () => {
     const [todos, setTodos] = useState([
@@ -509,275 +779,6 @@ export default function MentorshipPortal() {
             );
           })()}
         </Dialog>
-      </div>
-    );
-  };
-
-  
-  const ProfileView = () => {
-    const [profileData, setProfileData] = useState({
-      username: auth.currentUser?.email || "johndoe@example.com",
-      bio: "",
-      skills: [],
-      achievements: [],
-      niche: "",
-      goal: "",
-      isGoogleConnected: false,
-      isInstagramConnected: false,
-      isDiscordConnected: false,
-      isLinkedInConnected: false,
-      isTwitterConnected: false,
-      isTikTokConnected: false
-    });
-
-    const handleConnect = (service: string) => {
-      // OAuth integration would go here for each service
-      setProfileData(prev => ({
-        ...prev,
-        [`is${service}Connected`]: true
-      }));
-      toast({
-        title: "Success",
-        description: `Connected to ${service}`
-      });
-    };
-
-    return (
-      <div className="space-y-6 pt-10">
-        {/* Profile Information Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Profile Information</CardTitle>
-            <CardDescription>
-              Update your basic profile information
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-2">
-              <label htmlFor="username">Username</label>
-              <input
-                id="username"
-                value={profileData.username}
-                onChange={(e) => setProfileData({...profileData, username: e.target.value})}
-                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
-              />
-            </div>
-            <div className="grid gap-2">
-              <label htmlFor="bio">Bio</label>
-              <textarea
-                id="bio"
-                value={profileData.bio}
-                onChange={(e) => setProfileData({...profileData, bio: e.target.value})}
-                className="flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
-                placeholder="Tell us about yourself..."
-              />
-            </div>
-            <div className="grid gap-2">
-              <label htmlFor="skills">Skills</label>
-              <Select
-                onValueChange={(value) => setProfileData(prev => ({
-                  ...prev,
-                  skills: [...prev.skills, value]
-                }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Add a skill" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="javascript">JavaScript</SelectItem>
-                  <SelectItem value="react">React</SelectItem>
-                  <SelectItem value="node">Node.js</SelectItem>
-                  <SelectItem value="python">Python</SelectItem>
-                </SelectContent>
-              </Select>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {profileData.skills.map((skill, index) => (
-                  <Badge key={index} variant="secondary" className="px-2 py-1">
-                    {skill}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="ml-2 h-4 w-4 p-0"
-                      onClick={() => setProfileData(prev => ({
-                        ...prev,
-                        skills: prev.skills.filter((_, i) => i !== index)
-                      }))}
-                    >
-                      ×
-                    </Button>
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Achievements Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Achievements</CardTitle>
-            <CardDescription>
-              Add your certifications and accomplishments
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <input
-                  placeholder="Add new achievement"
-                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      const target = e.target as HTMLInputElement;
-                      setProfileData(prev => ({
-                        ...prev,
-                        achievements: [...prev.achievements, target.value]
-                      }));
-                      target.value = '';
-                    }
-                  }}
-                />
-              </div>
-              <div className="space-y-2">
-                {profileData.achievements.map((achievement, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 border rounded-md">
-                    <span>{achievement}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setProfileData(prev => ({
-                        ...prev,
-                        achievements: prev.achievements.filter((_, i) => i !== index)
-                      }))}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Connected Services Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Profile Details</CardTitle>
-            <CardDescription>
-              Enhance your profile with additional information
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-6">
-            {/* Left Column */}
-            <div className="space-y-6">
-              {/* About Section */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg">About</h3>
-                <Textarea 
-                  placeholder="Tell us about yourself, your background, and what drives you..."
-                  className="min-h-[100px]"
-                  value={profileData.bio} // Using existing bio field
-                  onChange={(e) => setProfileData(prev => ({
-                    ...prev,
-                    bio: e.target.value
-                  }))}
-                />
-              </div>
-
-              {/* Objectives & Goals Section */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Objectives & Goals</h3>
-                <div className="space-y-2">
-                  <Textarea
-                    placeholder="Define your learning objectives and career goals..."
-                    className="min-h-[100px]"
-                    value={profileData.goal}
-                    onChange={(e) => setProfileData(prev => ({
-                      ...prev,
-                      goal: e.target.value
-                    }))}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column - Connected Services */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-lg">Connected Services</h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-2 border rounded-md">
-                  <div className="flex items-center gap-2">
-                    <CalendarIcon className="h-5 w-5" />
-                    <span>Google</span>
-                  </div>
-                  <Button
-                    variant={profileData.isGoogleConnected ? "secondary" : "default"}
-                    onClick={() => handleConnect('Google')}
-                  >
-                    {profileData.isGoogleConnected ? "Connected" : "Connect"}
-                  </Button>
-                </div>
-                <div className="flex items-center justify-between p-2 border rounded-md">
-                  <div className="flex items-center gap-2">
-                    <Instagram className="h-5 w-5" />
-                    <span>Instagram</span>
-                  </div>
-                  <Button
-                    variant={profileData.isInstagramConnected ? "secondary" : "default"}
-                    onClick={() => handleConnect('Instagram')}
-                  >
-                    {profileData.isInstagramConnected ? "Connected" : "Connect"}
-                  </Button>
-                </div>
-                <div className="flex items-center justify-between p-2 border rounded-md">
-                  <div className="flex items-center gap-2">
-                    <MessageSquare className="h-5 w-5" />
-                    <span>Discord</span>
-                  </div>
-                  <Button
-                    variant={profileData.isDiscordConnected ? "secondary" : "default"}
-                    onClick={() => handleConnect('Discord')}
-                  >
-                    {profileData.isDiscordConnected ? "Connected" : "Connect"}
-                  </Button>
-                </div>
-                <div className="flex items-center justify-between p-2 border rounded-md">
-                  <div className="flex items-center gap-2">
-                    <Linkedin className="h-5 w-5" />
-                    <span>LinkedIn</span>
-                  </div>
-                  <Button
-                    variant={profileData.isLinkedInConnected ? "secondary" : "default"}
-                    onClick={() => handleConnect('LinkedIn')}
-                  >
-                    {profileData.isLinkedInConnected ? "Connected" : "Connect"}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="flex justify-between">
-          <Button 
-            variant="destructive"
-            onClick={() => {
-              localStorage.clear();
-              window.location.href = '/login';
-            }}
-            className="flex items-center gap-2"
-          >
-            <LogOut className="h-4 w-4" />
-            Logout
-          </Button>
-          <Button 
-            onClick={() => toast({ title: "Profile updated successfully" })}
-            className="flex items-center gap-2"
-          >
-            <Save className="h-4 w-4" />
-            Save Changes
-          </Button>
-        </div>
       </div>
     );
   };
@@ -3428,15 +3429,7 @@ export default function MentorshipPortal() {
         {currentView === 'resources' && <ResourcesView/>}
         {currentView === 'course' && <CourseView/>}
         {currentView === 'mentor' && <MyMentorView/>}
-        {currentView === 'profile' && <ProfileView/>}
-
       </div>
     </div>
   );
 }
-
-
-function setSelectedType(value: string): void {
-  throw new Error('Function not implemented.');
-}
-
