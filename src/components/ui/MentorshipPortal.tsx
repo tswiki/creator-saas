@@ -146,7 +146,7 @@ export default function MentorshipPortal() {
     const [currentProfileView, setCurrentProfileView] = useState('details');
     const [profileData, setProfileData] = useState({
       username: auth.currentUser?.email || "johndoe@example.com",
-      fullName: auth.currentUser?.displayName || "John Doe",
+      fullName: auth.currentUser?.displayName || "John Doe", 
       email: auth.currentUser?.email || "johndoe@example.com",
       photoURL: auth.currentUser?.photoURL || "/default-avatar.png",
       bio: "",
@@ -246,8 +246,27 @@ export default function MentorshipPortal() {
           </Button>
 
           <Dialog open={showProfileDialog} onOpenChange={setShowProfileDialog}>
-            <DialogContent className="w-[70vw] max-w-[1000px] h-[80vh] max-h-[800px] overflow-y-auto">
-              <div className="space-y-6 mt-6">
+            <DialogContent className="w-[70vw] max-w-[1000px] h-[80vh] max-h-[800px]">
+              <div className="space-y-6 mt-6 overflow-y-auto pr-4 custom-scrollbar" style={{
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'rgb(203 213 225) transparent'
+              }}>
+                <style jsx global>{`
+                  .custom-scrollbar::-webkit-scrollbar {
+                    width: 8px;
+                  }
+                  .custom-scrollbar::-webkit-scrollbar-track {
+                    background: transparent;
+                  }
+                  .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background-color: rgb(203 213 225);
+                    border-radius: 20px;
+                    border: 2px solid transparent;
+                  }
+                  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background-color: rgb(148 163 184);
+                  }
+                `}</style>
                 <Card>
                   <CardHeader>
                     <CardTitle>Personal Information</CardTitle>
