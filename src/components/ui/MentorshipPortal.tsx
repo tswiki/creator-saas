@@ -349,7 +349,7 @@ export default function MentorshipPortal() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="mentor">Mentor</SelectItem>
-                            <SelectItem value="mentee">Mentee</SelectItem>
+                            <SelectItem value="mentee">Community member</SelectItem>
                             <SelectItem value="admin">Admin</SelectItem>
                           </SelectContent>
                         </Select>
@@ -557,10 +557,10 @@ export default function MentorshipPortal() {
                           <SelectValue placeholder="Add a skill" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="javascript">JavaScript</SelectItem>
-                          <SelectItem value="react">React</SelectItem>
-                          <SelectItem value="node">Node.js</SelectItem>
-                          <SelectItem value="python">Python</SelectItem>
+                          <SelectItem value="Lead Generation">Lead Generation</SelectItem>
+                          <SelectItem value="Appointment Setting">Appointment Setting</SelectItem>
+                          <SelectItem value="Closing">Closing</SelectItem>
+                          <SelectItem value="Customer Success">Customer Success</SelectItem>
                         </SelectContent>
                       </Select>
                       <div className="flex flex-wrap gap-2">
@@ -582,42 +582,6 @@ export default function MentorshipPortal() {
                         ))}
                       </div>
                     </div>
-
-                    <div className="space-y-4">
-                      <h3 className="font-semibold">Achievements</h3>
-                      <div className="flex gap-2">
-                        <Input
-                          placeholder="Add new achievement"
-                          onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
-                              const target = e.target as HTMLInputElement;
-                              setProfileData(prev => ({
-                                ...prev,
-                                achievements: [...prev.achievements, target.value]
-                              }));
-                              target.value = '';
-                            }
-                          }}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        {profileData.achievements.map((achievement, index) => (
-                          <div key={index} className="flex items-center justify-between p-2 border rounded-md">
-                            <span>{achievement}</span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setProfileData(prev => ({
-                                ...prev,
-                                achievements: prev.achievements.filter((_, i) => i !== index)
-                              }))}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
                   </CardContent>
                 </Card>
               </div>
@@ -635,9 +599,37 @@ export default function MentorshipPortal() {
                   Logout
                 </Button>
                 <Button 
-                  onClick={() => {
-                    toast({ title: "Profile updated successfully" });
-                    setShowProfileDialog(false);
+                  onClick={async () => {
+                    try {
+                      const response = await fetch('/api/profiles', {
+                        method: 'PUT',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                          email: profileData.email,
+                          fullname: profileData.fullName,
+                          skills: profileData.skills,
+                          about: profileData.bio,
+                          integrations: Object.entries(profileData)
+                            .filter(([key, value]) => key.startsWith('is') && value === true)
+                            .map(([key]) => key.replace('is', '').replace('Connected', '')),
+                        }),
+                      });
+
+                      if (!response.ok) {
+                        throw new Error('Failed to update profile');
+                      }
+
+                      toast({ title: "Profile updated successfully" });
+                      setShowProfileDialog(false);
+                    } catch (error) {
+                      toast({ 
+                        title: "Error updating profile",
+                        variant: "destructive"
+                      });
+                      console.error(error);
+                    }
                   }}
                   className="flex items-center gap-2"
                 >
