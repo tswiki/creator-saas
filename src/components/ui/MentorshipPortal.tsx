@@ -135,6 +135,38 @@ export function HeroVideoDialogDemoTopInBottomOut() {
   );
 }
 
+async function refreshSession() {
+  try {
+    // Get current user
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error('No user logged in');
+    }
+
+    // Get fresh ID token
+    const idToken = await user.getIdToken(true);
+
+    // Call session endpoint to refresh session cookie
+    const response = await fetch('/api/auth/session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ idToken }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to refresh session');
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error refreshing session:', error);
+    return false;
+  }
+}
+
+
 export default function MentorshipPortal() {
 
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -204,7 +236,7 @@ export default function MentorshipPortal() {
             </Button>
           </div>
 
-          <div className="flex items-center justify-center w-full border-t pt-3 pb-3">
+          <div className="flex items-center justify-center w-full border-t border-b pt-3 pb-3 mb-4">
             <div className="flex items-center justify-center space-x-2">
               <div className="flex items-center justify-center gap-2">
                 <Sun className={`h-4 w-4 transition-opacity ${theme === 'dark' ? 'opacity-50' : 'text-yellow-500'}`} />
@@ -228,9 +260,32 @@ export default function MentorshipPortal() {
             </div>
           </div>
 
-          <Button variant="ghost" className="justify-between w-full mt-2 border-t pt-3" onClick={() => {
-            setShowProfileDialog(true);
-            setCurrentProfileView('details');
+          <Button variant="ghost" className="justify-between w-full mt-2 mb-2" onClick={async () => {
+              try {
+                const response = await fetch('/api/profiles', {
+                  method: 'GET',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  }
+                });
+
+                if (!response.ok) {
+                  throw new Error('Failed to fetch profile');
+                }
+
+                const data = await response.json();
+                setProfileData(data.profile);
+                setShowProfileDialog(true);
+                setCurrentProfileView('details');
+              } catch (error) {
+                console.error('Error fetching profile:', error);
+                toast({
+                  title: "Error",
+                  description: "Failed to load profile data",
+                  variant: "destructive",
+                  duration: 3000
+                });
+              }
           }}>
             <div className="flex items-center gap-2">
               <Avatar className="h-8 w-8">
@@ -268,21 +323,32 @@ export default function MentorshipPortal() {
                   }
                 `}</style>
                 <Card>
-                  <CardHeader>
-                    <CardTitle>Personal Information</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="flex items-center gap-4 mb-6">
-                      <Avatar className="h-20 w-20">
-                        <AvatarImage src={profileData.photoURL} alt={profileData.fullName} />
-                        <AvatarFallback>{profileData.fullName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                      </Avatar>
-                      <Button variant="outline">Change Photo</Button>
+                  <CardHeader className="pb-4">
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="relative">
+                        <Avatar className="h-24 w-24">
+                          <AvatarImage src={profileData.photoURL} alt={profileData.fullName} />
+                          <AvatarFallback>{profileData.fullName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                        </Avatar>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="absolute bottom-0 right-0 rounded-full bg-background shadow-sm"
+                        >
+                          <Pencil className="h-4 w-4" />
+                          <span className="sr-only">Change photo</span>
+                        </Button>
+                      </div>
+                      <Button variant="outline" size="sm">
+                        <Link className="h-4 w-4 mr-1" />
+                        Copy Link
+                      </Button>
                     </div>
-
-                    <div className="grid gap-4">
-                      <div className="grid gap-2">
-                        <label htmlFor="fullName">Full Name</label>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-4 divide-y divide-border">
+                      <div>
+                        <h3 className="text-sm font-medium mb-2">Name</h3>
                         <input
                           id="fullName"
                           value={profileData.fullName}
@@ -291,8 +357,18 @@ export default function MentorshipPortal() {
                         />
                       </div>
 
-                      <div className="grid gap-2">
-                        <label htmlFor="email">Email</label>
+                      <div className="pt-4">
+                        <h3 className="text-sm font-medium mb-2">Username</h3>
+                        <input
+                          id="username"
+                          value={profileData.username}
+                          onChange={(e) => setProfileData({...profileData, username: e.target.value})}
+                          className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+                        />
+                      </div>
+
+                      <div className="pt-4">
+                        <h3 className="text-sm font-medium mb-2">Email Address</h3>
                         <input
                           id="email"
                           value={profileData.email}
@@ -301,8 +377,8 @@ export default function MentorshipPortal() {
                         />
                       </div>
 
-                      <div className="grid gap-2">
-                        <label htmlFor="phone">Phone Number</label>
+                      <div className="pt-4">
+                        <h3 className="text-sm font-medium mb-2">Phone Number</h3>
                         <div className="flex gap-2">
                           <Select
                             onValueChange={(value) => setProfileData(prev => ({
@@ -328,277 +404,43 @@ export default function MentorshipPortal() {
                           <input
                             id="phone"
                             type="tel"
-                            value={profileData.phone}
-                            onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
+                            value={profileData.phoneNumber}
+                            onChange={(e) => setProfileData({...profileData, phoneNumber: e.target.value})}
                             className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
                             placeholder="Enter phone number"
                           />
                         </div>
                       </div>
 
-                      <div className="grid gap-2">
-                        <label htmlFor="role">Role</label>
-                        <Select
-                          onValueChange={(value) => setProfileData(prev => ({
-                            ...prev,
-                            role: value
-                          }))}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select role" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="mentor">Mentor</SelectItem>
-                            <SelectItem value="mentee">Community member</SelectItem>
-                            <SelectItem value="admin">Admin</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="grid gap-2">
-                        <label htmlFor="bio">About</label>
+                      <div className="pt-4">
+                        <h3 className="text-sm font-medium mb-2">About</h3>
                         <textarea
                           id="bio"
                           value={profileData.bio}
                           onChange={(e) => setProfileData({...profileData, bio: e.target.value})}
-                          className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+                          className="flex h-20 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
                           placeholder="Tell us about yourself..."
                         />
-                      </div>
-
-                      <div className="grid gap-2">
-                        <label>Connected Services</label>
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            <Button 
-                              variant={profileData.isGoogleConnected ? "default" : "outline"}
-                              className="flex items-center gap-2 justify-start relative"
-                              onClick={() => handleConnect('Google')}
-                            >
-                              <CalendarIcon className="h-4 w-4" />
-                              <span>Google</span>
-                              <div className="absolute right-2 flex items-center">
-                                {profileData.isGoogleConnected ? 
-                                  <div className="flex items-center text-green-500">
-                                    <Check className="h-4 w-4 mr-1" />
-                                    <span className="text-xs">Integrated</span>
-                                  </div> :
-                                  <div className="flex items-center text-gray-400">
-                                    <X className="h-4 w-4 mr-1" />
-                                    <span className="text-xs">Not Connected</span>
-                                  </div>
-                                }
-                              </div>
-                            </Button>
-
-                            <Button
-                              variant={profileData.isInstagramConnected ? "default" : "outline"} 
-                              className="flex items-center gap-2 justify-start relative"
-                              onClick={() => handleConnect('Instagram')}
-                            >
-                              <Instagram className="h-4 w-4" />
-                              <span>Instagram</span>
-                              <div className="absolute right-2 flex items-center">
-                                {profileData.isInstagramConnected ? 
-                                  <div className="flex items-center text-green-500">
-                                    <Check className="h-4 w-4 mr-1" />
-                                    <span className="text-xs">Integrated</span>
-                                  </div> :
-                                  <div className="flex items-center text-gray-400">
-                                    <X className="h-4 w-4 mr-1" />
-                                    <span className="text-xs">Not Connected</span>
-                                  </div>
-                                }
-                              </div>
-                            </Button>
-
-                            <Button
-                              variant={profileData.isDiscordConnected ? "default" : "outline"}
-                              className="flex items-center gap-2 justify-start relative"
-                              onClick={() => handleConnect('Discord')}
-                            >
-                              <MessageSquare className="h-4 w-4" />
-                              <span>Discord</span>
-                              <div className="absolute right-2 flex items-center">
-                                {profileData.isDiscordConnected ? 
-                                  <div className="flex items-center text-green-500">
-                                    <Check className="h-4 w-4 mr-1" />
-                                    <span className="text-xs">Integrated</span>
-                                  </div> :
-                                  <div className="flex items-center text-gray-400">
-                                    <X className="h-4 w-4 mr-1" />
-                                    <span className="text-xs">Not Connected</span>
-                                  </div>
-                                }
-                              </div>
-                            </Button>
-
-                            <Button
-                              variant={profileData.isLinkedInConnected ? "default" : "outline"}
-                              className="flex items-center gap-2 justify-start relative"
-                              onClick={() => handleConnect('LinkedIn')}
-                            >
-                              <Linkedin className="h-4 w-4" />
-                              <span>LinkedIn</span>
-                              <div className="absolute right-2 flex items-center">
-                                {profileData.isLinkedInConnected ? 
-                                  <div className="flex items-center text-green-500">
-                                    <Check className="h-4 w-4 mr-1" />
-                                    <span className="text-xs">Integrated</span>
-                                  </div> :
-                                  <div className="flex items-center text-gray-400">
-                                    <X className="h-4 w-4 mr-1" />
-                                    <span className="text-xs">Not Connected</span>
-                                  </div>
-                                }
-                              </div>
-                            </Button>
-
-                            <Button
-                              variant={profileData.isTwitterConnected ? "default" : "outline"}
-                              className="flex items-center gap-2 justify-start relative"
-                              onClick={() => handleConnect('Twitter')}
-                            >
-                              <Twitter className="h-4 w-4" />
-                              <span>Twitter</span>
-                              <div className="absolute right-2 flex items-center">
-                                {profileData.isTwitterConnected ? 
-                                  <div className="flex items-center text-green-500">
-                                    <Check className="h-4 w-4 mr-1" />
-                                    <span className="text-xs">Integrated</span>
-                                  </div> :
-                                  <div className="flex items-center text-gray-400">
-                                    <X className="h-4 w-4 mr-1" />
-                                    <span className="text-xs">Not Connected</span>
-                                  </div>
-                                }
-                              </div>
-                            </Button>
-
-                            <Button
-                              variant={profileData.isTikTokConnected ? "default" : "outline"}
-                              className="flex items-center gap-2 justify-start relative"
-                              onClick={() => handleConnect('TikTok')}
-                            >
-                              <Video className="h-4 w-4" />
-                              <span>TikTok</span>
-                              <div className="absolute right-2 flex items-center">
-                                {profileData.isTikTokConnected ? 
-                                  <div className="flex items-center text-green-500">
-                                    <Check className="h-4 w-4 mr-1" />
-                                    <span className="text-xs">Integrated</span>
-                                  </div> :
-                                  <div className="flex items-center text-gray-400">
-                                    <X className="h-4 w-4 mr-1" />
-                                    <span className="text-xs">Not Connected</span>
-                                  </div>
-                                }
-                              </div>
-                            </Button>
-                          </div>
-
-                          <div className="space-y-2">
-                            {Object.entries(profileData)
-                              .filter(([key]) => key.startsWith('is') && key.endsWith('Connected') && profileData[key as keyof typeof profileData])
-                              .map(([key]) => {
-                                const serviceName = key.replace('is', '').replace('Connected', '');
-                                return (
-                                  <div key={key} className="flex items-center justify-between p-2 border rounded-md">
-                                    <div className="flex items-center gap-2">
-                                      {serviceName === 'Google' && <CalendarIcon className="h-4 w-4" />}
-                                      {serviceName === 'Instagram' && <Instagram className="h-4 w-4" />}
-                                      {serviceName === 'Discord' && <MessageSquare className="h-4 w-4" />}
-                                      {serviceName === 'LinkedIn' && <Linkedin className="h-4 w-4" />}
-                                      {serviceName === 'Twitter' && <Twitter className="h-4 w-4" />}
-                                      {serviceName === 'TikTok' && <Video className="h-4 w-4" />}
-                                      <span>{serviceName}</span>
-                                      <Badge variant="success" className="ml-2">Integrated</Badge>
-                                    </div>
-                                    <Button
-                                      variant="destructive"
-                                      size="sm"
-                                      onClick={() => {
-                                        setProfileData(prev => ({
-                                          ...prev,
-                                          [`is${serviceName}Connected`]: false
-                                        }));
-                                        toast({
-                                          title: "Disconnected",
-                                          description: `Disconnected from ${serviceName}`
-                                        });
-                                      }}
-                                    >
-                                      Disconnect
-                                    </Button>
-                                  </div>
-                                );
-                            })}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Skills & Achievements</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="space-y-4">
-                      <h3 className="font-semibold">Skills</h3>
-                      <Select
-                        onValueChange={(value) => setProfileData(prev => ({
-                          ...prev,
-                          skills: [...prev.skills, value]
-                        }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Add a skill" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Lead Generation">Lead Generation</SelectItem>
-                          <SelectItem value="Appointment Setting">Appointment Setting</SelectItem>
-                          <SelectItem value="Closing">Closing</SelectItem>
-                          <SelectItem value="Customer Success">Customer Success</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <div className="flex flex-wrap gap-2">
-                        {profileData.skills.map((skill, index) => (
-                          <Badge key={index} variant="secondary">
-                            {skill}
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="ml-1 h-4 w-4 p-0"
-                              onClick={() => setProfileData(prev => ({
-                                ...prev,
-                                skills: prev.skills.filter((_, i) => i !== index)
-                              }))}
-                            >
-                              ×
-                            </Button>
-                          </Badge>
-                        ))}
                       </div>
                     </div>
                   </CardContent>
                 </Card>
               </div>
 
-              <div className="flex justify-between mt-6">
+              <div className="flex justify-center gap-4 mt-6">
                 <Button 
                   variant="destructive"
                   onClick={() => {
                     localStorage.clear();
                     window.location.href = '/login';
                   }}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
                 >
                   <LogOut className="h-4 w-4" />
                   Logout
                 </Button>
                 <Button 
+                  className="flex items-center gap-2 bg-slate-800 hover:bg-slate-900 dark:bg-white dark:hover:bg-gray-100"
                   onClick={async () => {
                     try {
                       const response = await fetch('/api/profiles', {
@@ -606,35 +448,33 @@ export default function MentorshipPortal() {
                         headers: {
                           'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({
-                          email: profileData.email,
-                          fullname: profileData.fullName,
-                          skills: profileData.skills,
-                          about: profileData.bio,
-                          integrations: Object.entries(profileData)
-                            .filter(([key, value]) => key.startsWith('is') && value === true)
-                            .map(([key]) => key.replace('is', '').replace('Connected', '')),
-                        }),
+                        body: JSON.stringify(profileData)
                       });
-
+                      
                       if (!response.ok) {
-                        throw new Error('Failed to update profile');
+                        throw new Error('Failed to save changes');
                       }
-
-                      toast({ title: "Profile updated successfully" });
+                      
+                      const data = await response.json();
+                      toast({
+                        title: "Success",
+                        description: "Profile updated successfully",
+                        duration: 3000
+                      });
                       setShowProfileDialog(false);
                     } catch (error) {
-                      toast({ 
-                        title: "Error updating profile",
-                        variant: "destructive"
+                      console.error('Error saving changes:', error);
+                      toast({
+                        title: "Error",
+                        description: "Failed to save changes",
+                        variant: "destructive",
+                        duration: 3000
                       });
-                      console.error(error);
                     }
                   }}
-                  className="flex items-center gap-2"
                 >
                   <Save className="h-4 w-4" />
-                  Save Changes
+                  Save
                 </Button>
               </div>
             </DialogContent>

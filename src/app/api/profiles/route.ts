@@ -19,7 +19,7 @@ interface ProfileData {
 }
 
 // Get Firestore instance
-const db = getFirestore(app);
+const db = getFirestore();
 
 export async function GET(request: Request) {
   try {
@@ -103,6 +103,7 @@ export async function POST(request: Request) {
   }
 }
 
+
 export async function PUT(request: Request) {
   try {
     // Verify session
@@ -120,18 +121,32 @@ export async function PUT(request: Request) {
     // Get request body
     const updateData: Partial<ProfileData> = await request.json();
 
-    // Update profile in Firestore
-    await db
+    // Reference to the profile document
+    const profileRef = db
       .collection('User_Data')
       .doc(userId)
       .collection('profile')
-      .doc('info')
-      .update(updateData);
+      .doc('info');
 
-    return NextResponse.json({
-      status: 'success',
-      message: 'Profile updated successfully'
-    });
+    // Check if the document exists
+    const doc = await profileRef.get();
+    
+    if (!doc.exists) {
+      // If document doesn't exist, create it with the update data
+      await profileRef.set(updateData);
+      return NextResponse.json({
+        status: 'success',
+        message: 'Profile created successfully'
+      });
+    } else {
+      // If document exists, update it
+      await profileRef.update(updateData);
+      return NextResponse.json({
+        status: 'success',
+        message: 'Profile updated successfully'
+      });
+    }
+
   } catch (error) {
     console.error('Error updating profile:', error);
     return NextResponse.json(
@@ -140,39 +155,3 @@ export async function PUT(request: Request) {
     );
   }
 }
-
-// Optional: Delete profile
-// export async function DELETE(request: Request) {
-//   try {
-//     // Verify session
-//     const cookieStore = await cookies();
-//     const sessionCookie = cookieStore.get('session')?.value;
-
-//     if (!sessionCookie) {
-//       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-//     }
-
-//     // Verify the session cookie and get user claims
-//     const decodedClaims = await adminAuth.verifySessionCookie(sessionCookie);
-//     const userId = decodedClaims.uid;
-
-//     // Delete profile document
-//     await db
-//       .collection('User_Data')
-//       .doc(userId)
-//       .collection('profile')
-//       .doc('info')
-//       .delete();
-
-//     return NextResponse.json({
-//       status: 'success',
-//       message: 'Profile deleted successfully'
-//     });
-//   } catch (error) {
-//     console.error('Error deleting profile:', error);
-//     return NextResponse.json(
-//       { error: 'Failed to delete profile' },
-//       { status: 500 }
-//     );
-//   }
-// }
