@@ -1,109 +1,77 @@
-
 import { NextResponse } from 'next/server'
-import { auth } from '@/firebase/firebaseConfig'
-import { db } from '@/firebase/firebaseConfig'
-import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore'
+import type { NextRequest } from 'next/server'
 
-// GET /api/resources - Get all resources
+// Mock database for demo purposes
+let resources = [
+  {
+    id: 1,
+    title: "Advanced React Patterns",
+    type: "Course",
+    platform: "Udemy", 
+    link: "https://udemy.com/react-patterns",
+    recommended: "Sarah Wilson",
+    description: "Deep dive into advanced React patterns and best practices",
+    attachments: [
+      { name: "Course Slides", type: "PDF", size: "2.4MB" },
+      { name: "Exercise Files", type: "ZIP", size: "15MB" }
+    ],
+    progress: 45
+  }
+]
+
 export async function GET() {
-  try {
-    const resourcesRef = collection(db, 'resources')
-    const snapshot = await getDocs(resourcesRef)
-    const resources = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }))
-    return NextResponse.json(resources)
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to fetch resources' },
-      { status: 500 }
-    )
-  }
+  return NextResponse.json(resources)
 }
 
-// POST /api/resources - Create new resource
-export async function POST(request: Request) {
-  try {
-    const body = await request.json()
-    const user = auth.currentUser
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
-
-    const resourceData = {
-      ...body,
-      createdBy: user.uid,
-      createdAt: new Date().toISOString()
-    }
-
-    const docRef = await addDoc(collection(db, 'resources'), resourceData)
-    
-    return NextResponse.json({
-      id: docRef.id,
-      ...resourceData
-    })
-
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to create resource' },
-      { status: 500 }
-    )
+export async function POST(request: NextRequest) {
+  const data = await request.json()
+  
+  const newResource = {
+    id: resources.length + 1,
+    ...data
   }
+  
+  resources.push(newResource)
+  
+  return NextResponse.json(newResource, { status: 201 })
 }
 
-// PUT /api/resources/:id - Update resource
-export async function PUT(request: Request) {
-  try {
-    const body = await request.json()
-    const user = auth.currentUser
-    const { id } = body
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
-
-    const resourceRef = doc(db, 'resources', id)
-    await updateDoc(resourceRef, body)
-
-    return NextResponse.json({ success: true })
-
-  } catch (error) {
+export async function PUT(request: NextRequest) {
+  const data = await request.json()
+  const { id, ...updates } = data
+  
+  const index = resources.findIndex(r => r.id === id)
+  if (index === -1) {
     return NextResponse.json(
-      { error: 'Failed to update resource' },
-      { status: 500 }
+      { error: 'Resource not found' },
+      { status: 404 }
     )
   }
+
+  resources[index] = {
+    ...resources[index],
+    ...updates
+  }
+
+  return NextResponse.json(resources[index])
 }
 
-// DELETE /api/resources/:id - Delete resource 
-export async function DELETE(request: Request) {
-  try {
-    const { id } = await request.json()
-    const user = auth.currentUser
+export async function DELETE(request: NextRequest) {
+  const { searchParams } = new URL(request.url)
+  const id = Number(searchParams.get('id'))
 
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
-
-    await deleteDoc(doc(db, 'resources', id))
-    
-    return NextResponse.json({ success: true })
-
-  } catch (error) {
+  const index = resources.findIndex(r => r.id === id)
+  if (index === -1) {
     return NextResponse.json(
-      { error: 'Failed to delete resource' },
-      { status: 500 }
+      { error: 'Resource not found' },
+      { status: 404 }
     )
   }
+
+  resources = resources.filter(r => r.id !== id)
+  
+  return NextResponse.json(
+    { message: 'Resource deleted successfully' },
+    { status: 200 }
+  )
 }

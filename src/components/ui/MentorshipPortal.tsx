@@ -1653,46 +1653,55 @@ export default function MentorshipPortal() {
                               </DialogTrigger>
                               <DialogContent className="sm:max-w-[500px]">
                                 <DialogHeader>
-                                  <DialogTitle>{resource.title}</DialogTitle>
-                                  <DialogDescription>{resource.description}</DialogDescription>
+                                  <DialogTitle>Join Our Mentorship Program</DialogTitle>
+                                  <DialogDescription>
+                                    Get personalized guidance and unlock premium resources
+                                  </DialogDescription>
                                 </DialogHeader>
-                                <div className="space-y-4">
-                                  <div>
-                                    <h4 className="font-medium mb-2">Progress</h4>
-                                    <div className="h-2 bg-secondary rounded-full">
-                                      <div 
-                                        className="h-full bg-primary rounded-full" 
-                                        style={{width: `${resource.progress}%`}}
-                                      />
-                                    </div>
-                                    <p className="text-sm text-right mt-1">{resource.progress}% Complete</p>
+                                <div className="space-y-6">
+                                  <div className="text-center">
+                                    <h4 className="font-medium mb-4">Premium Mentorship Benefits</h4>
+                                    <ul className="text-sm space-y-3">
+                                      <li className="flex items-center gap-2">
+                                        <CheckCircle2 className="h-4 w-4 text-primary" />
+                                        <span>1-on-1 sessions with expert mentors</span>
+                                      </li>
+                                      <li className="flex items-center gap-2">
+                                        <CheckCircle2 className="h-4 w-4 text-primary" />
+                                        <span>Access to all premium resources</span>
+                                      </li>
+                                      <li className="flex items-center gap-2">
+                                        <CheckCircle2 className="h-4 w-4 text-primary" />
+                                        <span>Personalized learning path</span>
+                                      </li>
+                                      <li className="flex items-center gap-2">
+                                        <CheckCircle2 className="h-4 w-4 text-primary" />
+                                        <span>Project reviews and feedback</span>
+                                      </li>
+                                    </ul>
                                   </div>
-                                  
-                                  <div>
-                                    <h4 className="font-medium mb-2">Attachments</h4>
-                                    <div className="space-y-2">
-                                      {resource.attachments.map((file, j) => (
-                                        <div key={j} className="flex items-center justify-between p-2 border rounded-lg">
-                                          <div className="flex items-center gap-2">
-                                            <BookOpen className="h-4 w-4" />
-                                            <span className="text-sm">{file.name}</span>
-                                            <Badge variant="outline" className="text-xs">
-                                              {file.size}
-                                            </Badge>
-                                          </div>
-                                          <Button variant="ghost" size="sm">
-                                            Download
-                                          </Button>
-                                        </div>
-                                      ))}
+
+                                  <div className="text-center space-y-4">
+                                    <div>
+                                      <span className="text-3xl font-bold">$199</span>
+                                      <span className="text-sm text-muted-foreground">/month</span>
                                     </div>
+                                    <p className="text-sm text-muted-foreground">
+                                      Cancel anytime. 100% satisfaction guaranteed.
+                                    </p>
                                   </div>
-                                  
-                                  <div className="flex justify-between">
-                                    <Button variant="outline" onClick={() => window.open(resource.link, '_blank')}>
-                                      Open in {resource.platform}
+
+                                  <div className="flex flex-col gap-3">
+                                    <Button size="lg">
+                                      Start Your Mentorship Journey
                                     </Button>
-                                    <Button onClick={() => setCurrentView('course')}>Continue Learning</Button>
+                                    <Button variant="outline" size="lg">
+                                      Schedule a Free Consultation
+                                    </Button>
+                                  </div>
+
+                                  <div className="text-center text-sm text-muted-foreground">
+                                    <p>Have questions? <span className="text-primary cursor-pointer hover:underline">Contact us</span></p>
                                   </div>
                                 </div>
                               </DialogContent>
@@ -1830,7 +1839,37 @@ export default function MentorshipPortal() {
               </div>
             </div>
             <DialogFooter>
-              <Button onClick={() => setShowAddDialog(false)}>Add Resource</Button>
+              <Button onClick={async () => {
+                try {
+                  // Call the resources API endpoint to create new resource
+                  const response = await fetch('/api/resources', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(newResource)
+                  });
+
+                  if (!response.ok) {
+                    throw new Error('Failed to add resource');
+                  }
+
+                  // Reset form
+                  setNewResource({
+                    title: '',
+                    type: '',
+                    platform: '',
+                    author: '',
+                    description: '',
+                  });
+                  
+                  // Close dialog
+                  setShowAddDialog(false);
+                } catch (error) {
+                  console.error('Error adding resource:', error);
+                  // Here you could show an error toast/alert to the user
+                }
+              }}>Add Resource</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
