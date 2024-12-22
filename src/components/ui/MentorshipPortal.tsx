@@ -116,295 +116,312 @@ import ScheduleView from '@/components/ui/calendar';
 
 
 const DashboardView = () => {
-  const [todos, setTodos] = useState([
-    { id: 1, title: "Complete React Tutorial", description: "Finish chapters 4-6", dueDate: "2024-02-01", priority: "High" },
-    { id: 2, title: "Review Pull Request", description: "Review team's code changes", dueDate: "2024-02-03", priority: "Medium" }
+  interface Email {
+    id: number;
+    subject: string;
+    from: string;
+    to: string;
+    date: string;
+    status: string;
+    priority: string;
+    content: string;
+    attachments: string[];
+    starred: boolean;
+  }
+
+  const [emails, setEmails] = useState<Email[]>([
+    {
+      id: 1,
+      subject: "Project Update Meeting",
+      from: "sarah.manager@company.com",
+      to: "me@company.com",
+      date: "2024-02-01 09:30 AM",
+      status: "unread",
+      priority: "High",
+      content: "Hi team, Let's meet to discuss the latest project developments. I've attached the current sprint report for review.",
+      attachments: ["sprint-report.pdf"],
+      starred: false
+    },
+    {
+      id: 2, 
+      subject: "Code Review Request",
+      from: "dev.team@company.com",
+      to: "me@company.com", 
+      date: "2024-02-01 11:15 AM",
+      status: "read",
+      priority: "Medium",
+      content: "Please review the latest pull request for the authentication feature. Changes include...",
+      attachments: [],
+      starred: true
+    },
+    {
+      id: 3,
+      subject: "Client Meeting Notes",
+      from: "client.success@company.com",
+      to: "me@company.com",
+      date: "2024-02-02 02:00 PM", 
+      status: "read",
+      priority: "High",
+      content: "Summary of today's client meeting and action items...",
+      attachments: ["meeting-notes.doc", "requirements.pdf"],
+      starred: false
+    }
   ]);
 
-  const [inProgress, setInProgress] = useState([
-    { id: 3, title: "Build Portfolio Project", description: "Working on the frontend", dueDate: "2024-02-05", priority: "High" }
-  ]);
+  const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
+  const [showComposeDialog, setShowComposeDialog] = useState(false);
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [newEmail, setNewEmail] = useState({
+    to: "",
+    subject: "",
+    content: "",
+    attachments: []
+  });
 
-  const [completed, setCompleted] = useState([
-    { id: 4, title: "Setup Development Environment", description: "Install necessary tools", dueDate: "2024-01-30", priority: "Low" }
-  ]);
+  const filteredEmails = emails
+    .filter(email => {
+      if (filterStatus === "starred") return email.starred;
+      if (filterStatus === "unread") return email.status === "unread";
+      return true;
+    })
+    .filter(email => 
+      email.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      email.from.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      email.content.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
-  const [showNewTaskDialog, setShowNewTaskDialog] = useState(false);
-  const [selectedColumn, setSelectedColumn] = useState('');
-  const [newTask, setNewTask] = useState({ title: "", description: "", dueDate: "", priority: "Medium" });
-
-  const addNewTask = () => {
-    const task = {
+  const sendEmail = () => {
+    const email: Email = {
       id: Date.now(),
-      ...newTask
+      from: "me@company.com",
+      date: new Date().toLocaleString(),
+      status: "sent",
+      priority: "Medium",
+      starred: false,
+      ...newEmail,
+      attachments: []
     };
     
-    switch(selectedColumn) {
-      case 'todo':
-        setTodos([...todos, task]);
-        break;
-      case 'inProgress':
-        setInProgress([...inProgress, task]);
-        break;
-      case 'completed':
-        setCompleted([...completed, task]);
-        break;
-    }
+    setEmails([...emails, email]);
+    setNewEmail({ to: "", subject: "", content: "", attachments: [] });
+    setShowComposeDialog(false);
     
-    setNewTask({ title: "", description: "", dueDate: "", priority: "Medium" });
-    setShowNewTaskDialog(false);
+    toast({
+      title: "Email Sent",
+      description: "Your email has been sent successfully"
+    });
   };
 
-  const moveTask = (taskId: number, from: any[], setFrom: Function, to: any[], setTo: Function) => {
-    const taskIndex = from.findIndex(task => task.id === taskId);
-    if (taskIndex !== -1) {
-      const task = from[taskIndex];
-      setFrom(from.filter(t => t.id !== taskId));
-      setTo([...to, task]);
-    }
+  const markAsRead = (emailId: number) => {
+    setEmails(emails.map(email => 
+      email.id === emailId ? {...email, status: "read"} : email
+    ));
   };
 
-  const TaskColumn = ({ title, tasks, onMoveLeft, onMoveRight, leftLabel, rightLabel, columnType }: any) => (
-    <Card className="flex-1">
-      <CardHeader>
-        <CardTitle className="flex justify-between items-center">
-          <span>{title}</span>
-          <Badge variant="secondary">{tasks.length}</Badge>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4 relative">
-        {tasks.map((task: any) => (
-          <Card key={task.id} className="p-4 space-y-2">
-            <div className="flex justify-between items-start">
-              <h4 className="font-semibold">{task.title}</h4>
-              <Badge>{task.priority}</Badge>
-            </div>
-            <p className="text-sm text-muted-foreground">{task.description}</p>
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-muted-foreground">Due: {task.dueDate}</span>
-              <div className="flex gap-2">
-                {onMoveLeft && (
-                  <Button size="sm" variant="ghost" onClick={() => onMoveLeft(task.id)}>
-                    <ArrowLeft className="h-4 w-4" />
-                    <span className="sr-only">{leftLabel}</span>
-                  </Button>
-                )}
-                {onMoveRight && (
-                  <Button size="sm" variant="ghost" onClick={() => onMoveRight(task.id)}>
-                    <ArrowRight className="h-4 w-4" />
-                    <span className="sr-only">{rightLabel}</span>
-                  </Button>
-                )}
-              </div>
-            </div>
-          </Card>
-        ))}
-        
-        <Button 
-          variant="ghost" 
-          className="w-full mt-4 border-2 border-dashed"
-          onClick={() => {
-            setSelectedColumn(columnType);
-            setShowNewTaskDialog(true);
-          }}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Card
-        </Button>
-      </CardContent>
-    </Card>
-  );
+  const toggleStar = (emailId: number) => {
+    setEmails(emails.map(email => 
+      email.id === emailId ? {...email, starred: !email.starred} : email
+    ));
+  };
 
-  const [showMailboxDialog, setShowMailboxDialog] = useState(false);
-  const [emails] = useState([
-    { id: 1, subject: "Project Update", from: "team@company.com", date: "2024-02-01", content: "Latest project updates..." },
-    { id: 2, subject: "Meeting Notes", from: "manager@company.com", date: "2024-02-02", content: "Notes from today's meeting..." }
-  ]);
+  const deleteEmail = (emailId: number) => {
+    setEmails(emails.filter(email => email.id !== emailId));
+    setSelectedEmail(null);
+    toast({
+      title: "Email Deleted",
+      description: "The email has been moved to trash"
+    });
+  };
 
   return (
-    <div className="space-y-6 pt-12">
-      <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-        <Button onClick={() => setShowMailboxDialog(true)}>
-          <Mail className="h-4 w-4 mr-1" />
-          Mailbox
-        </Button>
-      </div>
+    <Card className="w-full">
+      <CardHeader>
+        <div className="flex justify-between items-center">
+          <CardTitle>Email Inbox</CardTitle>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Input
+                placeholder="Search emails..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-64"
+              />
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filter emails" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="unread">Unread</SelectItem>
+                  <SelectItem value="starred">Starred</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button onClick={() => setShowComposeDialog(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Compose
+            </Button>
+          </div>
+        </div>
+      </CardHeader>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <TaskColumn
-          title="To Do"
-          tasks={todos}
-          onMoveRight={(id: number) => moveTask(id, todos, setTodos, inProgress, setInProgress)}
-          rightLabel="Move to In Progress"
-          columnType="todo"
-        />
-        <TaskColumn
-          title="In Progress"
-          tasks={inProgress}
-          onMoveLeft={(id: number) => moveTask(id, inProgress, setInProgress, todos, setTodos)}
-          onMoveRight={(id: number) => moveTask(id, inProgress, setInProgress, completed, setCompleted)}
-          leftLabel="Move to Todo"
-          rightLabel="Move to Completed"
-          columnType="inProgress"
-        />
-        <TaskColumn
-          title="Completed"
-          tasks={completed}
-          onMoveLeft={(id: number) => moveTask(id, completed, setCompleted, inProgress, setInProgress)}
-          leftLabel="Move to In Progress"
-          columnType="completed"
-        />
-      </div>
+      <CardContent className="space-y-4">
+        {filteredEmails.map(email => (
+          <Card key={email.id}>
+            <CardHeader className="p-4">
+              <div className="flex justify-between items-start">
+                <div className="flex-1" onClick={() => {
+                  setSelectedEmail(email);
+                  markAsRead(email.id);
+                }}>
+                  <div className="flex items-center gap-2">
+                    {email.status === "unread" && (
+                      <div className="w-2 h-2 rounded-full bg-blue-500" />
+                    )}
+                    <CardTitle className="text-base">{email.subject}</CardTitle>
+                  </div>
+                  <CardDescription>From: {email.from}</CardDescription>
+                </div>
+                <div className="flex items-center gap-4">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleStar(email.id);
+                    }}
+                  >
+                    {email.starred ? (
+                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    ) : (
+                      <Star className="h-4 w-4" />
+                    )}
+                  </Button>
+                  {email.attachments.length > 0 && (
+                    <Paperclip className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="px-4 pb-2">
+              <p className="text-sm line-clamp-2">{email.content}</p>
+            </CardContent>
+            <CardFooter className="px-4 py-2 flex justify-between">
+              <Badge variant={email.priority === "High" ? "destructive" : "secondary"}>
+                {email.priority}
+              </Badge>
+              <span className="text-sm text-muted-foreground">{email.date}</span>
+            </CardFooter>
+          </Card>
+        ))}
+      </CardContent>
 
-      <Dialog open={showNewTaskDialog} onOpenChange={setShowNewTaskDialog}>
+      <Dialog open={showComposeDialog} onOpenChange={setShowComposeDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add New Task</DialogTitle>
+            <DialogTitle>Compose Email</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="title">Title</Label>
+              <Label>To</Label>
               <Input
-                id="title"
-                value={newTask.title}
-                onChange={(e) => setNewTask({...newTask, title: e.target.value})}
+                value={newEmail.to}
+                onChange={(e) => setNewEmail({...newEmail, to: e.target.value})}
+                placeholder="recipient@example.com"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={newTask.description}
-                onChange={(e) => setNewTask({...newTask, description: e.target.value})}
+              <Label>Subject</Label>
+              <Input
+                value={newEmail.subject}
+                onChange={(e) => setNewEmail({...newEmail, subject: e.target.value})}
+                placeholder="Email subject"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="dueDate">Due Date</Label>
-                <Input
-                  id="dueDate"
-                  type="date"
-                  value={newTask.dueDate}
-                  onChange={(e) => setNewTask({...newTask, dueDate: e.target.value})}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="priority">Priority</Label>
-                <Select onValueChange={(value) => setNewTask({...newTask, priority: value})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select priority" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Low">Low</SelectItem>
-                    <SelectItem value="Medium">Medium</SelectItem>
-                    <SelectItem value="High">High</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-2">
+              <Label>Message</Label>
+              <Textarea
+                value={newEmail.content}
+                onChange={(e) => setNewEmail({...newEmail, content: e.target.value})}
+                placeholder="Write your message here..."
+                rows={5}
+              />
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={addNewTask}>Add Task</Button>
+            <Button variant="outline" onClick={() => setShowComposeDialog(false)}>Cancel</Button>
+            <Button onClick={sendEmail}>Send</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showMailboxDialog} onOpenChange={setShowMailboxDialog}>
-        {(() => {
-          const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
-          
-          return (
-            <DialogContent className="max-h-[80vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>
-                  {selectedEmailId ? (
-                    <Button 
-                      variant="ghost" 
-                      className="p-0 hover:bg-transparent" 
-                      onClick={() => setSelectedEmailId(null)}
+      <Dialog open={!!selectedEmail} onOpenChange={() => setSelectedEmail(null)}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>{selectedEmail?.subject}</DialogTitle>
+          </DialogHeader>
+          {selectedEmail && (
+            <Card>
+              <CardHeader>
+                <div className="flex justify-between items-center text-sm">
+                  <div>
+                    <p>From: {selectedEmail.from}</p>
+                    <p>To: {selectedEmail.to}</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => selectedEmail && toggleStar(selectedEmail.id)}
                     >
-                      <ArrowLeft className="h-4 w-4 mr-2" />
-                      Back to Inbox
+                      {selectedEmail.starred ? (
+                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      ) : (
+                        <Star className="h-4 w-4" />
+                      )}
                     </Button>
-                  ) : 
-                    "Mailbox"
-                  }
-                </DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                {!selectedEmailId ? (
-                  // Inbox View
-                  emails.map(email => (
-                    <Card 
-                      key={email.id} 
-                      className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
-                      onClick={() => setSelectedEmailId(email.id)}
-                    >
-                      <div className="flex justify-between items-start">
-                        <h4 className="font-semibold">{email.subject}</h4>
-                        <span className="text-sm text-muted-foreground">{email.date}</span>
-                      </div>
-                      <p className="text-sm text-muted-foreground">From: {email.from}</p>
-                      <p className="text-sm mt-2 line-clamp-2">{email.content}</p>
-                    </Card>
-                  ))
-                ) : (
-                  // Email Detail View
-                  (() => {
-                    const email = emails.find(e => e.id === selectedEmailId);
-                    if (!email) return null;
-                    return (
-                      <div className="space-y-6">
-                        <div className="space-y-4">
-                          <h3 className="text-xl font-semibold">{email.subject}</h3>
-                          <div className="flex justify-between text-sm text-muted-foreground">
-                            <span>From: {email.from}</span>
-                            <span>{email.date}</span>
-                          </div>
-                        </div>
-                        <Separator />
-                        <div className="prose dark:prose-invert max-w-none">
-                          {email.content}
-                        </div>
-                        <div className="flex justify-end space-x-2">
-                          <Button 
-                            variant="outline" 
-                            onClick={() => {
-                              // Handle reply logic
-                              toast({
-                                title: "Reply sent",
-                                description: "Your reply has been sent successfully"
-                              });
-                            }}
-                          >
-                            <ReplyIcon className="h-4 w-4 mr-2" />
-                            Reply
-                          </Button>
-                          <Button 
-                            variant="outline"
-                            onClick={() => {
-                              // Handle forward logic
-                              toast({
-                                title: "Email forwarded",
-                                description: "The email has been forwarded"
-                              });
-                            }}
-                          >
-                            <Forward className="h-4 w-4 mr-2" />
-                            Forward
-                          </Button>
-                        </div>
-                      </div>
-                    );
-                  })()
+                    <p className="text-muted-foreground">{selectedEmail.date}</p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="prose dark:prose-invert max-w-none">
+                  {selectedEmail.content}
+                </div>
+                {selectedEmail.attachments.length > 0 && (
+                  <div className="mt-4">
+                    <h4 className="text-sm font-medium mb-2">Attachments</h4>
+                    <div className="flex gap-2">
+                      {selectedEmail.attachments.map((attachment: string) => (
+                        <Button key={attachment} variant="outline" size="sm">
+                          <Paperclip className="h-4 w-4 mr-2" />
+                          {attachment}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
                 )}
-              </div>
-            </DialogContent>
-          );
-        })()}
+              </CardContent>
+              <CardFooter className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => selectedEmail && deleteEmail(selectedEmail.id)}>
+                  <Trash className="h-4 w-4 mr-2" />
+                  Delete
+                </Button>
+                <Button variant="outline">
+                  <ReplyIcon className="h-4 w-4 mr-2" />
+                  Reply
+                </Button>
+                <Button variant="outline">
+                  <Forward className="h-4 w-4 mr-2" />
+                  Forward
+                </Button>
+              </CardFooter>
+            </Card>
+          )}
+        </DialogContent>
       </Dialog>
-    </div>
+    </Card>
   );
 };
 

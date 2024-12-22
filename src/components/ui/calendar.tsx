@@ -14,10 +14,10 @@ const ScheduleView = () => {
   const [showSessionDetailsDialog, setShowSessionDetailsDialog] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  // Constants for layout - adjusted to account for header and sidebar
-  const HEADER_HEIGHT = 64; // Match header height
-  const SIDEBAR_WIDTH = 256; // Match sidebar width
-  const TIME_COLUMN_WIDTH = 80; // Reduced for better proportions
+  // Constants for layout
+  const SIDEBAR_WIDTH = 256; // 64px * 4 = 256px
+  const HEADER_HEIGHT = 64;
+  const TIME_COLUMN_WIDTH = 100;
 
   // Time slots in 3-hour groups
   const timeGroups = [
@@ -71,93 +71,65 @@ const ScheduleView = () => {
   };
 
   return (
-    <div className="fixed inset-0 flex flex-col" style={{ 
-      marginLeft: SIDEBAR_WIDTH, 
-      marginTop: HEADER_HEIGHT,
-      height: `calc(100vh - ${HEADER_HEIGHT}px)`,
-      width: `calc(100vw - ${SIDEBAR_WIDTH}px)`
-    }}>
-      {/* Calendar Header with Filters */}
-      <div className="flex items-center justify-between p-4 border-b bg-background/95 backdrop-blur-sm">
-        <div className="flex items-center space-x-4">
-          <Tabs value={view} onValueChange={(v: any) => setView(v)} className="w-[300px]">
-            <TabsList className="grid w-full grid-cols-3">
+    <div className="flex h-screen" style={{ marginLeft: SIDEBAR_WIDTH, marginTop: HEADER_HEIGHT }}>
+      <div className="flex-1 flex flex-col">
+        {/* View selector */}
+        <div className="p-4 border-b">
+          <Tabs value={view} onValueChange={(v: any) => setView(v)} className="w-full">
+            <TabsList className="grid w-[400px] grid-cols-3">
               <TabsTrigger value="day">Day</TabsTrigger>
               <TabsTrigger value="week">Week</TabsTrigger>
               <TabsTrigger value="month">Month</TabsTrigger>
             </TabsList>
           </Tabs>
-          <Button variant="outline" size="sm">
-            <Filter className="h-4 w-4 mr-2" />
-            Filter
-          </Button>
-          <Button variant="outline" size="sm">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Event
-          </Button>
         </div>
-        <div className="text-sm text-muted-foreground">
-          {format(date, 'MMMM yyyy')}
-        </div>
-      </div>
 
-      {/* Calendar Grid */}
-      <div className="flex-1 overflow-auto">
-        <div className="grid" style={{ 
-          gridTemplateColumns: `${TIME_COLUMN_WIDTH}px repeat(${getDaysToShow().length}, minmax(150px, 1fr))`,
-          minHeight: '100%'
-        }}>
-          {/* Time Column */}
-          <div className="border-r bg-background/95 backdrop-blur-sm sticky left-0">
-            {timeGroups.map((timeGroup) => (
-              <div 
-                key={timeGroup}
-                className="border-b px-2 py-4 text-sm text-muted-foreground h-20"
-              >
-                {timeGroup}
+        {/* Calendar Grid */}
+        <div className="flex-1 overflow-auto">
+          <div className="grid" style={{ 
+            gridTemplateColumns: `${TIME_COLUMN_WIDTH}px repeat(${getDaysToShow().length}, 1fr)`,
+            minHeight: '100%'
+          }}>
+            {/* Day Columns */}
+            {getDaysToShow().map((day) => (
+              <div key={format(day, 'd')} className="min-w-[200px]">
+                <div className="sticky top-0 z-10 bg-background border-b p-2">
+                  <div className="text-sm font-medium">{format(day, 'EEEE')}</div>
+                  <div className="text-sm text-muted-foreground">{format(day, 'd MMM')}</div>
+                </div>
+
+                {timeGroups.map((timeGroup) => (
+                  <div 
+                    key={`${format(day, 'd')}-${timeGroup}`}
+                    className="border-b border-r p-2 relative h-24"
+                  >
+                    {sessions.map(session => (
+                      <Card 
+                        key={session.id}
+                        className="cursor-pointer hover:shadow-md transition-shadow"
+                        onClick={() => {
+                          setSelectedSession(session);
+                          setShowSessionDetailsDialog(true);
+                        }}
+                      >
+                        <CardHeader className="p-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              {session.icon}
+                              <div className="font-medium text-sm">{session.title}</div>
+                            </div>
+                            <Button variant="ghost" size="sm">
+                              <Edit2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </CardHeader>
+                      </Card>
+                    ))}
+                  </div>
+                ))}
               </div>
             ))}
           </div>
-
-          {/* Day Columns */}
-          {getDaysToShow().map((day) => (
-            <div key={format(day, 'd')} className="min-w-[150px]">
-              <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b p-2">
-                <div className="text-sm font-medium">{format(day, 'EEEE')}</div>
-                <div className="text-sm text-muted-foreground">{format(day, 'd MMM')}</div>
-              </div>
-
-              {timeGroups.map((timeGroup) => (
-                <div 
-                  key={`${format(day, 'd')}-${timeGroup}`}
-                  className="border-b border-r p-2 relative h-20"
-                >
-                  {sessions.map(session => (
-                    <Card 
-                      key={session.id}
-                      className="cursor-pointer hover:shadow-md transition-shadow"
-                      onClick={() => {
-                        setSelectedSession(session);
-                        setShowSessionDetailsDialog(true);
-                      }}
-                    >
-                      <CardHeader className="p-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            {session.icon}
-                            <div className="font-medium text-sm">{session.title}</div>
-                          </div>
-                          <Button variant="ghost" size="sm">
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </CardHeader>
-                    </Card>
-                  ))}
-                </div>
-              ))}
-            </div>
-          ))}
         </div>
       </div>
 
