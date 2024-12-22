@@ -1,15 +1,12 @@
+
+
 "use client"
 
-// Add styles to center the calendar form component
 import { cn } from "@/lib/utils"
-
 import { useEffect, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-
 import { toast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -22,11 +19,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
 
 const FormSchema = z.object({
   dob: z.date({
@@ -76,39 +68,16 @@ export function CalendarForm() {
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel className="text-white">Date of event</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        getButtonWidth(),
-                        "pl-3 text-left font-normal bg-gray-700 border-gray-600 text-white",
-                        !field.value && "text-gray-400"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>Select a date</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className={cn("p-0 bg-gray-700 border-gray-600", windowWidth < 640 ? "w-screen" : "w-auto")} align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
-                    initialFocus
-                    className="text-white"
-                  />
-                </PopoverContent>
-              </Popover>
+              <FormControl>
+                <Calendar
+                  className={cn(
+                    getButtonWidth(),
+                    "bg-gray-700 border-gray-600 text-white"
+                  )}
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              </FormControl>
               <FormDescription className="text-gray-400">
                 Select a date from the calendar.
               </FormDescription>
@@ -116,7 +85,15 @@ export function CalendarForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" className={cn("bg-gray-600 hover:bg-gray-500 text-white", windowWidth < 640 ? "w-full" : "w-auto")}>Confirm</Button>
+        <Button 
+          type="submit" 
+          className={cn(
+            "bg-gray-600 hover:bg-gray-500 text-white", 
+            windowWidth < 640 ? "w-full" : "w-auto"
+          )}
+        >
+          Confirm
+        </Button>
       </form>
     </Form>
   )

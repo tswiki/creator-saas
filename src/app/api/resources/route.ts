@@ -2,6 +2,44 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 // Mock database for demo purposes
+
+
+// interface Attachment {
+//   name: string;
+//   type: string;  // e.g., "PDF", "Code", "Video", "Document"
+//   size?: number; // optional, in bytes
+// }
+
+// interface Resource {
+//   // Required fields
+//   id: string;          // Unique identifier
+//   title: string;       // Title of the resource
+//   type: string;        // Type of resource (Course, Book, Document, Video)
+//   description: string; // Description of the resource
+  
+//   // Author/Source information
+//   author: string;      // Author or creator
+//   platform?: string;   // Platform where resource is hosted (e.g., Udemy, YouTube)
+//   link?: string;       // URL to the resource
+  
+//   // Recommendation details
+//   recommended?: string;  // Person who recommended the resource
+  
+//   // Content and progress tracking
+//   attachments?: Attachment[];  // Array of related attachments
+//   progress?: number;           // Progress percentage (0-100)
+//   status?: "Completed" | "In Progress" | "Upcoming";
+  
+//   // Metadata
+//   createdAt: Date;     // When the resource was added
+//   updatedAt: Date;     // When the resource was last updated
+  
+//   // Optional learning path related fields
+//   milestone?: string;  // Associated milestone/category
+//   tasks?: string[];    // Related tasks or subtopics
+// }
+
+
 let resources = [
   {
     id: 1,
