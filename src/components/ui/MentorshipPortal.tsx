@@ -1,7 +1,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { AwaitedReactNode, JSXElementConstructor, Key, ReactElement, ReactNode, SetStateAction, useEffect, useRef, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,7 +24,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Select,
   SelectContent,
@@ -112,100 +111,86 @@ import { useTheme } from 'next-themes';
 import { toast } from '@/hooks/use-toast';
 import { Textarea } from './textarea';
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarTrigger } from './menubar';
-import ScheduleView from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
 
 
 const DashboardView = () => {
-  interface Email {
-    id: number;
-    subject: string;
-    from: string;
-    to: string;
-    date: string;
-    status: string;
-    priority: string;
-    content: string;
-    attachments: string[];
-    starred: boolean;
-  }
-
-  const [emails, setEmails] = useState<Email[]>([
-    {
-      id: 1,
-      subject: "Project Update Meeting",
-      from: "sarah.manager@company.com",
-      to: "me@company.com",
-      date: "2024-02-01 09:30 AM",
-      status: "unread",
-      priority: "High",
-      content: "Hi team, Let's meet to discuss the latest project developments. I've attached the current sprint report for review.",
-      attachments: ["sprint-report.pdf"],
-      starred: false
+  const [emails, setEmails] = useState([
+    { 
+      id: 1, 
+      subject: "Welcome to the Team",
+      from: "manager@company.com",
+      to: "you@company.com", 
+      date: "2024-02-01",
+      content: "Welcome aboard! We're excited to have you join the team...",
+      read: false,
+      starred: false,
+      labels: ["Important"]
     },
     {
-      id: 2, 
-      subject: "Code Review Request",
-      from: "dev.team@company.com",
-      to: "me@company.com", 
-      date: "2024-02-01 11:15 AM",
-      status: "read",
-      priority: "Medium",
-      content: "Please review the latest pull request for the authentication feature. Changes include...",
-      attachments: [],
-      starred: true
-    },
-    {
-      id: 3,
-      subject: "Client Meeting Notes",
-      from: "client.success@company.com",
-      to: "me@company.com",
-      date: "2024-02-02 02:00 PM", 
-      status: "read",
-      priority: "High",
-      content: "Summary of today's client meeting and action items...",
-      attachments: ["meeting-notes.doc", "requirements.pdf"],
-      starred: false
+      id: 2,
+      subject: "Project Deadline Update",
+      from: "projectlead@company.com", 
+      to: "you@company.com",
+      date: "2024-02-02",
+      content: "The deadline for the current sprint has been extended...",
+      read: true,
+      starred: true,
+      labels: ["Work"]
     }
   ]);
 
-  const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
+  const [selectedEmailId, setSelectedEmailId] = useState<number | null>(null);
   const [showComposeDialog, setShowComposeDialog] = useState(false);
-  const [filterStatus, setFilterStatus] = useState<string>("all");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [filterText, setFilterText] = useState("");
+  const [filterStarred, setFilterStarred] = useState(false);
+  const [filterUnread, setFilterUnread] = useState(false);
   const [newEmail, setNewEmail] = useState({
     to: "",
     subject: "",
-    content: "",
-    attachments: []
+    content: ""
   });
 
-  const filteredEmails = emails
-    .filter(email => {
-      if (filterStatus === "starred") return email.starred;
-      if (filterStatus === "unread") return email.status === "unread";
-      return true;
-    })
-    .filter(email => 
-      email.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      email.from.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      email.content.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+  const filteredEmails = emails.filter(email => {
+    const matchesText = email.subject.toLowerCase().includes(filterText.toLowerCase()) ||
+                       email.from.toLowerCase().includes(filterText.toLowerCase()) ||
+                       email.content.toLowerCase().includes(filterText.toLowerCase());
+    const matchesStarred = filterStarred ? email.starred : true;
+    const matchesUnread = filterUnread ? !email.read : true;
+    return matchesText && matchesStarred && matchesUnread;
+  });
+
+  const markAsRead = (emailId: number) => {
+    setEmails(emails.map(email => 
+      email.id === emailId ? {...email, read: true} : email
+    ));
+  };
+
+  const toggleStar = (emailId: number) => {
+    setEmails(emails.map(email =>
+      email.id === emailId ? {...email, starred: !email.starred} : email
+    ));
+  };
+
+  const deleteEmail = (emailId: number) => {
+    setEmails(emails.filter(email => email.id !== emailId));
+    setSelectedEmailId(null);
+  };
 
   const sendEmail = () => {
-    const email: Email = {
+    const newEmailObj = {
       id: Date.now(),
-      from: "me@company.com",
-      date: new Date().toLocaleString(),
-      status: "sent",
-      priority: "Medium",
-      starred: false,
       ...newEmail,
-      attachments: []
+      from: "you@company.com",
+      date: new Date().toISOString().split('T')[0],
+      read: true,
+      starred: false,
+      labels: []
     };
     
-    setEmails([...emails, email]);
-    setNewEmail({ to: "", subject: "", content: "", attachments: [] });
+    setEmails([newEmailObj, ...emails]);
     setShowComposeDialog(false);
+    setNewEmail({ to: "", subject: "", content: "" });
     
     toast({
       title: "Email Sent",
@@ -213,217 +198,597 @@ const DashboardView = () => {
     });
   };
 
-  const markAsRead = (emailId: number) => {
-    setEmails(emails.map(email => 
-      email.id === emailId ? {...email, status: "read"} : email
-    ));
-  };
-
-  const toggleStar = (emailId: number) => {
-    setEmails(emails.map(email => 
-      email.id === emailId ? {...email, starred: !email.starred} : email
-    ));
-  };
-
-  const deleteEmail = (emailId: number) => {
-    setEmails(emails.filter(email => email.id !== emailId));
-    setSelectedEmail(null);
-    toast({
-      title: "Email Deleted",
-      description: "The email has been moved to trash"
-    });
-  };
-
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <CardTitle>Email Inbox</CardTitle>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Input
-                placeholder="Search emails..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-64"
-              />
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter emails" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="unread">Unread</SelectItem>
-                  <SelectItem value="starred">Starred</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+    <div className="pt-20"> {/* Added top padding to account for header */}
+      <Card className="w-full">
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle>Email Inbox</CardTitle>
             <Button onClick={() => setShowComposeDialog(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Compose
             </Button>
           </div>
-        </div>
-      </CardHeader>
-
-      <CardContent className="space-y-4">
-        {filteredEmails.map(email => (
-          <Card key={email.id}>
-            <CardHeader className="p-4">
-              <div className="flex justify-between items-start">
-                <div className="flex-1" onClick={() => {
-                  setSelectedEmail(email);
-                  markAsRead(email.id);
-                }}>
-                  <div className="flex items-center gap-2">
-                    {email.status === "unread" && (
-                      <div className="w-2 h-2 rounded-full bg-blue-500" />
-                    )}
-                    <CardTitle className="text-base">{email.subject}</CardTitle>
-                  </div>
-                  <CardDescription>From: {email.from}</CardDescription>
+          <CardDescription>
+            <div className="flex gap-4 items-center mt-4">
+              <div className="flex-1">
+                <Input
+                  placeholder="Search emails..."
+                  value={filterText}
+                  onChange={(e) => setFilterText(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    checked={filterStarred}
+                    onCheckedChange={setFilterStarred}
+                  />
+                  <span>Starred</span>
                 </div>
-                <div className="flex items-center gap-4">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleStar(email.id);
-                    }}
-                  >
-                    {email.starred ? (
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ) : (
-                      <Star className="h-4 w-4" />
-                    )}
-                  </Button>
-                  {email.attachments.length > 0 && (
-                    <Paperclip className="h-4 w-4 text-muted-foreground" />
-                  )}
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    checked={filterUnread}
+                    onCheckedChange={setFilterUnread}
+                  />
+                  <span>Unread</span>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent className="px-4 pb-2">
-              <p className="text-sm line-clamp-2">{email.content}</p>
-            </CardContent>
-            <CardFooter className="px-4 py-2 flex justify-between">
-              <Badge variant={email.priority === "High" ? "destructive" : "secondary"}>
-                {email.priority}
-              </Badge>
-              <span className="text-sm text-muted-foreground">{email.date}</span>
-            </CardFooter>
-          </Card>
-        ))}
-      </CardContent>
+            </div>
+          </CardDescription>
+        </CardHeader>
 
-      <Dialog open={showComposeDialog} onOpenChange={setShowComposeDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Compose Email</DialogTitle>
-          </DialogHeader>
+        <CardContent>
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>To</Label>
-              <Input
-                value={newEmail.to}
-                onChange={(e) => setNewEmail({...newEmail, to: e.target.value})}
-                placeholder="recipient@example.com"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Subject</Label>
-              <Input
-                value={newEmail.subject}
-                onChange={(e) => setNewEmail({...newEmail, subject: e.target.value})}
-                placeholder="Email subject"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Message</Label>
-              <Textarea
-                value={newEmail.content}
-                onChange={(e) => setNewEmail({...newEmail, content: e.target.value})}
-                placeholder="Write your message here..."
-                rows={5}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowComposeDialog(false)}>Cancel</Button>
-            <Button onClick={sendEmail}>Send</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={!!selectedEmail} onOpenChange={() => setSelectedEmail(null)}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>{selectedEmail?.subject}</DialogTitle>
-          </DialogHeader>
-          {selectedEmail && (
-            <Card>
-              <CardHeader>
-                <div className="flex justify-between items-center text-sm">
-                  <div>
-                    <p>From: {selectedEmail.from}</p>
-                    <p>To: {selectedEmail.to}</p>
+            {filteredEmails.map(email => (
+              <Card key={email.id} className={`${!email.read ? 'bg-muted/20' : ''}`}>
+                <CardHeader className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleStar(email.id);
+                        }}
+                      >
+                        <Heart 
+                          className={`h-4 w-4 ${email.starred ? 'fill-current text-yellow-500' : ''}`} 
+                        />
+                      </Button>
+                      <div>
+                        <CardTitle className="text-base">{email.subject}</CardTitle>
+                        <CardDescription>From: {email.from}</CardDescription>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <span className="text-sm text-muted-foreground">{email.date}</span>
+                      {!email.read && <Badge variant="secondary">New</Badge>}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-4">
+                </CardHeader>
+                <CardContent className="px-4 pb-2">
+                  <p className="text-sm text-muted-foreground line-clamp-1">{email.content}</p>
+                </CardContent>
+                <CardFooter className="p-4 pt-2 flex justify-end">
+                  <div className="flex space-x-2">
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => selectedEmail && toggleStar(selectedEmail.id)}
+                      onClick={() => {
+                        setSelectedEmailId(email.id);
+                        markAsRead(email.id);
+                      }}
                     >
-                      {selectedEmail.starred ? (
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      ) : (
-                        <Star className="h-4 w-4" />
-                      )}
+                      <Eye className="h-4 w-4 mr-2" />
+                      Read
                     </Button>
-                    <p className="text-muted-foreground">{selectedEmail.date}</p>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => deleteEmail(email.id)}
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
                   </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="prose dark:prose-invert max-w-none">
-                  {selectedEmail.content}
-                </div>
-                {selectedEmail.attachments.length > 0 && (
-                  <div className="mt-4">
-                    <h4 className="text-sm font-medium mb-2">Attachments</h4>
-                    <div className="flex gap-2">
-                      {selectedEmail.attachments.map((attachment: string) => (
-                        <Button key={attachment} variant="outline" size="sm">
-                          <Paperclip className="h-4 w-4 mr-2" />
-                          {attachment}
-                        </Button>
-                      ))}
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        </CardContent>
+
+        <Dialog open={selectedEmailId !== null} onOpenChange={() => setSelectedEmailId(null)}>
+          <DialogContent className="max-w-3xl">
+            {(() => {
+              const email = emails.find(e => e.id === selectedEmailId);
+              if (!email) return null;
+              return (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <span>{email.subject}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleStar(email.id)}
+                      >
+                        <Heart className={`h-4 w-4 ${email.starred ? 'fill-current text-yellow-500' : ''}`} />
+                      </Button>
+                    </CardTitle>
+                    <CardDescription>
+                      <div className="flex justify-between text-sm">
+                        <div>
+                          <p>From: {email.from}</p>
+                          <p>To: {email.to}</p>
+                        </div>
+                        <p>{email.date}</p>
+                      </div>
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="prose dark:prose-invert max-w-none">
+                      {email.content}
                     </div>
-                  </div>
-                )}
+                  </CardContent>
+                  <CardFooter className="flex justify-end space-x-2">
+                    <Button variant="outline">
+                      <ReplyIcon className="h-4 w-4 mr-2" />
+                      Reply
+                    </Button>
+                    <Button variant="outline">
+                      <Forward className="h-4 w-4 mr-2" />
+                      Forward
+                    </Button>
+                  </CardFooter>
+                </Card>
+              );
+            })()}
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={showComposeDialog} onOpenChange={setShowComposeDialog}>
+          <DialogContent>
+            <Card>
+              <CardHeader>
+                <CardTitle>New Email</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>To</Label>
+                  <Input
+                    value={newEmail.to}
+                    onChange={(e) => setNewEmail({...newEmail, to: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Subject</Label>
+                  <Input
+                    value={newEmail.subject}
+                    onChange={(e) => setNewEmail({...newEmail, subject: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Message</Label>
+                  <Textarea
+                    rows={6}
+                    value={newEmail.content}
+                    onChange={(e) => setNewEmail({...newEmail, content: e.target.value})}
+                  />
+                </div>
               </CardContent>
-              <CardFooter className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => selectedEmail && deleteEmail(selectedEmail.id)}>
-                  <Trash className="h-4 w-4 mr-2" />
-                  Delete
-                </Button>
-                <Button variant="outline">
-                  <ReplyIcon className="h-4 w-4 mr-2" />
-                  Reply
-                </Button>
-                <Button variant="outline">
-                  <Forward className="h-4 w-4 mr-2" />
-                  Forward
-                </Button>
+              <CardFooter>
+                <Button onClick={sendEmail}>Send</Button>
               </CardFooter>
             </Card>
-          )}
-        </DialogContent>
-      </Dialog>
-    </Card>
+          </DialogContent>
+        </Dialog>
+      </Card>
+    </div>
   );
 };
+
+const ScheduleView = () => {
+  const [tasks, setTasks] = useState<any[]>([
+    // Sample data for better visualization
+    {
+      id: '1',
+      title: 'Weekly Team Standup',
+      description: 'Regular team sync meeting to discuss progress and blockers',
+      dueDate: new Date(Date.now() + 1000 * 60 * 60).toISOString(), // 1 hour from now
+      priority: 'medium',
+      status: 'current',
+      type: 'meeting',
+      attendees: ['john@example.com', 'sarah@example.com', 'mike@example.com'],
+      location: 'Conference Room A'
+    },
+    {
+      id: '2', 
+      title: 'Project Deadline',
+      description: 'Complete and submit the Q1 project deliverables',
+      dueDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2).toISOString(), // 2 days from now
+      priority: 'high',
+      status: 'upcoming',
+      type: 'task'
+    },
+    {
+      id: '3',
+      title: 'Client Presentation',
+      description: 'Present new features to key stakeholders',
+      dueDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 5).toISOString(), // 5 days from now
+      priority: 'high', 
+      status: 'upcoming',
+      type: 'meeting',
+      attendees: ['client@external.com', 'ceo@example.com'],
+      location: 'Virtual - Zoom'
+    }
+  ]);
+
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterType, setFilterType] = useState<'all' | 'meeting' | 'task'>('all');
+  const [filterPriority, setFilterPriority] = useState<'all' | 'low' | 'medium' | 'high'>('all');
+  const [newTask, setNewTask] = useState({
+    title: '',
+    description: '',
+    dueDate: '',
+    priority: 'medium',
+    type: 'task',
+    attendees: [] as string[],
+    location: ''
+  });
+
+  const filteredTasks = useMemo(() => {
+    return tasks
+      .filter(task => {
+        const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            task.description.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesType = filterType === 'all' || task.type === filterType;
+        const matchesPriority = filterPriority === 'all' || task.priority === filterPriority;
+        return matchesSearch && matchesType && matchesPriority;
+      })
+      .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+  }, [tasks, searchQuery, filterType, filterPriority]);
+
+  const groupedTasks = useMemo(() => {
+    const now = new Date();
+    const groups = {
+      overdue: [] as typeof tasks,
+      today: [] as typeof tasks,
+      tomorrow: [] as typeof tasks,
+      thisWeek: [] as typeof tasks,
+      later: [] as typeof tasks,
+      completed: [] as typeof tasks,
+    };
+
+    filteredTasks.forEach(task => {
+      if (task.status === 'completed') {
+        groups.completed.push(task);
+        return;
+      }
+
+      const taskDate = new Date(task.dueDate);
+      const isToday = taskDate.toDateString() === now.toDateString();
+      const isTomorrow = taskDate.toDateString() === new Date(now.getTime() + 86400000).toDateString();
+      const isThisWeek = taskDate <= new Date(now.getTime() + 7 * 86400000);
+
+      if (taskDate < now && !isToday) {
+        groups.overdue.push(task);
+      } else if (isToday) {
+        groups.today.push(task);
+      } else if (isTomorrow) {
+        groups.tomorrow.push(task);
+      } else if (isThisWeek) {
+        groups.thisWeek.push(task);
+      } else {
+        groups.later.push(task);
+      }
+    });
+
+    return groups;
+  }, [filteredTasks]);
+
+  const addTask = async () => {
+    try {
+      const newTaskData = {
+        ...newTask,
+        id: (tasks.length + 1).toString(),
+        status: 'upcoming',
+        dueDate: new Date(newTask.dueDate).toISOString()
+      };
+      
+      setTasks([...tasks, newTaskData]);
+      setShowAddDialog(false);
+      setNewTask({
+        title: '',
+        description: '',
+        dueDate: '',
+        priority: 'medium',
+        type: 'task',
+        attendees: [],
+        location: ''
+      });
+
+      toast({
+        title: "Success",
+        description: "Task added successfully"
+      });
+    } catch (error) {
+      console.error('Error adding task:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add task",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const updateTaskStatus = (taskId: string, newStatus: string) => {
+    setTasks(tasks.map(task => 
+      task.id === taskId ? { ...task, status: newStatus } : task
+    ));
+    
+    toast({
+      title: "Success", 
+      description: "Task status updated"
+    });
+  };
+
+  const deleteTask = (taskId: string) => {
+    setTasks(tasks.filter(task => task.id !== taskId));
+    toast({
+      title: "Success",
+      description: "Task deleted successfully"
+    });
+  };
+
+  const renderTaskCard = (task: any) => (
+    <Card key={task.id} className="relative">
+      <CardHeader>
+        <div className="flex justify-between items-start">
+          <div>
+            <CardTitle className="text-lg">{task.title}</CardTitle>
+            <CardDescription>{task.description}</CardDescription>
+          </div>
+          <Badge variant={task.priority === 'high' ? 'destructive' : task.priority === 'medium' ? 'default' : 'secondary'}>
+            {task.priority}
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          <div className="flex items-center text-sm text-muted-foreground">
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {new Date(task.dueDate).toLocaleDateString()}
+          </div>
+          {task.type === 'meeting' && (
+            <>
+              <div className="flex items-center text-sm text-muted-foreground">
+                <MapPin className="mr-2 h-4 w-4" />
+                {task.location}
+              </div>
+              <div className="flex items-center text-sm text-muted-foreground">
+                <Users className="mr-2 h-4 w-4" />
+                {task.attendees.join(', ')}
+              </div>
+            </>
+          )}
+        </div>
+      </CardContent>
+      <CardFooter className="justify-end space-x-2">
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => updateTaskStatus(task.id, task.status === 'completed' ? 'upcoming' : 'completed')}
+        >
+          {task.status === 'completed' ? 'Reopen' : 'Complete'}
+        </Button>
+        <Button 
+          variant="destructive" 
+          size="sm"
+          onClick={() => deleteTask(task.id)}
+        >
+          Delete
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+
+  return (
+    <div className="space-y-6 pt-10">
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <CardTitle>Schedule & Tasks Timeline</CardTitle>
+            <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+              <Input
+                placeholder="Search tasks..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="max-w-xs"
+              />
+              <Select value={filterType} onValueChange={(value: 'all' | 'meeting' | 'task') => setFilterType(value)}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filter by type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="meeting">Meetings</SelectItem>
+                  <SelectItem value="task">Tasks</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={filterPriority} onValueChange={(value: 'all' | 'low' | 'medium' | 'high') => setFilterPriority(value)}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filter by priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Priorities</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button onClick={() => setShowAddDialog(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Item
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-8">
+            {groupedTasks.overdue.length > 0 && (
+              <div>
+                <h3 className="text-red-500 font-semibold mb-4">Overdue</h3>
+                <div className="space-y-4">
+                  {groupedTasks.overdue.map(renderTaskCard)}
+                </div>
+              </div>
+            )}
+            
+            {groupedTasks.today.length > 0 && (
+              <div>
+                <h3 className="text-blue-500 font-semibold mb-4">Today</h3>
+                <div className="space-y-4">
+                  {groupedTasks.today.map(renderTaskCard)}
+                </div>
+              </div>
+            )}
+
+            {groupedTasks.tomorrow.length > 0 && (
+              <div>
+                <h3 className="text-green-500 font-semibold mb-4">Tomorrow</h3>
+                <div className="space-y-4">
+                  {groupedTasks.tomorrow.map(renderTaskCard)}
+                </div>
+              </div>
+            )}
+
+            {groupedTasks.thisWeek.length > 0 && (
+              <div>
+                <h3 className="text-purple-500 font-semibold mb-4">This Week</h3>
+                <div className="space-y-4">
+                  {groupedTasks.thisWeek.map(renderTaskCard)}
+                </div>
+              </div>
+            )}
+
+            {groupedTasks.later.length > 0 && (
+              <div>
+                <h3 className="text-gray-500 font-semibold mb-4">Later</h3>
+                <div className="space-y-4">
+                  {groupedTasks.later.map(renderTaskCard)}
+                </div>
+              </div>
+            )}
+
+            {groupedTasks.completed.length > 0 && (
+              <div>
+                <h3 className="text-gray-400 font-semibold mb-4">Completed</h3>
+                <div className="space-y-4">
+                  {groupedTasks.completed.map(renderTaskCard)}
+                </div>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Task/Meeting</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Title</Label>
+              <Input
+                value={newTask.title}
+                onChange={(e) => setNewTask({...newTask, title: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Description</Label>
+              <Textarea
+                value={newTask.description}
+                onChange={(e) => setNewTask({...newTask, description: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Due Date</Label>
+              <Input
+                type="datetime-local"
+                value={newTask.dueDate}
+                onChange={(e) => setNewTask({...newTask, dueDate: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Type</Label>
+              <Select 
+                value={newTask.type} 
+                onValueChange={(value: 'meeting' | 'task') => setNewTask({...newTask, type: value})}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="meeting">Meeting</SelectItem>
+                  <SelectItem value="task">Task</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Priority</Label>
+              <Select 
+                value={newTask.priority} 
+                onValueChange={(value: 'low' | 'medium' | 'high') => setNewTask({...newTask, priority: value})}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {newTask.type === 'meeting' && (
+              <>
+                <div className="space-y-2">
+                  <Label>Location</Label>
+                  <Input
+                    value={newTask.location}
+                    onChange={(e) => setNewTask({...newTask, location: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Attendees (comma-separated emails)</Label>
+                  <Input
+                    value={newTask.attendees.join(', ')}
+                    onChange={(e) => setNewTask({
+                      ...newTask, 
+                      attendees: e.target.value.split(',').map(email => email.trim())
+                    })}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddDialog(false)}>Cancel</Button>
+            <Button onClick={addTask}>Add</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+
+
+
 
 export function HeroVideoDialogDemoTopInBottomOut() {
   return (
