@@ -213,41 +213,146 @@ const DashboardView = () => {
 
       <div className="grid grid-cols-3 gap-6 h-[calc(100vh-160px)]">
         <Card className="col-span-2 h-full">
-          <CardHeader className="border-b py-4">
-            <div className="flex justify-between items-center">
-              <div className="flex-1 flex space-x-3">
-                <Input placeholder="Search emails..." className="max-w-md" />
-                <Button variant="outline" className="px-4">
-                  <Filter className="h-4 w-4 mr-2" />
-                  Filter
-                </Button>
-              </div>
-              <Button className="ml-4 px-4">
-                <Plus className="h-4 w-4 mr-2" />
-                Compose
-              </Button>
+          <CardHeader className="py-4">
+            <div className="mb-4 px-2 text-center">
+              <h2 className="text-2xl font-semibold">Inbox</h2>
             </div>
+            <Card className="p-4">
+              <div className="px-2">
+                <div className="flex justify-between items-center">
+                  <div className="flex-1 flex space-x-3">
+                    <Input placeholder="Search emails..." className="max-w-md" />
+                    <Button variant="outline" className="px-4">
+                      <Filter className="h-4 w-4 mr-2" />
+                      Filter
+                    </Button>
+                  </div>
+                  <Button className="ml-4 px-4">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Compose
+                  </Button>
+                </div>
+              </div>
+            </Card>
           </CardHeader>
           
-          <CardContent className="p-6 space-y-4">
-            {messages.map(msg => (
-              <Card key={msg.id} className="cursor-pointer hover:bg-muted/50">
-                <CardContent className="p-5">
-                  <div className="flex items-center space-x-5">
-                    <Avatar className="h-12 w-12">
-                      <AvatarFallback>{msg.sender[0]}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between mb-1">
-                        <p className="font-medium text-base truncate">{msg.sender}</p>
-                        <span className="text-sm text-muted-foreground">{msg.timestamp}</span>
-                      </div>
-                      <p className="text-sm text-muted-foreground truncate">{msg.content}</p>
-                    </div>
+          <CardContent className="p-6 h-[calc(100vh-280px)]">
+            <Card className="h-full">
+              <div className="p-4 h-full">
+                <ScrollArea className="h-full">
+                  <div className="space-y-4 pr-4">
+                    {messages.map(msg => (
+                      <Dialog key={msg.id}>
+                        <DialogTrigger asChild>
+                          <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
+                            <CardContent className="p-5">
+                              <div className="flex items-center space-x-5">
+                                <Avatar className="h-12 w-12">
+                                  <AvatarFallback>{msg.sender[0]}</AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex justify-between mb-1">
+                                    <p className="font-medium text-base truncate">{msg.sender}</p>
+                                    <span className="text-sm text-muted-foreground">{msg.timestamp}</span>
+                                  </div>
+                                  <p className="text-sm text-muted-foreground truncate">{msg.content}</p>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[525px]">
+                          <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2">
+                              <Avatar className="h-8 w-8">
+                                <AvatarFallback>{msg.sender[0]}</AvatarFallback>
+                              </Avatar>
+                              {msg.sender}
+                            </DialogTitle>
+                            <DialogDescription className="text-sm text-muted-foreground">
+                              {msg.timestamp}
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="mt-4">
+                            <p className="text-base">{msg.content}</p>
+                          </div>
+                          <DialogFooter className="mt-6">
+                            <Button>Reply</Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    ))}
+                    {/* Sample Messages */}
+                    {[
+                      {
+                        id: 'sample1',
+                        sender: 'John Mentor',
+                        timestamp: '10:30 AM',
+                        content: 'Hey there! Just checking in on your progress with the latest project milestone.'
+                      },
+                      {
+                        id: 'sample2',
+                        sender: 'Sarah Coach',
+                        timestamp: 'Yesterday',
+                        content: 'Great work on your presentation! I have some feedback to share when you have a moment.'
+                      },
+                      {
+                        id: 'sample3',
+                        sender: 'Tech Team',
+                        timestamp: '2 days ago',
+                        content: 'New resources available for the upcoming workshop. Please review before Thursday.'
+                      },
+                      {
+                        id: 'sample4',
+                        sender: 'Career Services',
+                        timestamp: '3 days ago',
+                        content: 'Exciting opportunity: Mock interviews scheduled for next week. Sign up now!'
+                      }
+                    ].map(msg => (
+                      <Dialog key={msg.id}>
+                        <DialogTrigger asChild>
+                          <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
+                            <CardContent className="p-5">
+                              <div className="flex items-center space-x-5">
+                                <Avatar className="h-12 w-12">
+                                  <AvatarFallback>{msg.sender[0]}</AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex justify-between mb-1">
+                                    <p className="font-medium text-base truncate">{msg.sender}</p>
+                                    <span className="text-sm text-muted-foreground">{msg.timestamp}</span>
+                                  </div>
+                                  <p className="text-sm text-muted-foreground truncate">{msg.content}</p>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[525px]">
+                          <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2">
+                              <Avatar className="h-8 w-8">
+                                <AvatarFallback>{msg.sender[0]}</AvatarFallback>
+                              </Avatar>
+                              {msg.sender}
+                            </DialogTitle>
+                            <DialogDescription className="text-sm text-muted-foreground">
+                              {msg.timestamp}
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="mt-4">
+                            <p className="text-base">{msg.content}</p>
+                          </div>
+                          <DialogFooter className="mt-6">
+                            <Button>Reply</Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    ))}
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                </ScrollArea>
+              </div>
+            </Card>
           </CardContent>
         </Card>
 
@@ -255,11 +360,11 @@ const DashboardView = () => {
         <div className="space-y-6">
           {/* Cohort Section */}
           <Card>
-            <Card className="flex justify-center">
-              <CardHeader className="py-4">
+            <CardHeader className="py-4">
+              <Card className="p-2">
                 <CardTitle className="text-lg text-center">Cohort Members</CardTitle>
-              </CardHeader>
-            </Card>
+              </Card>
+            </CardHeader>
             <CardContent className="p-0">
               <ScrollArea className="h-[300px] px-4">
                 <div className="space-y-3 py-4">
@@ -350,11 +455,6 @@ const DashboardView = () => {
                       ))}
                     </div>
                   </Card>
-                  <Card className="sticky bottom-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10 shadow-sm">
-                    <CardHeader className="py-3">
-                      <CardTitle className="text-sm text-muted-foreground">End of Member List</CardTitle>
-                    </CardHeader>
-                  </Card>
                 </div>
               </ScrollArea>
             </CardContent>
@@ -362,42 +462,50 @@ const DashboardView = () => {
 
           {/* Event Section */}
           <Card>
-            <CardHeader className="py-4">
-              <CardTitle className="text-lg">Upcoming Event</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 p-4">
-              <div>
-                <h3 className="font-semibold text-base mb-1">{upcomingEvent.name}</h3>
-                <p className="text-sm text-muted-foreground">{upcomingEvent.description}</p>
-              </div>
-              
-              <div className="space-y-2">
-                <div className="flex items-center text-xs">
-                  <Clock className="h-3 w-3 mr-2" />
-                  {upcomingEvent.startTime} ({upcomingEvent.duration})
-                </div>
-                <div className="flex items-center text-xs">
-                  <Calendar className="h-3 w-3 mr-2" />
-                  {upcomingEvent.date}
-                </div>
-              </div>
+            <div className="flex justify-center">
+              <CardHeader className="py-4 text-center">
+                <Card className="p-4">
+                  <CardTitle className="text-lg">Upcoming Event</CardTitle>
+                </Card>
+              </CardHeader>
+            </div>
+            <CardContent className="space-y-4 p-2">
+              <Card className="flex justify-center">
+                <CardContent className="space-y-4 p-4 text-center">
+                  <div>
+                    <h3 className="font-semibold text-base mb-1">{upcomingEvent.name}</h3>
+                    <p className="text-sm text-muted-foreground">{upcomingEvent.description}</p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center text-xs justify-center">
+                      <Clock className="h-3 w-3 mr-2" />
+                      {upcomingEvent.startTime} ({upcomingEvent.duration})
+                    </div>
+                    <div className="flex items-center text-xs justify-center">
+                      <Calendar className="h-3 w-3 mr-2" />
+                      {upcomingEvent.date}
+                    </div>
+                  </div>
 
-              <div>
-                <p className="text-xs font-medium mb-2">Attendees</p>
-                <div className="flex -space-x-2">
-                  {upcomingEvent.attendees.map((attendee, i) => (
-                    <Avatar key={i} className="h-8 w-8 border-2 border-background">
-                      <AvatarImage src={attendee.avatar} />
-                      <AvatarFallback>{attendee.name[0]}</AvatarFallback>
-                    </Avatar>
-                  ))}
-                </div>
-              </div>
+                  <div>
+                    <p className="text-xs font-medium mb-2">Attendees</p>
+                    <div className="flex -space-x-2 justify-center">
+                      {upcomingEvent.attendees.map((attendee, i) => (
+                        <Avatar key={i} className="h-8 w-8 border-2 border-background">
+                          <AvatarImage src={attendee.avatar} />
+                          <AvatarFallback>{attendee.name[0]}</AvatarFallback>
+                        </Avatar>
+                      ))}
+                    </div>
+                  </div>
 
-              <Button className="w-full text-sm py-2" variant="outline">
-                <Share className="h-3 w-3 mr-2" />
-                Share Invitation Link
-              </Button>
+                  <Button className="w-full text-sm py-2" variant="outline">
+                    <Share className="h-3 w-3 mr-2" />
+                    Share Invitation Link
+                  </Button>
+                </CardContent>
+              </Card>
             </CardContent>
           </Card>
         </div>
