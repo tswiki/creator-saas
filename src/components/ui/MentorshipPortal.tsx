@@ -600,7 +600,7 @@ const ScheduleView = () => {
       <Card>
         <CardHeader>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <CardTitle>Schedule & Tasks Timeline</CardTitle>
+            <CardTitle>Timeline</CardTitle>
             <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
               <Input
                 placeholder="Search tasks..."
@@ -608,27 +608,57 @@ const ScheduleView = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="max-w-xs"
               />
-              <Select value={filterType} onValueChange={(value: 'all' | 'meeting' | 'task') => setFilterType(value)}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="meeting">Meetings</SelectItem>
-                  <SelectItem value="task">Tasks</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={filterPriority} onValueChange={(value: 'all' | 'low' | 'medium' | 'high') => setFilterPriority(value)}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by priority" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Priorities</SelectItem>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                </SelectContent>
-              </Select>
+              <Menubar>
+                <MenubarMenu>
+                  <MenubarTrigger asChild>
+                    <Button variant="ghost" className="w-[120px]">
+                      <Filter className="mr-2 h-4 w-4" />
+                      Filters
+                    </Button>
+                  </MenubarTrigger>
+                  <MenubarContent>
+                    <MenubarSub>
+                      <MenubarSubTrigger>Type ({filterType})</MenubarSubTrigger>
+                      <MenubarSubContent>
+                        <MenubarItem onClick={() => setFilterType('all')}>
+                          <Check className={`mr-2 h-4 w-4 ${filterType === 'all' ? 'opacity-100' : 'opacity-0'}`} />
+                          All Types
+                        </MenubarItem>
+                        <MenubarItem onClick={() => setFilterType('meeting')}>
+                          <Check className={`mr-2 h-4 w-4 ${filterType === 'meeting' ? 'opacity-100' : 'opacity-0'}`} />
+                          Meetings
+                        </MenubarItem>
+                        <MenubarItem onClick={() => setFilterType('task')}>
+                          <Check className={`mr-2 h-4 w-4 ${filterType === 'task' ? 'opacity-100' : 'opacity-0'}`} />
+                          Tasks
+                        </MenubarItem>
+                      </MenubarSubContent>
+                    </MenubarSub>
+                    <MenubarSeparator />
+                    <MenubarSub>
+                      <MenubarSubTrigger>Priority ({filterPriority})</MenubarSubTrigger>
+                      <MenubarSubContent>
+                        <MenubarItem onClick={() => setFilterPriority('all')}>
+                          <Check className={`mr-2 h-4 w-4 ${filterPriority === 'all' ? 'opacity-100' : 'opacity-0'}`} />
+                          All Priorities
+                        </MenubarItem>
+                        <MenubarItem onClick={() => setFilterPriority('low')}>
+                          <Check className={`mr-2 h-4 w-4 ${filterPriority === 'low' ? 'opacity-100' : 'opacity-0'}`} />
+                          Low
+                        </MenubarItem>
+                        <MenubarItem onClick={() => setFilterPriority('medium')}>
+                          <Check className={`mr-2 h-4 w-4 ${filterPriority === 'medium' ? 'opacity-100' : 'opacity-0'}`} />
+                          Medium
+                        </MenubarItem>
+                        <MenubarItem onClick={() => setFilterPriority('high')}>
+                          <Check className={`mr-2 h-4 w-4 ${filterPriority === 'high' ? 'opacity-100' : 'opacity-0'}`} />
+                          High
+                        </MenubarItem>
+                      </MenubarSubContent>
+                    </MenubarSub>
+                  </MenubarContent>
+                </MenubarMenu>
+              </Menubar>
               <Button onClick={() => setShowAddDialog(true)}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Item
