@@ -597,8 +597,8 @@ const ScheduleView = () => {
 
   return (
     <div className="space-y-6 pt-10">
-      <Card>
-        <CardHeader>
+      <Card className="h-[80vh] flex flex-col">
+        <CardHeader className="sticky top-0 bg-background z-10 border-b">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <CardTitle>Timeline</CardTitle>
             <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
@@ -666,7 +666,27 @@ const ScheduleView = () => {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex-1 overflow-y-auto pr-4 custom-scrollbar" style={{
+          scrollbarWidth: 'thin',
+          scrollbarColor: 'rgb(203 213 225) transparent'
+        }}>
+          <style jsx global>{`
+            .custom-scrollbar::-webkit-scrollbar {
+              width: 8px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-track {
+              background: transparent;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+              background-color: rgb(203 213 225);
+              border-radius: 20px;
+              border: 2px solid transparent;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+              background-color: rgb(148 163 184);
+            }
+          `}</style>
+
           <div className="space-y-8">
             {groupedTasks.overdue.length > 0 && (
               <div>
@@ -679,7 +699,16 @@ const ScheduleView = () => {
             
             {groupedTasks.today.length > 0 && (
               <div>
-                <h3 className="text-blue-500 font-semibold mb-4">Today</h3>
+                <div className="flex items-center gap-3 mb-4">
+                  <h3 className="text-blue-500 font-semibold">Today :</h3>
+                  <span className="text-blue-500 font-semibold">
+                    {new Date().toLocaleDateString('en-US', { 
+                      weekday: 'long',
+                      month: 'short', 
+                      day: 'numeric'
+                    })}
+                  </span>
+                </div>
                 <div className="space-y-4">
                   {groupedTasks.today.map(renderTaskCard)}
                 </div>
@@ -697,7 +726,18 @@ const ScheduleView = () => {
 
             {groupedTasks.thisWeek.length > 0 && (
               <div>
-                <h3 className="text-purple-500 font-semibold mb-4">This Week</h3>
+                <div className="flex items-center gap-3 mb-4">
+                  <h3 className="text-purple-500 font-semibold">This Week :</h3>
+                  <span className="text-purple-500 font-semibold">
+                    {new Date().toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric'
+                    })} - {new Date(Date.now() + 6 * 86400000).toLocaleDateString('en-US', {
+                      month: 'short', 
+                      day: 'numeric'
+                    })}
+                  </span>
+                </div>
                 <div className="space-y-4">
                   {groupedTasks.thisWeek.map(renderTaskCard)}
                 </div>
