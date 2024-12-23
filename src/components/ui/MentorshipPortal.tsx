@@ -103,7 +103,8 @@ import {
   ChevronLeft,
   ChevronRight,
   RefreshCw,
-  CheckCircle
+  CheckCircle,
+  Calendar
 } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
@@ -118,276 +119,289 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@radix-ui/react-tabs';
 
 
 const DashboardView = () => {
-  const [emails, setEmails] = useState([
-    { 
-      id: 1, 
-      subject: "Welcome to the Team",
-      from: "manager@company.com",
-      to: "you@company.com", 
-      date: "2024-02-01",
-      content: "Welcome aboard! We're excited to have you join the team...",
-      read: false,
-      starred: false,
-      labels: ["Important"]
+  const [selectedChat, setSelectedChat] = useState({
+    name: "John Doe",
+    avatar: "/avatars/john.jpg", 
+    lastMessage: "Thanks for the help!",
+    lastMessageTime: "2:30 PM"
+  });
+
+  const [messages, setMessages] = useState([
+    {
+      id: 1,
+      sender: "John Doe",
+      content: "Hi, I need help with React hooks",
+      timestamp: "2:15 PM"
     },
     {
       id: 2,
-      subject: "Project Deadline Update",
-      from: "projectlead@company.com", 
-      to: "you@company.com",
-      date: "2024-02-02",
-      content: "The deadline for the current sprint has been extended...",
-      read: true,
-      starred: true,
-      labels: ["Work"]
+      sender: "Me", 
+      content: "Sure, what specifically are you struggling with?",
+      timestamp: "2:20 PM"
+    },
+    {
+      id: 3,
+      sender: "John Doe",
+      content: "Thanks for the help!",
+      timestamp: "2:30 PM"
     }
   ]);
 
-  const [selectedEmailId, setSelectedEmailId] = useState<number | null>(null);
-  const [showComposeDialog, setShowComposeDialog] = useState(false);
-  const [filterText, setFilterText] = useState("");
-  const [filterStarred, setFilterStarred] = useState(false);
-  const [filterUnread, setFilterUnread] = useState(false);
-  const [newEmail, setNewEmail] = useState({
-    to: "",
-    subject: "",
-    content: ""
-  });
+  const cohortMembers = [
+    {
+      name: "Sarah Wilson",
+      avatar: "/avatars/sarah.jpg",
+      email: "sarah@example.com"
+    },
+    {
+      name: "Mike Johnson", 
+      avatar: "/avatars/mike.jpg",
+      email: "mike@example.com"
+    },
+    {
+      name: "Emily Brown",
+      avatar: "/avatars/emily.jpg",
+      email: "emily@example.com" 
+    }
+  ];
 
-  const filteredEmails = emails.filter(email => {
-    const matchesText = email.subject.toLowerCase().includes(filterText.toLowerCase()) ||
-                       email.from.toLowerCase().includes(filterText.toLowerCase()) ||
-                       email.content.toLowerCase().includes(filterText.toLowerCase());
-    const matchesStarred = filterStarred ? email.starred : true;
-    const matchesUnread = filterUnread ? !email.read : true;
-    return matchesText && matchesStarred && matchesUnread;
-  });
-
-  const markAsRead = (emailId: number) => {
-    setEmails(emails.map(email => 
-      email.id === emailId ? {...email, read: true} : email
-    ));
-  };
-
-  const toggleStar = (emailId: number) => {
-    setEmails(emails.map(email =>
-      email.id === emailId ? {...email, starred: !email.starred} : email
-    ));
-  };
-
-  const deleteEmail = (emailId: number) => {
-    setEmails(emails.filter(email => email.id !== emailId));
-    setSelectedEmailId(null);
-  };
-
-  const sendEmail = () => {
-    const newEmailObj = {
-      id: Date.now(),
-      ...newEmail,
-      from: "you@company.com",
-      date: new Date().toISOString().split('T')[0],
-      read: true,
-      starred: false,
-      labels: []
-    };
-    
-    setEmails([newEmailObj, ...emails]);
-    setShowComposeDialog(false);
-    setNewEmail({ to: "", subject: "", content: "" });
-    
-    toast({
-      title: "Email Sent",
-      description: "Your email has been sent successfully"
-    });
+  const upcomingEvent = {
+    name: "Weekly Mentorship Session",
+    description: "Group discussion on advanced React patterns",
+    startTime: "3:00 PM",
+    duration: "1 hour",
+    date: "Oct 15, 2023",
+    attendees: cohortMembers
   };
 
   return (
-    <div className="pt-20"> {/* Added top padding to account for header */}
-      <Card className="w-full">
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle>Email Inbox</CardTitle>
-            <Button onClick={() => setShowComposeDialog(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Compose
-            </Button>
-          </div>
-          <CardDescription>
-            <div className="flex gap-4 items-center mt-4">
-              <div className="flex-1">
-                <Input
-                  placeholder="Search emails..."
-                  value={filterText}
-                  onChange={(e) => setFilterText(e.target.value)}
-                  className="w-full"
-                />
-              </div>
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    checked={filterStarred}
-                    onCheckedChange={setFilterStarred}
-                  />
-                  <span>Starred</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    checked={filterUnread}
-                    onCheckedChange={setFilterUnread}
-                  />
-                  <span>Unread</span>
-                </div>
-              </div>
-            </div>
+    <div className="h-screen pt-16 px-6">
+      <Card className="mb-6">
+        <CardHeader className="py-4 flex flex-col items-center text-center">
+          <CardTitle className="text-2xl">
+            {(() => {
+              const { auth } = require('@/firebase/firebaseConfig');
+              const [firstName, setFirstName] = useState('');
+              
+              useEffect(() => {
+                const unsubscribe = auth.onAuthStateChanged(async (user: { displayName: string; }) => {
+                  if (user) {
+                    // Get user's display name and split to get first name
+                    const displayName = user.displayName || '';
+                    const firstName = displayName.split(' ')[0];
+                    setFirstName(firstName);
+                  }
+                });
+                
+                return () => unsubscribe();
+              }, []);
+
+              const hour = new Date().getHours();
+              let greeting = '';
+              if (hour < 12) greeting = 'Good morning';
+              else if (hour < 17) greeting = 'Good afternoon'; 
+              else greeting = 'Good evening';
+              
+              return `${greeting}, ${firstName || 'there'}!`
+            })()}
+          </CardTitle>
+          <CardDescription className="text-base">
+            Welcome to your mentorship dashboard
           </CardDescription>
         </CardHeader>
+      </Card>
 
-        <CardContent>
-          <div className="space-y-4">
-            {filteredEmails.map(email => (
-              <Card key={email.id} className={`${!email.read ? 'bg-muted/20' : ''}`}>
-                <CardHeader className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleStar(email.id);
-                        }}
-                      >
-                        <Heart 
-                          className={`h-4 w-4 ${email.starred ? 'fill-current text-yellow-500' : ''}`} 
-                        />
-                      </Button>
-                      <div>
-                        <CardTitle className="text-base">{email.subject}</CardTitle>
-                        <CardDescription>From: {email.from}</CardDescription>
+      <div className="grid grid-cols-3 gap-6 h-[calc(100vh-160px)]">
+        <Card className="col-span-2 h-full">
+          <CardHeader className="border-b py-4">
+            <div className="flex justify-between items-center">
+              <div className="flex-1 flex space-x-3">
+                <Input placeholder="Search emails..." className="max-w-md" />
+                <Button variant="outline" className="px-4">
+                  <Filter className="h-4 w-4 mr-2" />
+                  Filter
+                </Button>
+              </div>
+              <Button className="ml-4 px-4">
+                <Plus className="h-4 w-4 mr-2" />
+                Compose
+              </Button>
+            </div>
+          </CardHeader>
+          
+          <CardContent className="p-6 space-y-4">
+            {messages.map(msg => (
+              <Card key={msg.id} className="cursor-pointer hover:bg-muted/50">
+                <CardContent className="p-5">
+                  <div className="flex items-center space-x-5">
+                    <Avatar className="h-12 w-12">
+                      <AvatarFallback>{msg.sender[0]}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between mb-1">
+                        <p className="font-medium text-base truncate">{msg.sender}</p>
+                        <span className="text-sm text-muted-foreground">{msg.timestamp}</span>
                       </div>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <span className="text-sm text-muted-foreground">{email.date}</span>
-                      {!email.read && <Badge variant="secondary">New</Badge>}
+                      <p className="text-sm text-muted-foreground truncate">{msg.content}</p>
                     </div>
                   </div>
-                </CardHeader>
-                <CardContent className="px-4 pb-2">
-                  <p className="text-sm text-muted-foreground line-clamp-1">{email.content}</p>
                 </CardContent>
-                <CardFooter className="p-4 pt-2 flex justify-end">
-                  <div className="flex space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setSelectedEmailId(email.id);
-                        markAsRead(email.id);
-                      }}
-                    >
-                      <Eye className="h-4 w-4 mr-2" />
-                      Read
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => deleteEmail(email.id)}
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardFooter>
               </Card>
             ))}
-          </div>
-        </CardContent>
+          </CardContent>
+        </Card>
 
-        <Dialog open={selectedEmailId !== null} onOpenChange={() => setSelectedEmailId(null)}>
-          <DialogContent className="max-w-3xl">
-            {(() => {
-              const email = emails.find(e => e.id === selectedEmailId);
-              if (!email) return null;
-              return (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                      <span>{email.subject}</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toggleStar(email.id)}
-                      >
-                        <Heart className={`h-4 w-4 ${email.starred ? 'fill-current text-yellow-500' : ''}`} />
-                      </Button>
-                    </CardTitle>
-                    <CardDescription>
-                      <div className="flex justify-between text-sm">
-                        <div>
-                          <p>From: {email.from}</p>
-                          <p>To: {email.to}</p>
-                        </div>
-                        <p>{email.date}</p>
-                      </div>
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="prose dark:prose-invert max-w-none">
-                      {email.content}
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex justify-end space-x-2">
-                    <Button variant="outline">
-                      <ReplyIcon className="h-4 w-4 mr-2" />
-                      Reply
-                    </Button>
-                    <Button variant="outline">
-                      <Forward className="h-4 w-4 mr-2" />
-                      Forward
-                    </Button>
-                  </CardFooter>
-                </Card>
-              );
-            })()}
-          </DialogContent>
-        </Dialog>
-
-        <Dialog open={showComposeDialog} onOpenChange={setShowComposeDialog}>
-          <DialogContent>
-            <Card>
-              <CardHeader>
-                <CardTitle>New Email</CardTitle>
+        {/* Right Sidebar */}
+        <div className="space-y-6">
+          {/* Cohort Section */}
+          <Card>
+            <Card className="flex justify-center">
+              <CardHeader className="py-4">
+                <CardTitle className="text-lg text-center">Cohort Members</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label>To</Label>
-                  <Input
-                    value={newEmail.to}
-                    onChange={(e) => setNewEmail({...newEmail, to: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Subject</Label>
-                  <Input
-                    value={newEmail.subject}
-                    onChange={(e) => setNewEmail({...newEmail, subject: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Message</Label>
-                  <Textarea
-                    rows={6}
-                    value={newEmail.content}
-                    onChange={(e) => setNewEmail({...newEmail, content: e.target.value})}
-                  />
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button onClick={sendEmail}>Send</Button>
-              </CardFooter>
             </Card>
-          </DialogContent>
-        </Dialog>
-      </Card>
+            <CardContent className="p-0">
+              <ScrollArea className="h-[300px] px-4">
+                <div className="space-y-3 py-4">
+                  <Card className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10 shadow-sm">
+                    <CardHeader className="py-3">
+                      <CardTitle className="text-sm">Active Members</CardTitle>
+                    </CardHeader>
+                  </Card>
+                  <Card className="relative">
+                    <div className="space-y-2">
+                      {[
+                        {
+                          name: "Sarah Johnson",
+                          email: "sarah.j@example.com",
+                          avatar: "/avatars/sarah.png"
+                        },
+                        {
+                          name: "Michael Chen", 
+                          email: "m.chen@example.com",
+                          avatar: "/avatars/michael.png"
+                        },
+                        {
+                          name: "Emma Wilson",
+                          email: "emma.w@example.com", 
+                          avatar: "/avatars/emma.png"
+                        },
+                        {
+                          name: "James Rodriguez",
+                          email: "james.r@example.com",
+                          avatar: "/avatars/james.png"
+                        },
+                        {
+                          name: "Sophia Lee",
+                          email: "sophia.l@example.com",
+                          avatar: "/avatars/sophia.png"
+                        },
+                        {
+                          name: "David Kim",
+                          email: "david.k@example.com",
+                          avatar: "/avatars/david.png"
+                        },
+                        ...cohortMembers
+                      ].map((member, i) => (
+                        <Dialog key={i}>
+                          <DialogTrigger asChild>
+                            <Card className="p-3 cursor-pointer hover:bg-muted/50 transition-colors">
+                              <div className="flex items-center space-x-3">
+                                <Avatar className="h-10 w-10">
+                                  <AvatarImage src={member.avatar} />
+                                  <AvatarFallback>{member.name[0]}</AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1">
+                                  <p className="font-medium text-sm mb-1">{member.name}</p>
+                                  <div className="flex items-center text-xs text-muted-foreground">
+                                    <Mail className="h-3 w-3 mr-1" />
+                                    {member.email}
+                                  </div>
+                                </div>
+                              </div>
+                            </Card>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Send Message</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4 py-4">
+                              <div className="flex items-center space-x-3">
+                                <Avatar className="h-12 w-12">
+                                  <AvatarImage src={member.avatar} />
+                                  <AvatarFallback>{member.name[0]}</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <p className="font-medium">{member.name}</p>
+                                  <p className="text-sm text-muted-foreground">{member.email}</p>
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                <div className="text-sm font-medium">Message</div>
+                                <Textarea id="message" placeholder="Type your message here..." />
+                              </div>
+                            </div>
+                            <DialogFooter>
+                              <Button variant="outline">Cancel</Button>
+                              <Button>Send Message</Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                      ))}
+                    </div>
+                  </Card>
+                  <Card className="sticky bottom-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10 shadow-sm">
+                    <CardHeader className="py-3">
+                      <CardTitle className="text-sm text-muted-foreground">End of Member List</CardTitle>
+                    </CardHeader>
+                  </Card>
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+
+          {/* Event Section */}
+          <Card>
+            <CardHeader className="py-4">
+              <CardTitle className="text-lg">Upcoming Event</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 p-4">
+              <div>
+                <h3 className="font-semibold text-base mb-1">{upcomingEvent.name}</h3>
+                <p className="text-sm text-muted-foreground">{upcomingEvent.description}</p>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center text-xs">
+                  <Clock className="h-3 w-3 mr-2" />
+                  {upcomingEvent.startTime} ({upcomingEvent.duration})
+                </div>
+                <div className="flex items-center text-xs">
+                  <Calendar className="h-3 w-3 mr-2" />
+                  {upcomingEvent.date}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs font-medium mb-2">Attendees</p>
+                <div className="flex -space-x-2">
+                  {upcomingEvent.attendees.map((attendee, i) => (
+                    <Avatar key={i} className="h-8 w-8 border-2 border-background">
+                      <AvatarImage src={attendee.avatar} />
+                      <AvatarFallback>{attendee.name[0]}</AvatarFallback>
+                    </Avatar>
+                  ))}
+                </div>
+              </div>
+
+              <Button className="w-full text-sm py-2" variant="outline">
+                <Share className="h-3 w-3 mr-2" />
+                Share Invitation Link
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };
