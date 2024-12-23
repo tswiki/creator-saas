@@ -544,53 +544,100 @@ const ScheduleView = () => {
   };
 
   const renderTaskCard = (task: any) => (
-    <Card key={task.id} className="relative">
-      <CardHeader>
-        <div className="flex justify-between items-start">
-          <div>
-            <CardTitle className="text-lg">{task.title}</CardTitle>
-            <CardDescription>{task.description}</CardDescription>
+    <Card key={task.id} className="relative bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-shadow">
+      <div className="grid grid-cols-12 gap-4">
+        {/* Left Column - Due Date */}
+        <div className="col-span-2 p-4 border-r">
+          <div className="flex flex-col items-center justify-center h-full">
+            <div className="text-3xl font-bold">
+              {new Date(task.dueDate).getDate()}
+            </div>
+            <div className="text-sm text-gray-500">
+              {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short' })}
+            </div>
+            <div className="text-xs text-gray-400">
+              {new Date(task.dueDate).getFullYear()}
+            </div>
           </div>
-          <Badge variant={task.priority === 'high' ? 'destructive' : task.priority === 'medium' ? 'default' : 'secondary'}>
-            {task.priority}
-          </Badge>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-2">
-          <div className="flex items-center text-sm text-muted-foreground">
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {new Date(task.dueDate).toLocaleDateString()}
-          </div>
-          {task.type === 'meeting' && (
-            <>
+
+        {/* Middle Column - Time & Location */}
+        <div className="col-span-3 p-4 border-r">
+          <div className="space-y-3">
+            <div className="flex items-center text-sm">
+              <Clock className="mr-2 h-4 w-4 text-gray-400" />
+              {new Date(task.dueDate).toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: 'numeric'
+              })}
+            </div>
+            {task.type === 'meeting' && (
               <div className="flex items-center text-sm text-muted-foreground">
-                <MapPin className="mr-2 h-4 w-4" />
+                <MapPin className="mr-2 h-4 w-4 text-gray-400" />
                 {task.location}
               </div>
-              <div className="flex items-center text-sm text-muted-foreground">
-                <Users className="mr-2 h-4 w-4" />
-                {task.attendees.join(', ')}
-              </div>
-            </>
-          )}
+            )}
+            <Badge 
+              variant={task.priority === 'high' ? 'destructive' : task.priority === 'medium' ? 'default' : 'secondary'}
+              className="capitalize"
+            >
+              {task.priority}
+            </Badge>
+          </div>
         </div>
-      </CardContent>
-      <CardFooter className="justify-end space-x-2">
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={() => updateTaskStatus(task.id, task.status === 'completed' ? 'upcoming' : 'completed')}
-        >
-          {task.status === 'completed' ? 'Reopen' : 'Complete'}
-        </Button>
-        <Button 
-          variant="destructive" 
-          size="sm"
-          onClick={() => deleteTask(task.id)}
-        >
-          Delete
-        </Button>
+
+        {/* Right Column - Description & Attendees */}
+        <div className="col-span-7 p-4">
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-medium text-lg mb-1">{task.title}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+                {task.description}
+              </p>
+            </div>
+            
+            {task.attendees && task.attendees.length > 0 && (
+              <div className="flex items-center space-x-2">
+                <div className="flex -space-x-2">
+                  {task.attendees.map((attendee: string, index: number) => (
+                    <Avatar key={index} className="h-8 w-8 border-2 border-white dark:border-slate-900">
+                      <AvatarFallback className="bg-blue-500 text-white text-xs">
+                        {attendee.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  ))}
+                </div>
+                <span className="text-sm text-gray-500">
+                  {task.attendees.length} {task.attendees.length === 1 ? 'attendee' : 'attendees'}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <CardFooter className="pt-3 pb-3 px-6 justify-between border-t bg-gray-50 dark:bg-slate-800">
+        <div className="text-sm text-gray-500">
+          {task.type === 'meeting' ? 'Meeting' : 'Task'} • Created {new Date(task.dueDate).toLocaleDateString()}
+        </div>
+        <div className="space-x-2">
+          <Button 
+            variant="ghost"
+            size="sm"
+            className="text-gray-600 hover:text-gray-900"
+            onClick={() => updateTaskStatus(task.id, task.status === 'completed' ? 'upcoming' : 'completed')}
+          >
+            {task.status === 'completed' ? 'Reopen' : 'Complete'}
+          </Button>
+          <Button 
+            variant="ghost"
+            size="sm"
+            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+            onClick={() => deleteTask(task.id)}
+          >
+            Delete
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   );
@@ -599,74 +646,76 @@ const ScheduleView = () => {
     <div className="space-y-6 pt-10">
       <Card className="h-[80vh] flex flex-col">
         <Card className="rounded-b-none border-b-0">
-          <CardHeader className="sticky top-0 bg-background z-10">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-              <CardTitle>Timeline</CardTitle>
-              <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-                <Input
-                  placeholder="Search tasks..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="max-w-xs"
-                />
-                <Menubar>
-                  <MenubarMenu>
-                    <MenubarTrigger asChild>
-                      <Button variant="ghost" className="w-[120px]">
-                        <Filter className="mr-2 h-4 w-4" />
-                        Filters
-                      </Button>
-                    </MenubarTrigger>
-                    <MenubarContent>
-                      <MenubarSub>
-                        <MenubarSubTrigger>Type ({filterType})</MenubarSubTrigger>
-                        <MenubarSubContent>
-                          <MenubarItem onClick={() => setFilterType('all')}>
-                            <Check className={`mr-2 h-4 w-4 ${filterType === 'all' ? 'opacity-100' : 'opacity-0'}`} />
-                            All Types
-                          </MenubarItem>
-                          <MenubarItem onClick={() => setFilterType('meeting')}>
-                            <Check className={`mr-2 h-4 w-4 ${filterType === 'meeting' ? 'opacity-100' : 'opacity-0'}`} />
-                            Meetings
-                          </MenubarItem>
-                          <MenubarItem onClick={() => setFilterType('task')}>
-                            <Check className={`mr-2 h-4 w-4 ${filterType === 'task' ? 'opacity-100' : 'opacity-0'}`} />
-                            Tasks
-                          </MenubarItem>
-                        </MenubarSubContent>
-                      </MenubarSub>
-                      <MenubarSeparator />
-                      <MenubarSub>
-                        <MenubarSubTrigger>Priority ({filterPriority})</MenubarSubTrigger>
-                        <MenubarSubContent>
-                          <MenubarItem onClick={() => setFilterPriority('all')}>
-                            <Check className={`mr-2 h-4 w-4 ${filterPriority === 'all' ? 'opacity-100' : 'opacity-0'}`} />
-                            All Priorities
-                          </MenubarItem>
-                          <MenubarItem onClick={() => setFilterPriority('low')}>
-                            <Check className={`mr-2 h-4 w-4 ${filterPriority === 'low' ? 'opacity-100' : 'opacity-0'}`} />
-                            Low
-                          </MenubarItem>
-                          <MenubarItem onClick={() => setFilterPriority('medium')}>
-                            <Check className={`mr-2 h-4 w-4 ${filterPriority === 'medium' ? 'opacity-100' : 'opacity-0'}`} />
-                            Medium
-                          </MenubarItem>
-                          <MenubarItem onClick={() => setFilterPriority('high')}>
-                            <Check className={`mr-2 h-4 w-4 ${filterPriority === 'high' ? 'opacity-100' : 'opacity-0'}`} />
-                            High
-                          </MenubarItem>
-                        </MenubarSubContent>
-                      </MenubarSub>
-                    </MenubarContent>
-                  </MenubarMenu>
-                </Menubar>
-                <Button onClick={() => setShowAddDialog(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Item
-                </Button>
+          <Card>
+            <CardHeader className="sticky top-0 bg-background z-10">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <CardTitle>Timeline</CardTitle>
+                <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+                  <Input
+                    placeholder="Search tasks..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="max-w-xs"
+                  />
+                  <Menubar>
+                    <MenubarMenu>
+                      <MenubarTrigger asChild>
+                        <Button variant="ghost" className="w-[120px]">
+                          <Filter className="mr-2 h-4 w-4" />
+                          Filters
+                        </Button>
+                      </MenubarTrigger>
+                      <MenubarContent>
+                        <MenubarSub>
+                          <MenubarSubTrigger>Type ({filterType})</MenubarSubTrigger>
+                          <MenubarSubContent>
+                            <MenubarItem onClick={() => setFilterType('all')}>
+                              <Check className={`mr-2 h-4 w-4 ${filterType === 'all' ? 'opacity-100' : 'opacity-0'}`} />
+                              All Types
+                            </MenubarItem>
+                            <MenubarItem onClick={() => setFilterType('meeting')}>
+                              <Check className={`mr-2 h-4 w-4 ${filterType === 'meeting' ? 'opacity-100' : 'opacity-0'}`} />
+                              Meetings
+                            </MenubarItem>
+                            <MenubarItem onClick={() => setFilterType('task')}>
+                              <Check className={`mr-2 h-4 w-4 ${filterType === 'task' ? 'opacity-100' : 'opacity-0'}`} />
+                              Tasks
+                            </MenubarItem>
+                          </MenubarSubContent>
+                        </MenubarSub>
+                        <MenubarSeparator />
+                        <MenubarSub>
+                          <MenubarSubTrigger>Priority ({filterPriority})</MenubarSubTrigger>
+                          <MenubarSubContent>
+                            <MenubarItem onClick={() => setFilterPriority('all')}>
+                              <Check className={`mr-2 h-4 w-4 ${filterPriority === 'all' ? 'opacity-100' : 'opacity-0'}`} />
+                              All Priorities
+                            </MenubarItem>
+                            <MenubarItem onClick={() => setFilterPriority('low')}>
+                              <Check className={`mr-2 h-4 w-4 ${filterPriority === 'low' ? 'opacity-100' : 'opacity-0'}`} />
+                              Low
+                            </MenubarItem>
+                            <MenubarItem onClick={() => setFilterPriority('medium')}>
+                              <Check className={`mr-2 h-4 w-4 ${filterPriority === 'medium' ? 'opacity-100' : 'opacity-0'}`} />
+                              Medium
+                            </MenubarItem>
+                            <MenubarItem onClick={() => setFilterPriority('high')}>
+                              <Check className={`mr-2 h-4 w-4 ${filterPriority === 'high' ? 'opacity-100' : 'opacity-0'}`} />
+                              High
+                            </MenubarItem>
+                          </MenubarSubContent>
+                        </MenubarSub>
+                      </MenubarContent>
+                    </MenubarMenu>
+                  </Menubar>
+                  <Button onClick={() => setShowAddDialog(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Item
+                  </Button>
+                </div>
               </div>
-            </div>
-          </CardHeader>
+            </CardHeader>
+          </Card>
         </Card>
 
         <Card className="flex-1 rounded-t-none border-t-0">
@@ -702,7 +751,7 @@ const ScheduleView = () => {
               )}
               
               {groupedTasks.today.length > 0 && (
-                <div>
+                <div className="pt-4">
                   <div className="flex items-center gap-3 mb-4">
                     <h3 className="text-blue-500 font-semibold">Today :</h3>
                     <span className="text-blue-500 font-semibold">
