@@ -101,7 +101,9 @@ import {
   Filter,
   Palette,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  RefreshCw,
+  CheckCircle
 } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
@@ -112,6 +114,7 @@ import { toast } from '@/hooks/use-toast';
 import { Textarea } from './textarea';
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarTrigger } from './menubar';
 import { cn } from '@/lib/utils';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@radix-ui/react-tabs';
 
 
 const DashboardView = () => {
@@ -545,100 +548,229 @@ const ScheduleView = () => {
 
   const renderTaskCard = (task: any) => (
     <Card key={task.id} className="relative bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-shadow">
-      <div className="grid grid-cols-12 gap-4">
-        {/* Left Column - Due Date */}
-        <div className="col-span-2 p-4 border-r">
-          <div className="flex flex-col items-center justify-center h-full">
-            <div className="text-3xl font-bold">
-              {new Date(task.dueDate).getDate()}
-            </div>
-            <div className="text-sm text-gray-500">
-              {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short' })}
-            </div>
-            <div className="text-xs text-gray-400">
-              {new Date(task.dueDate).getFullYear()}
-            </div>
+      <Card className="p-4">
+        <div className="grid grid-cols-12 gap-6">
+          {/* Left Column - Due Date */}
+          <div className="col-span-2 p-4">
+            <Card className="h-full shadow-md border-2 border-gray-200 dark:border-gray-700">
+              <CardContent className="flex items-center justify-center h-full p-4">
+                <Card className="w-full transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/20 border border-transparent hover:border-primary">
+                  <CardContent className="p-2">
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="text-3xl font-bold">
+                        {new Date(task.dueDate).getDate()}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short' })}
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        {new Date(task.dueDate).getFullYear()}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Middle Column - Time & Location */}
+          <div className="col-span-3 p-4">
+            <Card className="h-full shadow-md border-2 border-gray-200 dark:border-gray-700">
+              <CardContent className="space-y-3 p-4">
+                <Card className="transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/20 border border-transparent hover:border-primary">
+                  <CardContent className="p-2">
+                    <div className="flex items-center text-sm">
+                      <Clock className="mr-2 h-4 w-4 text-gray-400" />
+                      {new Date(task.dueDate).toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        minute: 'numeric'
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+                {task.type === 'meeting' && (
+                  <Card className="transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/20 border border-transparent hover:border-primary">
+                    <CardContent className="p-2">
+                      <div className="flex items-center text-sm text-muted-foreground group cursor-pointer">
+                        <MapPin className="mr-2 h-4 w-4 text-gray-400 group-hover:text-primary transition-colors" />
+                        <span className="hover:underline group-hover:text-primary transition-colors">{task.location}</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+                <Badge 
+                  variant={task.priority === 'high' ? 'destructive' : task.priority === 'medium' ? 'default' : 'secondary'}
+                  className="capitalize"
+                >
+                  {task.priority}
+                </Badge>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Column - Description & Attendees */}
+          <div className="col-span-7 p-4">
+            <Card className="h-full shadow-md border-2 border-gray-200 dark:border-gray-700">
+              <CardContent className="space-y-4 p-4">
+                <Card className="transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/20 border border-transparent hover:border-primary">
+                  <CardContent className="p-2">
+                    <div>
+                      <h3 className="font-medium text-lg mb-1">{task.title}</h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+                        {task.description}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                {task.attendees && task.attendees.length > 0 && (
+                  <div className="flex items-center space-x-2">
+                    <div className="flex -space-x-2">
+                      {task.attendees.map((attendee: string, index: number) => (
+                        <Avatar key={index} className="h-8 w-8 border-2 border-white dark:border-slate-900">
+                          <AvatarFallback className="bg-blue-500 text-white text-xs">
+                            {attendee.substring(0, 2).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                      ))}
+                      <Button
+                        variant="outline" 
+                        size="sm"
+                        className="h-8 w-8 rounded-full border-2 border-white dark:border-slate-900 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
+                        onClick={() => {
+                          // Add attendee logic here
+                        }}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <span className="text-sm text-gray-500">
+                      {task.attendees.length} {task.attendees.length === 1 ? 'attendee' : 'attendees'}
+                    </span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </div>
+      </Card>
 
-        {/* Middle Column - Time & Location */}
-        <div className="col-span-3 p-4 border-r">
-          <div className="space-y-3">
-            <div className="flex items-center text-sm">
-              <Clock className="mr-2 h-4 w-4 text-gray-400" />
-              {new Date(task.dueDate).toLocaleTimeString('en-US', {
-                hour: 'numeric',
-                minute: 'numeric'
-              })}
-            </div>
-            {task.type === 'meeting' && (
-              <div className="flex items-center text-sm text-muted-foreground">
-                <MapPin className="mr-2 h-4 w-4 text-gray-400" />
-                {task.location}
+      <Card className="border-t rounded-t-none">
+        <CardFooter className="pt-3 pb-3 px-6 flex items-center justify-between bg-black-50 dark:bg-black-800">
+          <Card className="bg-white dark:bg-gray-800 shadow-sm">
+            <CardContent className="p-2">
+              <div className="text-sm text-gray-500 flex items-center">
+                <span>{task.type === 'meeting' ? 'Meeting' : 'Task'}</span>
+                <span className="mx-2">•</span>
+                <span>Created {new Date(task.dueDate).toLocaleDateString()}</span>
               </div>
-            )}
-            <Badge 
-              variant={task.priority === 'high' ? 'destructive' : task.priority === 'medium' ? 'default' : 'secondary'}
-              className="capitalize"
+            </CardContent>
+          </Card>
+          <div className="flex items-center space-x-2">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 inline-flex items-center"
+                >
+                  <Pencil className="h-4 w-4 mr-1" />
+                  Edit
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Edit {task.type === 'meeting' ? 'Meeting' : 'Task'}</DialogTitle>
+                </DialogHeader>
+                <Tabs defaultValue="date">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="date">Date</TabsTrigger>
+                    <TabsTrigger value="details">Details</TabsTrigger>
+                    <TabsTrigger value="content">Content</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="date" className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Due Date</Label>
+                      <Input type="date" defaultValue={new Date(task.dueDate).toISOString().split('T')[0]} />
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="details" className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Time</Label>
+                      <Input type="time" defaultValue={new Date(task.dueDate).toTimeString().slice(0,5)} />
+                    </div>
+                    {task.type === 'meeting' && (
+                      <div className="space-y-2">
+                        <Label>Location</Label>
+                        <Input defaultValue={task.location} />
+                      </div>
+                    )}
+                    <div className="space-y-2">
+                      <Label>Priority</Label>
+                      <Select defaultValue={task.priority}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="low">Low</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="high">High</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="content" className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Title</Label>
+                      <Input defaultValue={task.title} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Description</Label>
+                      <Textarea defaultValue={task.description} />
+                    </div>
+                    {task.type === 'meeting' && (
+                      <div className="space-y-2">
+                        <Label>Attendees</Label>
+                        <Input defaultValue={task.attendees?.join(', ')} placeholder="Enter email addresses separated by commas" />
+                      </div>
+                    )}
+                  </TabsContent>
+                </Tabs>
+                <DialogFooter>
+                  <Button type="submit">Save Changes</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            <Button 
+              variant="outline"
+              size="sm"
+              className="text-gray-600 hover:text-gray-900 inline-flex items-center"
+              onClick={() => updateTaskStatus(task.id, task.status === 'completed' ? 'upcoming' : 'completed')}
             >
-              {task.priority}
-            </Badge>
+              {task.status === 'completed' ? (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-1" />
+                  Reopen
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="h-4 w-4 mr-1" />
+                  Complete
+                </>
+              )}
+            </Button>
+            <Button 
+              variant="outline"
+              size="sm"
+              className="text-red-600 hover:text-red-900 hover:bg-red-100 dark:hover:text-red-400 dark:hover:bg-red-950 inline-flex items-center"
+              onClick={() => deleteTask(task.id)}
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              Delete
+            </Button>
           </div>
-        </div>
-
-        {/* Right Column - Description & Attendees */}
-        <div className="col-span-7 p-4">
-          <div className="space-y-4">
-            <div>
-              <h3 className="font-medium text-lg mb-1">{task.title}</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
-                {task.description}
-              </p>
-            </div>
-            
-            {task.attendees && task.attendees.length > 0 && (
-              <div className="flex items-center space-x-2">
-                <div className="flex -space-x-2">
-                  {task.attendees.map((attendee: string, index: number) => (
-                    <Avatar key={index} className="h-8 w-8 border-2 border-white dark:border-slate-900">
-                      <AvatarFallback className="bg-blue-500 text-white text-xs">
-                        {attendee.substring(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                  ))}
-                </div>
-                <span className="text-sm text-gray-500">
-                  {task.attendees.length} {task.attendees.length === 1 ? 'attendee' : 'attendees'}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <CardFooter className="pt-3 pb-3 px-6 justify-between border-t bg-gray-50 dark:bg-slate-800">
-        <div className="text-sm text-gray-500">
-          {task.type === 'meeting' ? 'Meeting' : 'Task'} • Created {new Date(task.dueDate).toLocaleDateString()}
-        </div>
-        <div className="space-x-2">
-          <Button 
-            variant="ghost"
-            size="sm"
-            className="text-gray-600 hover:text-gray-900"
-            onClick={() => updateTaskStatus(task.id, task.status === 'completed' ? 'upcoming' : 'completed')}
-          >
-            {task.status === 'completed' ? 'Reopen' : 'Complete'}
-          </Button>
-          <Button 
-            variant="ghost"
-            size="sm"
-            className="text-red-600 hover:text-red-700 hover:bg-red-50"
-            onClick={() => deleteTask(task.id)}
-          >
-            Delete
-          </Button>
-        </div>
-      </CardFooter>
+        </CardFooter>
+      </Card>
     </Card>
   );
 
@@ -649,7 +781,11 @@ const ScheduleView = () => {
           <Card>
             <CardHeader className="sticky top-0 bg-background z-10">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <CardTitle>Timeline</CardTitle>
+                <Card className="bg-white dark:bg-gray-800 shadow-sm">
+                  <CardHeader className="p-2">
+                    <CardTitle>Timeline</CardTitle>
+                  </CardHeader>
+                </Card>
                 <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
                   <Input
                     placeholder="Search tasks..."
@@ -752,16 +888,20 @@ const ScheduleView = () => {
               
               {groupedTasks.today.length > 0 && (
                 <div className="pt-4">
-                  <div className="flex items-center gap-3 mb-4">
-                    <h3 className="text-blue-500 font-semibold">Today :</h3>
-                    <span className="text-blue-500 font-semibold">
-                      {new Date().toLocaleDateString('en-US', { 
-                        weekday: 'long',
-                        month: 'short', 
-                        day: 'numeric'
-                      })}
-                    </span>
-                  </div>
+                  <Card className="bg-white dark:bg-gray-800 shadow-sm">
+                    <CardContent className="p-2">
+                      <div className="flex items-center justify-center gap-3">
+                        <h3 className="text-blue-500 font-semibold">Today :</h3>
+                        <span className="text-blue-500 font-semibold">
+                          {new Date().toLocaleDateString('en-US', { 
+                            weekday: 'long',
+                            month: 'short', 
+                            day: 'numeric'
+                          })}
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
                   <div className="space-y-4">
                     {groupedTasks.today.map(renderTaskCard)}
                   </div>
@@ -779,18 +919,22 @@ const ScheduleView = () => {
 
               {groupedTasks.thisWeek.length > 0 && (
                 <div>
-                  <div className="flex items-center gap-3 mb-4">
-                    <h3 className="text-purple-500 font-semibold">This Week :</h3>
-                    <span className="text-purple-500 font-semibold">
-                      {new Date().toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric'
-                      })} - {new Date(Date.now() + 6 * 86400000).toLocaleDateString('en-US', {
-                        month: 'short', 
-                        day: 'numeric'
-                      })}
-                    </span>
-                  </div>
+                  <Card className="bg-white dark:bg-gray-800 shadow-sm">
+                    <CardContent className="p-2">
+                      <div className="flex items-center justify-center gap-3">
+                        <h3 className="text-purple-500 font-semibold">This Week :</h3>
+                        <span className="text-purple-500 font-semibold">
+                          {new Date().toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric'
+                          })} - {new Date(Date.now() + 6 * 86400000).toLocaleDateString('en-US', {
+                            month: 'short', 
+                            day: 'numeric'
+                          })}
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
                   <div className="space-y-4">
                     {groupedTasks.thisWeek.map(renderTaskCard)}
                   </div>
