@@ -598,171 +598,176 @@ const ScheduleView = () => {
   return (
     <div className="space-y-6 pt-10">
       <Card className="h-[80vh] flex flex-col">
-        <CardHeader className="sticky top-0 bg-background z-10 border-b">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <CardTitle>Timeline</CardTitle>
-            <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-              <Input
-                placeholder="Search tasks..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="max-w-xs"
-              />
-              <Menubar>
-                <MenubarMenu>
-                  <MenubarTrigger asChild>
-                    <Button variant="ghost" className="w-[120px]">
-                      <Filter className="mr-2 h-4 w-4" />
-                      Filters
-                    </Button>
-                  </MenubarTrigger>
-                  <MenubarContent>
-                    <MenubarSub>
-                      <MenubarSubTrigger>Type ({filterType})</MenubarSubTrigger>
-                      <MenubarSubContent>
-                        <MenubarItem onClick={() => setFilterType('all')}>
-                          <Check className={`mr-2 h-4 w-4 ${filterType === 'all' ? 'opacity-100' : 'opacity-0'}`} />
-                          All Types
-                        </MenubarItem>
-                        <MenubarItem onClick={() => setFilterType('meeting')}>
-                          <Check className={`mr-2 h-4 w-4 ${filterType === 'meeting' ? 'opacity-100' : 'opacity-0'}`} />
-                          Meetings
-                        </MenubarItem>
-                        <MenubarItem onClick={() => setFilterType('task')}>
-                          <Check className={`mr-2 h-4 w-4 ${filterType === 'task' ? 'opacity-100' : 'opacity-0'}`} />
-                          Tasks
-                        </MenubarItem>
-                      </MenubarSubContent>
-                    </MenubarSub>
-                    <MenubarSeparator />
-                    <MenubarSub>
-                      <MenubarSubTrigger>Priority ({filterPriority})</MenubarSubTrigger>
-                      <MenubarSubContent>
-                        <MenubarItem onClick={() => setFilterPriority('all')}>
-                          <Check className={`mr-2 h-4 w-4 ${filterPriority === 'all' ? 'opacity-100' : 'opacity-0'}`} />
-                          All Priorities
-                        </MenubarItem>
-                        <MenubarItem onClick={() => setFilterPriority('low')}>
-                          <Check className={`mr-2 h-4 w-4 ${filterPriority === 'low' ? 'opacity-100' : 'opacity-0'}`} />
-                          Low
-                        </MenubarItem>
-                        <MenubarItem onClick={() => setFilterPriority('medium')}>
-                          <Check className={`mr-2 h-4 w-4 ${filterPriority === 'medium' ? 'opacity-100' : 'opacity-0'}`} />
-                          Medium
-                        </MenubarItem>
-                        <MenubarItem onClick={() => setFilterPriority('high')}>
-                          <Check className={`mr-2 h-4 w-4 ${filterPriority === 'high' ? 'opacity-100' : 'opacity-0'}`} />
-                          High
-                        </MenubarItem>
-                      </MenubarSubContent>
-                    </MenubarSub>
-                  </MenubarContent>
-                </MenubarMenu>
-              </Menubar>
-              <Button onClick={() => setShowAddDialog(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Item
-              </Button>
+        <Card className="rounded-b-none border-b-0">
+          <CardHeader className="sticky top-0 bg-background z-10">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <CardTitle>Timeline</CardTitle>
+              <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+                <Input
+                  placeholder="Search tasks..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="max-w-xs"
+                />
+                <Menubar>
+                  <MenubarMenu>
+                    <MenubarTrigger asChild>
+                      <Button variant="ghost" className="w-[120px]">
+                        <Filter className="mr-2 h-4 w-4" />
+                        Filters
+                      </Button>
+                    </MenubarTrigger>
+                    <MenubarContent>
+                      <MenubarSub>
+                        <MenubarSubTrigger>Type ({filterType})</MenubarSubTrigger>
+                        <MenubarSubContent>
+                          <MenubarItem onClick={() => setFilterType('all')}>
+                            <Check className={`mr-2 h-4 w-4 ${filterType === 'all' ? 'opacity-100' : 'opacity-0'}`} />
+                            All Types
+                          </MenubarItem>
+                          <MenubarItem onClick={() => setFilterType('meeting')}>
+                            <Check className={`mr-2 h-4 w-4 ${filterType === 'meeting' ? 'opacity-100' : 'opacity-0'}`} />
+                            Meetings
+                          </MenubarItem>
+                          <MenubarItem onClick={() => setFilterType('task')}>
+                            <Check className={`mr-2 h-4 w-4 ${filterType === 'task' ? 'opacity-100' : 'opacity-0'}`} />
+                            Tasks
+                          </MenubarItem>
+                        </MenubarSubContent>
+                      </MenubarSub>
+                      <MenubarSeparator />
+                      <MenubarSub>
+                        <MenubarSubTrigger>Priority ({filterPriority})</MenubarSubTrigger>
+                        <MenubarSubContent>
+                          <MenubarItem onClick={() => setFilterPriority('all')}>
+                            <Check className={`mr-2 h-4 w-4 ${filterPriority === 'all' ? 'opacity-100' : 'opacity-0'}`} />
+                            All Priorities
+                          </MenubarItem>
+                          <MenubarItem onClick={() => setFilterPriority('low')}>
+                            <Check className={`mr-2 h-4 w-4 ${filterPriority === 'low' ? 'opacity-100' : 'opacity-0'}`} />
+                            Low
+                          </MenubarItem>
+                          <MenubarItem onClick={() => setFilterPriority('medium')}>
+                            <Check className={`mr-2 h-4 w-4 ${filterPriority === 'medium' ? 'opacity-100' : 'opacity-0'}`} />
+                            Medium
+                          </MenubarItem>
+                          <MenubarItem onClick={() => setFilterPriority('high')}>
+                            <Check className={`mr-2 h-4 w-4 ${filterPriority === 'high' ? 'opacity-100' : 'opacity-0'}`} />
+                            High
+                          </MenubarItem>
+                        </MenubarSubContent>
+                      </MenubarSub>
+                    </MenubarContent>
+                  </MenubarMenu>
+                </Menubar>
+                <Button onClick={() => setShowAddDialog(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Item
+                </Button>
+              </div>
             </div>
-          </div>
-        </CardHeader>
-        <CardContent className="flex-1 overflow-y-auto pr-4 custom-scrollbar" style={{
-          scrollbarWidth: 'thin',
-          scrollbarColor: 'rgb(203 213 225) transparent'
-        }}>
-          <style jsx global>{`
-            .custom-scrollbar::-webkit-scrollbar {
-              width: 8px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-track {
-              background: transparent;
-            }
-            .custom-scrollbar::-webkit-scrollbar-thumb {
-              background-color: rgb(203 213 225);
-              border-radius: 20px;
-              border: 2px solid transparent;
-            }
-            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-              background-color: rgb(148 163 184);
-            }
-          `}</style>
+          </CardHeader>
+        </Card>
 
-          <div className="space-y-8">
-            {groupedTasks.overdue.length > 0 && (
-              <div>
-                <h3 className="text-red-500 font-semibold mb-4">Overdue</h3>
-                <div className="space-y-4">
-                  {groupedTasks.overdue.map(renderTaskCard)}
-                </div>
-              </div>
-            )}
-            
-            {groupedTasks.today.length > 0 && (
-              <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <h3 className="text-blue-500 font-semibold">Today :</h3>
-                  <span className="text-blue-500 font-semibold">
-                    {new Date().toLocaleDateString('en-US', { 
-                      weekday: 'long',
-                      month: 'short', 
-                      day: 'numeric'
-                    })}
-                  </span>
-                </div>
-                <div className="space-y-4">
-                  {groupedTasks.today.map(renderTaskCard)}
-                </div>
-              </div>
-            )}
+        <Card className="flex-1 rounded-t-none border-t-0">
+          <CardContent className="flex-1 overflow-y-auto pr-4 custom-scrollbar" style={{
+            scrollbarWidth: 'thin',
+            scrollbarColor: 'rgb(203 213 225) transparent'
+          }}>
+            <style jsx global>{`
+              .custom-scrollbar::-webkit-scrollbar {
+                width: 8px;
+              }
+              .custom-scrollbar::-webkit-scrollbar-track {
+                background: transparent;
+              }
+              .custom-scrollbar::-webkit-scrollbar-thumb {
+                background-color: rgb(203 213 225);
+                border-radius: 20px;
+                border: 2px solid transparent;
+              }
+              .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background-color: rgb(148 163 184);
+              }
+            `}</style>
 
-            {groupedTasks.tomorrow.length > 0 && (
-              <div>
-                <h3 className="text-green-500 font-semibold mb-4">Tomorrow</h3>
-                <div className="space-y-4">
-                  {groupedTasks.tomorrow.map(renderTaskCard)}
+            <div className="space-y-8">
+              {groupedTasks.overdue.length > 0 && (
+                <div>
+                  <h3 className="text-red-500 font-semibold mb-4">Overdue</h3>
+                  <div className="space-y-4">
+                    {groupedTasks.overdue.map(renderTaskCard)}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+              
+              {groupedTasks.today.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <h3 className="text-blue-500 font-semibold">Today :</h3>
+                    <span className="text-blue-500 font-semibold">
+                      {new Date().toLocaleDateString('en-US', { 
+                        weekday: 'long',
+                        month: 'short', 
+                        day: 'numeric'
+                      })}
+                    </span>
+                  </div>
+                  <div className="space-y-4">
+                    {groupedTasks.today.map(renderTaskCard)}
+                  </div>
+                </div>
+              )}
 
-            {groupedTasks.thisWeek.length > 0 && (
-              <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <h3 className="text-purple-500 font-semibold">This Week :</h3>
-                  <span className="text-purple-500 font-semibold">
-                    {new Date().toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric'
-                    })} - {new Date(Date.now() + 6 * 86400000).toLocaleDateString('en-US', {
-                      month: 'short', 
-                      day: 'numeric'
-                    })}
-                  </span>
+              {groupedTasks.tomorrow.length > 0 && (
+                <div>
+                  <h3 className="text-green-500 font-semibold mb-4">Tomorrow</h3>
+                  <div className="space-y-4">
+                    {groupedTasks.tomorrow.map(renderTaskCard)}
+                  </div>
                 </div>
-                <div className="space-y-4">
-                  {groupedTasks.thisWeek.map(renderTaskCard)}
-                </div>
-              </div>
-            )}
+              )}
 
-            {groupedTasks.later.length > 0 && (
-              <div>
-                <h3 className="text-gray-500 font-semibold mb-4">Later</h3>
-                <div className="space-y-4">
-                  {groupedTasks.later.map(renderTaskCard)}
+              {groupedTasks.thisWeek.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <h3 className="text-purple-500 font-semibold">This Week :</h3>
+                    <span className="text-purple-500 font-semibold">
+                      {new Date().toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric'
+                      })} - {new Date(Date.now() + 6 * 86400000).toLocaleDateString('en-US', {
+                        month: 'short', 
+                        day: 'numeric'
+                      })}
+                    </span>
+                  </div>
+                  <div className="space-y-4">
+                    {groupedTasks.thisWeek.map(renderTaskCard)}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {groupedTasks.completed.length > 0 && (
-              <div>
-                <h3 className="text-gray-400 font-semibold mb-4">Completed</h3>
-                <div className="space-y-4">
-                  {groupedTasks.completed.map(renderTaskCard)}
+              {groupedTasks.later.length > 0 && (
+                <div>
+                  <h3 className="text-gray-500 font-semibold mb-4">Later</h3>
+                  <div className="space-y-4">
+                    {groupedTasks.later.map(renderTaskCard)}
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        </CardContent>
+              )}
+
+              {groupedTasks.completed.length > 0 && (
+                <div>
+                  <h3 className="text-gray-400 font-semibold mb-4">Completed</h3>
+                  <div className="space-y-4">
+                    {groupedTasks.completed.map(renderTaskCard)}
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </Card>
 
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
