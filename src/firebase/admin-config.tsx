@@ -6,6 +6,7 @@ import { getAuth } from 'firebase-admin/auth'
 
 // Import the service account file directly
 import serviceAccount from '../firebase/service-account-key.json'
+
 // const serviceAccount = {
 //   projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
 //   clientEmail: process.env.NEXT_PUBLIC_FIREBASE_CLIENT_EMAIL,

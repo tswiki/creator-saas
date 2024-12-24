@@ -107,7 +107,9 @@ import {
   Calendar,
   Inbox,
   Users2,
-  FileText
+  FileText,
+  Music,
+  Youtube
 } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
@@ -1606,6 +1608,10 @@ export default function MentorshipPortal() {
       fetchResources();
     }, []);
 
+    function setView(arg0: string): void {
+      throw new Error('Function not implemented.');
+    }
+
     return (
     <div className="space-y-6 pt-10">
         <Card>
@@ -1707,72 +1713,175 @@ export default function MentorshipPortal() {
 
               {/* Learning Path */}
               <div>
-                <h3 className="font-semibold mb-4">Your Learning Path</h3>
-                <div className="space-y-4">
-                  {[
-                    {
-                      milestone: "Frontend Fundamentals",
-                      status: "Completed",
-                      tasks: ["HTML/CSS Basics", "JavaScript Fundamentals", "React Basics"],
-                      resources: [
-                        { name: "HTML Guide", type: "PDF" },
-                        { name: "CSS Examples", type: "Code" }
-                      ]
-                    },
-                    {
-                      milestone: "Advanced Frontend",
-                      status: "In Progress",
-                      tasks: ["State Management", "Performance Optimization", "Testing"],
-                      resources: [
-                        { name: "Redux Tutorial", type: "Video" },
-                        { name: "Testing Guide", type: "Document" }
-                      ]
-                    },
-                    {
-                      milestone: "Backend Integration",
-                      status: "Upcoming",
-                      tasks: ["API Design", "Database Fundamentals", "Authentication"],
-                      resources: [
-                        { name: "API Best Practices", type: "PDF" },
-                        { name: "Database Schemas", type: "Document" }
-                      ]
-                    }
-                  ].map((milestone, i) => (
-                    <Card key={i}>
-                      <CardContent className="p-4">
-                        <div className="space-y-2">
-                          <div className="flex justify-between items-center">
-                            <h4 className="font-medium">{milestone.milestone}</h4>
-                            <Badge variant={
-                              milestone.status === "Completed" ? "default" :
-                              milestone.status === "In Progress" ? "secondary" : "outline"
-                            }>
-                              {milestone.status}
-                            </Badge>
-                          </div>
-                          <ul className="text-sm text-muted-foreground space-y-1">
-                            {milestone.tasks.map((task, j) => (
-                              <li key={j} className="flex items-center">
-                                <div className="w-2 h-2 rounded-full bg-primary mr-2" />
-                                {task}
-                              </li>
-                            ))}
-                          </ul>
-                          <div className="pt-2">
-                            <p className="text-sm font-medium mb-1">Resources:</p>
-                            <div className="flex gap-2">
-                              {milestone.resources.map((resource, k) => (
-                                <Badge key={k} variant="outline">
-                                  {resource.name}
-                                </Badge>
+                <h3 className="font-semibold mb-4">Creator Content Hub</h3>
+                {currentView === "youtube" ? (
+                  <YoutubeView />
+                ) : currentView === "tiktok" ? (
+                  <TikTokView />
+                ) : currentView === "twitter" ? (
+                  <TwitterView />
+                ) : (
+                  <div className="space-y-4">
+                    {[
+                      {
+                        platform: "YouTube",
+                        status: "Latest Content", 
+                        content: [
+                          {
+                            title: "Frontend Development Tips",
+                            views: "15K views",
+                            date: "2 days ago",
+                            thumbnail: "/youtube-thumb-1.jpg"
+                          },
+                          {
+                            title: "React Best Practices",
+                            views: "32K views",
+                            date: "1 week ago", 
+                            thumbnail: "/youtube-thumb-2.jpg"
+                          }
+                        ],
+                        channelInfo: {
+                          subscribers: "50K",
+                          totalVideos: "125"
+                        }
+                      },
+                      {
+                        platform: "TikTok",
+                        status: "Trending",
+                        content: [
+                          {
+                            title: "Quick CSS Tips",
+                            likes: "45K",
+                            comments: "1.2K",
+                            thumbnail: "/tiktok-thumb-1.jpg"
+                          },
+                          {
+                            title: "JavaScript Shorts",
+                            likes: "32K",
+                            comments: "890",
+                            thumbnail: "/tiktok-thumb-2.jpg"
+                          }
+                        ],
+                        profileInfo: {
+                          followers: "100K",
+                          likes: "1.2M"
+                        }
+                      },
+                      {
+                        platform: "Twitter",
+                        status: "Recent Threads",
+                        content: [
+                          {
+                            text: "🧵 Essential Web Development Tools in 2024",
+                            retweets: "2.5K",
+                            likes: "12K",
+                            time: "3h ago"
+                          },
+                          {
+                            text: "Breaking down complex React concepts 👇",
+                            retweets: "1.8K",
+                            likes: "8K",
+                            time: "1d ago"
+                          }
+                        ],
+                        profileInfo: {
+                          followers: "75K",
+                          tweets: "3.2K"
+                        }
+                      }
+                    ].map((platform, i) => (
+                      <Card 
+                        key={i} 
+                        className="hover:shadow-md transition-shadow"
+                      >
+                        <CardContent className="p-4">
+                          <div className="space-y-3">
+                            <div className="flex justify-between items-center">
+                              <h4 className="font-medium flex items-center gap-2">
+                                {platform.platform === "YouTube" && (
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon"
+                                    className="p-0"
+                                  >
+                                    <Youtube className="h-5 w-5 text-red-600" />
+                                  </Button>
+                                )}
+                                {platform.platform === "TikTok" && (
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon"
+                                    className="p-0"
+                                  >
+                                    <Music className="h-5 w-5 text-black" />
+                                  </Button>
+                                )}
+                                {platform.platform === "Twitter" && (
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon"
+                                    className="p-0"
+                                  >
+                                    <Twitter className="h-5 w-5 text-blue-400" />
+                                  </Button>
+                                )}
+                                {platform.platform}
+                              </h4>
+                              <Badge variant="secondary">{platform.status}</Badge>
+                            </div>
+
+                            <div className="grid gap-3">
+                              {platform.content.map((item, j) => (
+                                <div key={j} className="flex items-center gap-3 p-2 hover:bg-accent rounded-lg">
+                                  {item.thumbnail && (
+                                    <div className="w-24 h-16 bg-muted rounded overflow-hidden">
+                                      <div className="w-full h-full bg-center bg-cover" style={{backgroundImage: `url(${item.thumbnail})`}} />
+                                    </div>
+                                  )}
+                                  <div className="flex-1">
+                                    <p className="font-medium text-sm">{item.title || item.text}</p>
+                                    <div className="flex gap-2 text-xs text-muted-foreground mt-1">
+                                      {item.views && <span>{item.views}</span>}
+                                      {item.likes && <span>{item.likes} likes</span>}
+                                      {item.retweets && <span>{item.retweets} retweets</span>}
+                                      {item.date || item.time && <span>• {item.date || item.time}</span>}
+                                    </div>
+                                  </div>
+                                </div>
                               ))}
                             </div>
+
+                            <div className="pt-2 border-t">
+                              <div className="flex justify-between items-center">
+                                <div className="flex gap-4 text-sm text-muted-foreground">
+                                  {platform.channelInfo && (
+                                    <>
+                                      <span>{platform.channelInfo.subscribers} subscribers</span>
+                                      <span>{platform.channelInfo.totalVideos} videos</span>
+                                    </>
+                                  )}
+                                  {platform.profileInfo && (
+                                    <>
+                                      <span>{platform.profileInfo.followers} followers</span>
+                                      {platform.profileInfo.likes && <span>{platform.profileInfo.likes} likes</span>}
+                                      {platform.profileInfo.tweets && <span>{platform.profileInfo.tweets} tweets</span>}
+                                    </>
+                                  )}
+                                </div>
+                                <Button 
+                                  variant="outline"
+                                  onClick={() => setCurrentView(platform.platform.toLowerCase())}
+                                >
+                                  Open
+                                </Button>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>
@@ -1873,6 +1982,370 @@ export default function MentorshipPortal() {
     );
   };
 
+
+  const YoutubeView = () => {
+    const [channelData] = useState({
+      snippet: {
+        title: "Code With Sarah",
+        thumbnails: {
+          default: {
+            url: "/avatars/sarah.jpg"
+          }
+        }
+      },
+      statistics: {
+        subscriberCount: "125K",
+        videoCount: "342",
+        viewCount: "2.1M",
+        commentCount: "45.2K"
+      }
+    });
+
+    const [videos] = useState([
+      {
+        id: "1",
+        snippet: {
+          title: "Build a Full Stack App with Next.js 13",
+          thumbnails: {
+            medium: {
+              url: "/thumbnails/nextjs-tutorial.jpg"
+            }
+          },
+          publishedAt: "2024-01-15T14:30:00Z"
+        },
+        statistics: {
+          viewCount: "12.5K"
+        }
+      },
+      {
+        id: "2", 
+        snippet: {
+          title: "React Hooks Deep Dive - useState & useEffect",
+          thumbnails: {
+            medium: {
+              url: "/thumbnails/react-hooks.jpg" 
+            }
+          },
+          publishedAt: "2024-01-10T16:45:00Z"
+        },
+        statistics: {
+          viewCount: "8.2K"
+        }
+      },
+      {
+        id: "3",
+        snippet: {
+          title: "TypeScript Crash Course for Beginners",
+          thumbnails: {
+            medium: {
+              url: "/thumbnails/typescript.jpg"
+            }
+          },
+          publishedAt: "2024-01-05T13:15:00Z"
+        },
+        statistics: {
+          viewCount: "15.7K"
+        }
+      }
+    ]);
+
+    return (
+      <div className="space-y-8 pt-16">
+        {/* Channel Overview */}
+        <div className="bg-card rounded-lg p-6 shadow-sm">
+          <div className="flex items-center space-x-4">
+            {channelData.snippet?.thumbnails?.default && (
+              <img 
+                src={channelData.snippet.thumbnails.default.url}
+                alt="Channel thumbnail"
+                className="w-16 h-16 rounded-full"
+              />
+            )}
+            <div>
+              <h2 className="text-2xl font-bold">{channelData.snippet?.title}</h2>
+              <p className="text-muted-foreground">{channelData.statistics?.subscriberCount} subscribers</p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-3 gap-4 mt-6">
+            <div className="bg-background p-4 rounded-md text-center">
+              <p className="text-2xl font-bold">{channelData.statistics?.videoCount}</p>
+              <p className="text-sm text-muted-foreground">Videos</p>
+            </div>
+            <div className="bg-background p-4 rounded-md text-center">
+              <p className="text-2xl font-bold">{channelData.statistics?.viewCount}</p>
+              <p className="text-sm text-muted-foreground">Total Views</p>
+            </div>
+            <div className="bg-background p-4 rounded-md text-center">
+              <p className="text-2xl font-bold">{channelData.statistics?.commentCount}</p>
+              <p className="text-sm text-muted-foreground">Comments</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Videos Grid */}
+        <div>
+          <h3 className="text-xl font-semibold mb-4">Recent Videos</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {videos.map((video: any) => (
+              <div key={video.id} className="bg-card rounded-lg overflow-hidden shadow-sm">
+                <img 
+                  src={video.snippet.thumbnails.medium.url}
+                  alt={video.snippet.title}
+                  className="w-full aspect-video object-cover"
+                />
+                <div className="p-4">
+                  <h4 className="font-semibold line-clamp-2">{video.snippet.title}</h4>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    {video.statistics?.viewCount} views • {new Date(video.snippet.publishedAt).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const TikTokView = () => {
+    const [tiktokData, setTiktokData] = useState<any>({
+      statistics: {
+        followers: "100K",
+        likes: "1.2M",
+        videos: "450"
+      },
+      profile: {
+        username: "@codingmentor",
+        bio: "Teaching code one video at a time 👨‍💻",
+        avatar: "/tiktok-avatar.jpg"
+      }
+    });
+
+    const [posts, setPosts] = useState([
+      {
+        id: "1",
+        caption: "Quick CSS Grid Tutorial 🎨",
+        stats: {
+          likes: "45K",
+          comments: "1.2K",
+          shares: "2.3K"
+        },
+        thumbnail: "/tiktok-thumb-1.jpg",
+        posted: "2 days ago"
+      },
+      {
+        id: "2", 
+        caption: "JavaScript Tips & Tricks ⚡️",
+        stats: {
+          likes: "32K",
+          comments: "890",
+          shares: "1.5K"
+        },
+        thumbnail: "/tiktok-thumb-2.jpg",
+        posted: "5 days ago"
+      }
+    ]);
+
+    return (
+      <div className="space-y-8">
+        {/* Profile Header */}
+        <div className="bg-card p-6 rounded-lg">
+          <div className="flex items-center gap-6">
+            {tiktokData.profile.avatar && (
+              <img
+                src={tiktokData.profile.avatar}
+                alt="TikTok Profile"
+                className="w-16 h-16 rounded-full"
+              />
+            )}
+            <div>
+              <h2 className="text-2xl font-bold">{tiktokData.profile.username}</h2>
+              <p className="text-muted-foreground">{tiktokData.profile.bio}</p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-3 gap-4 mt-6">
+            <div className="bg-background p-4 rounded-md text-center">
+              <p className="text-2xl font-bold">{tiktokData.statistics.followers}</p>
+              <p className="text-sm text-muted-foreground">Followers</p>
+            </div>
+            <div className="bg-background p-4 rounded-md text-center">
+              <p className="text-2xl font-bold">{tiktokData.statistics.likes}</p>
+              <p className="text-sm text-muted-foreground">Total Likes</p>
+            </div>
+            <div className="bg-background p-4 rounded-md text-center">
+              <p className="text-2xl font-bold">{tiktokData.statistics.videos}</p>
+              <p className="text-sm text-muted-foreground">Videos</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Posts Grid */}
+        <div>
+          <h3 className="text-xl font-semibold mb-4">Recent Posts</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {posts.map((post) => (
+              <div key={post.id} className="bg-card rounded-lg overflow-hidden shadow-sm">
+                <img 
+                  src={post.thumbnail}
+                  alt={post.caption}
+                  className="w-full aspect-[9/16] object-cover"
+                />
+                <div className="p-4">
+                  <h4 className="font-semibold line-clamp-2">{post.caption}</h4>
+                  <div className="flex gap-4 text-sm text-muted-foreground mt-2">
+                    <span>{post.stats.likes} likes</span>
+                    <span>{post.stats.comments} comments</span>
+                    <span>{post.stats.shares} shares</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-2">{post.posted}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const TwitterView = () => {
+    const [twitterData] = useState({
+      statistics: {
+        followers: "75.2K",
+        following: "1.2K", 
+        tweets: "3.2K"
+      },
+      profile: {
+        handle: "@sarahcodes",
+        name: "Sarah Wilson",
+        bio: "Senior Software Engineer | Teaching web development and React | Building in public | Join me on my coding journey! 👩‍💻",
+        avatar: "/avatars/sarah.jpg",
+        banner: "/banners/twitter-banner.jpg",
+        location: "San Francisco, CA",
+        website: "sarahcodes.dev"
+      }
+    });
+
+    const [tweets] = useState([
+      {
+        id: "1",
+        text: "🔥 Just launched my new React course! Early bird pricing available for the next 48 hours.\n\nLearn React from the ground up including:\n• Hooks\n• State Management\n• Performance Optimization\n• Testing\n\nLink in bio! 🚀",
+        media: "/course-promo.jpg",
+        stats: {
+          retweets: "3.2K",
+          likes: "15.7K",
+          replies: "428",
+          views: "102K"
+        },
+        posted: "2h ago"
+      },
+      {
+        id: "2", 
+        text: "💡 Pro Tip: When debugging React components, use the React DevTools extension.\n\nIt lets you:\n• Inspect component props\n• View state changes\n• Profile performance\n• Debug hooks\n\nA must-have for React developers!",
+        stats: {
+          retweets: "2.1K",
+          likes: "9.3K", 
+          replies: "156",
+          views: "78K"
+        },
+        posted: "5h ago"
+      },
+      {
+        id: "3",
+        text: "Today's coding session:\n\n• Built a new authentication system\n• Added real-time updates\n• Fixed that pesky bug in production\n\nRemember: coding is a journey, not a race. Take breaks and celebrate small wins! 🎉",
+        stats: {
+          retweets: "1.8K",
+          likes: "7.2K",
+          replies: "203",
+          views: "65K"
+        },
+        posted: "8h ago"
+      }
+    ]);
+
+    return (
+      <div className="space-y-8">
+        {/* Profile Header */}
+        <div className="bg-card rounded-lg overflow-hidden">
+          <div className="h-32 bg-gradient-to-r from-blue-400 to-blue-600"></div>
+          <div className="p-6">
+            <div className="flex items-center gap-6">
+              <img
+                src={twitterData.profile.avatar}
+                alt={twitterData.profile.name}
+                className="w-20 h-20 rounded-full border-4 border-background -mt-12"
+              />
+              <div>
+                <h2 className="text-2xl font-bold">{twitterData.profile.name}</h2>
+                <p className="text-muted-foreground">{twitterData.profile.handle}</p>
+              </div>
+            </div>
+            
+            <p className="mt-4 text-muted-foreground">{twitterData.profile.bio}</p>
+            
+            <div className="flex gap-4 mt-4 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <MapPin className="h-4 w-4" />
+                {twitterData.profile.location}
+              </span>
+              <span className="flex items-center gap-1">
+                <Globe className="h-4 w-4" />
+                {twitterData.profile.website}
+              </span>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-3 gap-4 px-6 pb-6">
+            <div className="bg-background p-4 rounded-md text-center">
+              <p className="text-2xl font-bold">{twitterData.statistics.followers}</p>
+              <p className="text-sm text-muted-foreground">Followers</p>
+            </div>
+            <div className="bg-background p-4 rounded-md text-center">
+              <p className="text-2xl font-bold">{twitterData.statistics.following}</p>
+              <p className="text-sm text-muted-foreground">Following</p>
+            </div>
+            <div className="bg-background p-4 rounded-md text-center">
+              <p className="text-2xl font-bold">{twitterData.statistics.tweets}</p>
+              <p className="text-sm text-muted-foreground">Tweets</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Tweets List */}
+        <div>
+          <h3 className="text-xl font-semibold mb-4">Recent Tweets</h3>
+          <div className="space-y-4">
+            {tweets.map((tweet) => (
+              <div key={tweet.id} className="bg-card p-6 rounded-lg">
+                <p className="whitespace-pre-line text-base">{tweet.text}</p>
+                {tweet.media && (
+                  <img src={tweet.media} alt="" className="mt-4 rounded-lg w-full" />
+                )}
+                <div className="flex gap-6 mt-4 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    <MessageCircle className="h-4 w-4" /> {tweet.stats.replies}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <ReplyIcon className="h-4 w-4" /> {tweet.stats.retweets}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Heart className="h-4 w-4" /> {tweet.stats.likes}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Eye className="h-4 w-4" /> {tweet.stats.views}
+                  </span>
+                  <span className="ml-auto">{tweet.posted}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  
   const CourseView = () => {
     const [courses, setCourses] = useState<any[]>([]);
     const [isAdminView, setIsAdminView] = useState(false);
@@ -3485,6 +3958,9 @@ export default function MentorshipPortal() {
         {currentView === 'resources' && <ResourcesView/>}
         {currentView === 'course' && <CourseView/>}
         {currentView === 'connect' && <ConnectView/>}
+        {currentView === 'youtube' && <YoutubeView/>}
+        {currentView === 'tiktok' && <TikTokView/>}
+        {currentView === 'twitter' && <TwitterView/>}
       </div>
     </div>
   );
