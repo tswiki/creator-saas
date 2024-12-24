@@ -104,7 +104,9 @@ import {
   ChevronRight,
   RefreshCw,
   CheckCircle,
-  Calendar
+  Calendar,
+  Inbox,
+  Users2
 } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
@@ -127,24 +129,6 @@ const DashboardView = () => {
   });
 
   const [messages, setMessages] = useState([
-    {
-      id: 1,
-      sender: "John Doe",
-      content: "Hi, I need help with React hooks",
-      timestamp: "2:15 PM"
-    },
-    {
-      id: 2,
-      sender: "Me", 
-      content: "Sure, what specifically are you struggling with?",
-      timestamp: "2:20 PM"
-    },
-    {
-      id: 3,
-      sender: "John Doe",
-      content: "Thanks for the help!",
-      timestamp: "2:30 PM"
-    }
   ]);
 
   const cohortMembers = [
@@ -215,7 +199,10 @@ const DashboardView = () => {
         <Card className="col-span-2 h-full">
           <CardHeader className="py-4">
             <div className="mb-4 px-2 text-center">
-              <h2 className="text-2xl font-semibold">Inbox</h2>
+              <h2 className="text-2xl font-semibold flex items-center justify-center gap-2">
+                <Inbox className="h-6 w-6" />
+                Inbox
+              </h2>
             </div>
             <Card className="p-4">
               <div className="px-2">
@@ -236,10 +223,10 @@ const DashboardView = () => {
             </Card>
           </CardHeader>
           
-          <CardContent className="p-6 h-[calc(100vh-280px)]">
+          <CardContent className="p-6 h-[calc(100vh-100px)]">
             <Card className="h-full">
-              <div className="p-4 h-full">
-                <ScrollArea className="h-full">
+              <div className="h-full flex flex-col">
+                <ScrollArea className="flex-1 p-4 ">
                   <div className="space-y-4 pr-4">
                     {messages.map(msg => (
                       <Dialog key={msg.id}>
@@ -257,6 +244,7 @@ const DashboardView = () => {
                                     <p className="font-medium text-base truncate">{msg.sender}</p>
                                     <span className="text-sm text-muted-foreground">{msg.timestamp}</span>
                                   </div>
+                                  <p className="text-sm font-medium mb-1">{msg.subject}</p>
                                   <p className="text-sm text-muted-foreground truncate">{msg.content}</p>
                                 </div>
                               </div>
@@ -276,6 +264,7 @@ const DashboardView = () => {
                             </DialogDescription>
                           </DialogHeader>
                           <div className="mt-4">
+                            <p className="font-medium mb-2">{msg.subject}</p>
                             <p className="text-base">{msg.content}</p>
                           </div>
                           <DialogFooter className="mt-6">
@@ -289,24 +278,28 @@ const DashboardView = () => {
                       {
                         id: 'sample1',
                         sender: 'John Mentor',
+                        subject: 'Project Milestone Check-in',
                         timestamp: '15 March',
                         content: 'Hey there! Just checking in on your progress with the latest project milestone.'
                       },
                       {
                         id: 'sample2',
                         sender: 'Sarah Coach',
+                        subject: 'Presentation Feedback',
                         timestamp: '14 March',
                         content: 'Great work on your presentation! I have some feedback to share when you have a moment.'
                       },
                       {
                         id: 'sample3',
                         sender: 'Tech Team',
+                        subject: 'Workshop Resources Available',
                         timestamp: '13 March',
                         content: 'New resources available for the upcoming workshop. Please review before Thursday.'
                       },
                       {
                         id: 'sample4',
                         sender: 'Career Services',
+                        subject: 'Mock Interview Opportunity',
                         timestamp: '12 March',
                         content: 'Exciting opportunity: Mock interviews scheduled for next week. Sign up now!'
                       }
@@ -326,6 +319,7 @@ const DashboardView = () => {
                                     <p className="font-medium text-base truncate">{msg.sender}</p>
                                     <span className="text-sm text-muted-foreground">{msg.timestamp}</span>
                                   </div>
+                                  <p className="text-sm font-medium mb-1">{msg.subject}</p>
                                   <p className="text-sm text-muted-foreground truncate">{msg.content}</p>
                                 </div>
                               </div>
@@ -345,6 +339,7 @@ const DashboardView = () => {
                             </DialogDescription>
                           </DialogHeader>
                           <div className="mt-4">
+                            <p className="font-medium mb-2">{msg.subject}</p>
                             <p className="text-base">{msg.content}</p>
                           </div>
                           <DialogFooter className="mt-6">
@@ -358,6 +353,24 @@ const DashboardView = () => {
               </div>
             </Card>
           </CardContent>
+          <Card>
+            <div className="h-[calc(100vh-var(--header-height)-2rem)]">
+              <CardFooter className="flex flex-col gap-2 p-4">
+                <Card className="w-full p-3">
+                  <div className="flex items-center justify-center gap-2 text-sm">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <span>Last Updated: {new Date().toLocaleTimeString()}</span>
+                  </div>
+                </Card>
+                <Card className="w-full p-3">
+                  <div className="flex items-center justify-center gap-2">
+                    <Mail className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm">3 unread messages</span>
+                  </div>
+                </Card>
+              </CardFooter>
+            </div>
+          </Card>
         </Card>
 
         {/* Right Sidebar */}
@@ -365,9 +378,14 @@ const DashboardView = () => {
           {/* Cohort Section */}
           <Card>
             <CardHeader className="py-4">
-              <Card className="p-2">
-                <CardTitle className="text-lg text-center">Cohort Members</CardTitle>
-              </Card>
+              <div className="flex items-center justify-center gap-2">
+                <Card className="p-2 w-full">
+                  <CardTitle className="text-lg text-center flex items-center justify-center gap-2">
+                    <Users2 className="h-5 w-5" />
+                    Cohort
+                  </CardTitle>
+                </Card>
+              </div>
             </CardHeader>
             <CardContent className="p-0">
               <ScrollArea className="h-[300px] px-4">
@@ -468,9 +486,14 @@ const DashboardView = () => {
           <Card>
             <div className="flex justify-center">
               <CardHeader className="py-4 text-center">
-                <Card className="p-4">
-                  <CardTitle className="text-lg">Upcoming Event</CardTitle>
-                </Card>
+                <div>
+                  <Card className="p-4">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Calendar className="h-5 w-5" />
+                      Upcoming Event
+                    </CardTitle>
+                  </Card>
+                </div>
               </CardHeader>
             </div>
             <CardContent className="space-y-4 p-2">
