@@ -199,10 +199,12 @@ const DashboardView = () => {
         <Card className="col-span-2 h-full">
           <CardHeader className="py-4">
             <div className="mb-4 px-2 text-center">
-              <h2 className="text-2xl font-semibold flex items-center justify-center gap-2">
-                <Inbox className="h-6 w-6" />
-                Inbox
-              </h2>
+              <Card className="w-48 p-3 mx-auto">
+                <h2 className="text-2xl font-semibold flex items-center justify-center gap-2">
+                  <Inbox className="h-6 w-6" />
+                  Inbox
+                </h2>
+              </Card>
             </div>
             <Card className="p-4">
               <div className="px-2">
@@ -356,13 +358,13 @@ const DashboardView = () => {
           <Card>
             <div className="h-[calc(100vh-var(--header-height)-2rem)]">
               <CardFooter className="flex flex-col gap-2 p-4">
-                <Card className="w-full p-3">
+                <Card className="w-fit p-3">
                   <div className="flex items-center justify-center gap-2 text-sm">
                     <Clock className="h-4 w-4 text-muted-foreground" />
                     <span>Last Updated: {new Date().toLocaleTimeString()}</span>
                   </div>
                 </Card>
-                <Card className="w-full p-3">
+                <Card className="w-fit p-3">
                   <div className="flex items-center justify-center gap-2">
                     <Mail className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm">3 unread messages</span>
@@ -2473,8 +2475,12 @@ export default function MentorshipPortal() {
       <div className="max-w-7xl mx-auto space-y-6 pt-10">
         <Card>
           <CardHeader>
-            <CardTitle>Community Members</CardTitle>
-            <CardDescription>Connect with mentors and fellow developers in our community</CardDescription>
+            <Card className="p-4">
+              <div className="flex flex-col items-center justify-center text-center">
+                <CardTitle>Community Members</CardTitle>
+                <CardDescription>Connect with mentors and fellow developers in our community</CardDescription>
+              </div>
+            </Card>
           </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -2506,9 +2512,9 @@ export default function MentorshipPortal() {
                       </div>
                     </div>
 
-                    <div className="mt-4">
+                    <div className="mt-4 h-[80px]">
                       <h4 className="font-medium mb-2">Expertise</h4>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-2 h-[48px] overflow-hidden">
                         {member.expertise.slice(0, 3).map((skill, i) => (
                           <Badge key={i} variant="outline">{skill}</Badge>
                         ))}
