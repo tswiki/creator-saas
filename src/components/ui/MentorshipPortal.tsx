@@ -106,7 +106,8 @@ import {
   CheckCircle,
   Calendar,
   Inbox,
-  Users2
+  Users2,
+  FileText
 } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
@@ -118,6 +119,7 @@ import { Textarea } from './textarea';
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarTrigger } from './menubar';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@radix-ui/react-tabs';
+import Marquee from './marquee';
 
 
 const DashboardView = () => {
@@ -1873,14 +1875,14 @@ export default function MentorshipPortal() {
 
   const CourseView = () => {
     const [courses, setCourses] = useState<any[]>([]);
+    const [isAdminView, setIsAdminView] = useState(false);
 
     useEffect(() => {
       const fetchCourses = async () => {
         try {
-          const response = await fetch('/api/course',
-            {credentials: 'include'
-            }
-          );
+          const response = await fetch('/api/course', {
+            credentials: 'include'
+          });
           if (!response.ok) {
             throw new Error('Failed to fetch courses');
           }
@@ -1895,7 +1897,38 @@ export default function MentorshipPortal() {
     }, []);
 
     return (
-    <div className="space-y-6 pt-10">
+      <div className="space-y-6 pt-16">
+        <div className="flex justify-end mb-4">
+          <Button
+            variant="outline"
+            onClick={() => setIsAdminView(!isAdminView)}
+          >
+            {isAdminView ? (
+              <>
+                <Eye className="h-4 w-4 mr-2" />
+                View Course
+              </>
+            ) : (
+              <>
+                <Pencil className="h-4 w-4 mr-2" />
+                Edit Course
+              </>
+            )}
+          </Button>
+        </div>
+
+        {isAdminView ? (
+          <AdminCourseView courses={courses} />
+        ) : (
+          <MemberCourseView courses={courses} />
+        )}
+      </div>
+    );
+  };
+
+  // Member facing view
+  const MemberCourseView = ({ courses }: { courses: any[] }) => {
+    return (
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
@@ -1903,6 +1936,314 @@ export default function MentorshipPortal() {
             <Badge variant="secondary">Progress: 45%</Badge>
           </div>
         </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-3 gap-6">
+            
+            {/* Course Content Navigation */}
+            <div className="md:col-span-1 flex flex-col h-full">
+              <div className="font-semibold mb-4">Course Modules</div>
+              <ScrollArea className="flex-grow pr-4">
+                <div className="relative">
+                  {/* Vertical line connecting modules */}
+                  <div className="absolute left-[18px] top-6 bottom-6 w-0.5 bg-border" />
+                  
+                  {[
+                    {
+                      title: "Introduction to Advanced JS",
+                      completed: true,
+                      lessons: [
+                        { name: "Course Overview", completed: true, current: false, url: "/lessons/course-overview" },
+                        { name: "Setting Up Environment", completed: true, current: false, url: "/lessons/setup" }
+                      ]
+                    },
+                    {
+                      title: "Closures & Scope", 
+                      completed: false,
+                      current: true,
+                      lessons: [
+                        { name: "Understanding Closures", completed: true, current: false, url: "/lessons/closures" },
+                        { name: "Lexical Scope", completed: false, current: true, url: "/lessons/lexical-scope" },
+                        { name: "Practical Applications", completed: false, current: false, url: "/lessons/practical-closures" }
+                      ]
+                    },
+                    {
+                      title: "Prototypes & Inheritance",
+                      completed: false,
+                      lessons: [
+                        { name: "Prototype Chain", completed: false, current: false, url: "/lessons/prototype-chain" },
+                        { name: "Inheritance Patterns", completed: false, current: false, url: "/lessons/inheritance" }
+                      ]
+                    },
+                    {
+                      title: "Asynchronous JavaScript",
+                      completed: false,
+                      lessons: [
+                        { name: "Promises Deep Dive", completed: false, current: false, url: "/lessons/promises" },
+                        { name: "Async/Await Patterns", completed: false, current: false, url: "/lessons/async-await" },
+                        { name: "Error Handling", completed: false, current: false, url: "/lessons/error-handling" }
+                      ]
+                    },
+                    {
+                      title: "Design Patterns",
+                      completed: false,
+                      lessons: [
+                        { name: "Singleton Pattern", completed: false, current: false, url: "/lessons/singleton" },
+                        { name: "Factory Pattern", completed: false, current: false, url: "/lessons/factory" },
+                        { name: "Observer Pattern", completed: false, current: false, url: "/lessons/observer" },
+                        { name: "Module Pattern", completed: false, current: false, url: "/lessons/module-pattern" }
+                      ]
+                    },
+                    {
+                      title: "Performance Optimization",
+                      completed: false,
+                      lessons: [
+                        { name: "Memory Management", completed: false, current: false, url: "/lessons/memory" },
+                        { name: "Code Splitting", completed: false, current: false, url: "/lessons/code-splitting" },
+                        { name: "Lazy Loading", completed: false, current: false, url: "/lessons/lazy-loading" }
+                      ]
+                    }
+                  ].map((module, i) => {
+                    // Check if all lessons are completed
+                    const isModuleCompleted = module.lessons.every(lesson => lesson.completed);
+                    
+                    const handleLessonClick = async (lessonUrl: string, moduleIndex: number, lessonIndex: number) => {
+                      try {
+                        // Mark the lesson as completed
+                        const response = await fetch('/api/course/progress', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            moduleIndex,
+                            lessonIndex,
+                            completed: true
+                          })
+                        });
+
+                        if (!response.ok) {
+                          throw new Error('Failed to update lesson progress');
+                        }
+
+                        // Navigate to lesson content
+                        window.location.href = lessonUrl;
+                      } catch (error) {
+                        console.error('Error updating lesson progress:', error);
+                      }
+                    };
+
+                    return (
+                    <div key={i} className="mb-6 relative">
+                      <div className={`
+                        border rounded-lg p-4
+                        ${module.current ? 'border-primary bg-accent shadow-sm' : 'border-border'}
+                      `}>
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className={`
+                            w-5 h-5 rounded-full z-10 flex items-center justify-center
+                            ${isModuleCompleted ? 'bg-primary' : module.current ? 'border-2 border-primary' : 'border-2 border-muted-foreground'}
+                          `}>
+                            {isModuleCompleted && <Check className="h-3 w-3 text-primary-foreground" />}
+                          </div>
+                          <span className="font-medium">{module.title}</span>
+                        </div>
+                        
+                        <div className="space-y-2 ml-6 border-l-2 pl-4 border-border">
+                          {module.lessons.map((lesson, j) => (
+                            <button
+                              key={j}
+                              onClick={() => handleLessonClick(lesson.url, i, j)}
+                              className={`
+                                block w-full text-left flex items-center gap-2 p-2 rounded-md 
+                                transition-all duration-200 ease-in-out
+                                hover:bg-accent/50 hover:text-primary hover:-translate-y-0.5
+                                hover:underline hover:decoration-primary hover:decoration-2
+                                focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
+                                ${lesson.current ? 'bg-accent/50 text-primary font-medium' : ''}
+                                ${lesson.completed ? 'text-muted-foreground' : ''}
+                              `}
+                            >
+                              <div className={`
+                                w-3 h-3 rounded-full
+                                ${lesson.completed ? 'bg-primary/60' : lesson.current ? 'border-2 border-primary' : 'border border-muted-foreground'}
+                              `} />
+                              <span className="text-sm">{lesson.name}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )})}
+                </div>
+              </ScrollArea>
+
+              {/* Add New Module Section */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="w-full mt-6">
+                    + Add New Module
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Add New Module</DialogTitle>
+                    <DialogDescription>
+                      Create a new module and add its submodules. Click save when you're done.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid gap-2">
+                      <label htmlFor="module-name" className="text-sm font-medium">
+                        Module Name
+                      </label>
+                      <input
+                        id="module-name"
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        placeholder="Enter module name"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <label className="text-sm font-medium">
+                        Submodules
+                      </label>
+                      <div className="space-y-2">
+                        <input
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                          placeholder="Submodule 1"
+                        />
+                        <input
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                          placeholder="Submodule 2"
+                        />
+                        <Button variant="outline" className="w-full">
+                          + Add Another Submodule
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-3">
+                    <Button variant="outline">Cancel</Button>
+                    <Button>Save Module</Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            {/* Content Area */}
+            <div className="md:col-span-2 space-y-6">
+              <div>
+                <h3 className="font-semibold text-lg mb-4">Lexical Scope</h3>
+                
+                {/* Video Player */}
+                <Card className="mb-6">
+                  <CardContent className="p-4">
+                    <div className="aspect-video bg-accent rounded-lg flex items-center justify-center">
+                      <HeroVideoDialogDemoTopInBottomOut />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Course Materials */}
+                <Card className="mb-6">
+                  <CardHeader className="text-center">
+                    <Card className="p-4">
+                      <div className="text-center">
+                        <CardTitle className="text-base">Course Materials</CardTitle>
+                      </div>
+                    </Card>
+                  </CardHeader>
+                  <CardContent className="flex justify-center">
+                    <div className="space-y-4 w-full max-w-md">
+                      <Card className="p-4">
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-2">
+                            <FileText className="h-5 w-5" />
+                            <span>Notes.pdf</span>
+                          </div>
+                          <Button variant="outline" size="sm">Download</Button>
+                        </div>
+                      </Card>
+                      <Card className="p-4">
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-2">
+                            <Link className="h-5 w-5" />
+                            <span>Additional Resources</span>
+                          </div>
+                          <Button variant="outline" size="sm">Visit</Button>
+                        </div>
+                      </Card>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Quiz */}
+                <Card className="w-full">
+                  <CardHeader>
+                    <CardTitle className="text-base">Knowledge Check</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-6">
+                      <Card className="p-6">
+                        <div className="space-y-4">
+                          <Card className="p-4">
+                            <div className="font-medium">Question 1</div>
+                            <div className="text-sm mt-2">What is the main purpose of closures in JavaScript?</div>
+                          </Card>
+                          
+                          <Card className="p-4">
+                            <RadioGroup className="space-y-3">
+                              <Card className="p-3 hover:bg-accent transition-colors">
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroup value="a" id="a" />
+                                  <Label htmlFor="a">Data privacy and encapsulation</Label>
+                                </div>
+                              </Card>
+                              <Card className="p-3 hover:bg-accent transition-colors">
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroup value="b" id="b" />
+                                  <Label htmlFor="b">Memory optimization</Label>
+                                </div>
+                              </Card>
+                              <Card className="p-3 hover:bg-accent transition-colors">
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroup value="c" id="c" />
+                                  <Label htmlFor="c">Code organization</Label>
+                                </div>
+                              </Card>
+                            </RadioGroup>
+                          </Card>
+
+                          <Card className="p-4">
+                            <div className="flex justify-between items-center gap-4">
+                              <Input placeholder="feedback" className="max-w-xs" />
+                              <Button>Submit Answer</Button>
+                            </div>
+                          </Card>
+                        </div>
+                      </Card>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // Admin editing view - contains the original implementation
+  const AdminCourseView = ({ courses }: { courses: any[] }) => {
+    return (
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle>Course: Advanced JavaScript Concepts</CardTitle>
+            <Badge variant="secondary">Progress: 45%</Badge>
+          </div>
+        </CardHeader>
+        
+        
         <CardContent>
           <div className="grid md:grid-cols-3 gap-6">
             {/* Course Content Navigation */}
@@ -2320,8 +2661,8 @@ export default function MentorshipPortal() {
             </div>
           </div>
         </CardContent>
+
       </Card>
-    </div>
     );
   };
 
@@ -2361,41 +2702,6 @@ export default function MentorshipPortal() {
     };
 
     const communityMembers: CommunityMember[] = [
-      {
-        id: 1,
-        name: "Dr. Sarah Wilson",
-        role: "Senior Software Engineer",
-        type: "mentor",
-        company: "Google",
-        expertise: ["Web Development", "System Design", "Cloud Architecture"],
-        bio: "15+ years of experience in software development and mentoring. Passionate about helping others grow in their tech careers.",
-        yearsOfExperience: 15,
-        interests: ["Teaching", "Open Source", "Cloud Computing"],
-        socials: {
-          linkedin: "linkedin.com/in/sarahwilson",
-          twitter: "@sarahwilsontech",
-          github: "github.com/sarahwilson",
-          website: "sarahwilson.dev"
-        },
-        achievements: [
-          "Led 200+ successful mentorship sessions",
-          "Published author on system design",
-          "Google Developer Expert"
-        ],
-        availability: ["Mon 9-5 PST", "Wed 1-6 PST", "Fri 9-3 PST"],
-        languages: ["English", "Spanish"],
-        location: "San Francisco, CA",
-        timezone: "PST",
-        rating: 4.9,
-        reviews: [
-          {
-            author: "John Doe",
-            text: "Amazing mentor! Helped me land my dream job.",
-            rating: 5
-          }
-        ],
-        email: undefined
-      },
       {
         id: 2,
         name: "Alex Rivera",
