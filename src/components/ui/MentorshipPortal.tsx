@@ -246,10 +246,12 @@ const DashboardView = () => {
                         <DialogTrigger asChild>
                           <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
                             <CardContent className="p-5">
-                              <div className="flex items-center space-x-5">
-                                <Avatar className="h-12 w-12">
-                                  <AvatarFallback>{msg.sender[0]}</AvatarFallback>
-                                </Avatar>
+                              <div className="grid grid-cols-[80px_1fr] gap-4">
+                                <div className="flex items-center justify-center">
+                                  <Avatar className="h-12 w-12">
+                                    <AvatarFallback>{msg.sender[0]}</AvatarFallback>
+                                  </Avatar>
+                                </div>
                                 <div className="flex-1 min-w-0">
                                   <div className="flex justify-between mb-1">
                                     <p className="font-medium text-base truncate">{msg.sender}</p>
@@ -287,25 +289,25 @@ const DashboardView = () => {
                       {
                         id: 'sample1',
                         sender: 'John Mentor',
-                        timestamp: '10:30 AM',
+                        timestamp: '15 March',
                         content: 'Hey there! Just checking in on your progress with the latest project milestone.'
                       },
                       {
                         id: 'sample2',
                         sender: 'Sarah Coach',
-                        timestamp: 'Yesterday',
+                        timestamp: '14 March',
                         content: 'Great work on your presentation! I have some feedback to share when you have a moment.'
                       },
                       {
                         id: 'sample3',
                         sender: 'Tech Team',
-                        timestamp: '2 days ago',
+                        timestamp: '13 March',
                         content: 'New resources available for the upcoming workshop. Please review before Thursday.'
                       },
                       {
                         id: 'sample4',
                         sender: 'Career Services',
-                        timestamp: '3 days ago',
+                        timestamp: '12 March',
                         content: 'Exciting opportunity: Mock interviews scheduled for next week. Sign up now!'
                       }
                     ].map(msg => (
@@ -313,10 +315,12 @@ const DashboardView = () => {
                         <DialogTrigger asChild>
                           <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
                             <CardContent className="p-5">
-                              <div className="flex items-center space-x-5">
-                                <Avatar className="h-12 w-12">
-                                  <AvatarFallback>{msg.sender[0]}</AvatarFallback>
-                                </Avatar>
+                              <div className="grid grid-cols-[80px_1fr] gap-4">
+                                <div className="flex items-center justify-center">
+                                  <Avatar className="h-12 w-12">
+                                    <AvatarFallback>{msg.sender[0]}</AvatarFallback>
+                                  </Avatar>
+                                </div>
                                 <div className="flex-1 min-w-0">
                                   <div className="flex justify-between mb-1">
                                     <p className="font-medium text-base truncate">{msg.sender}</p>
