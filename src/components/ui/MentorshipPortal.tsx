@@ -109,7 +109,11 @@ import {
   Users2,
   FileText,
   Music,
-  Youtube
+  Youtube,
+  ThumbsUp,
+  ThumbsDown,
+  Download,
+  Subtitles
 } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
@@ -1796,62 +1800,66 @@ export default function MentorshipPortal() {
                       >
                         <CardContent className="p-4">
                           <div className="space-y-3">
-                            <div className="flex justify-between items-center">
-                              <h4 className="font-medium flex items-center gap-2">
-                                {platform.platform === "YouTube" && (
-                                  <Button 
-                                    variant="ghost" 
-                                    size="icon"
-                                    className="p-0"
-                                  >
-                                    <Youtube className="h-5 w-5 text-red-600" />
-                                  </Button>
-                                )}
-                                {platform.platform === "TikTok" && (
-                                  <Button 
-                                    variant="ghost" 
-                                    size="icon"
-                                    className="p-0"
-                                  >
-                                    <Music className="h-5 w-5 text-black" />
-                                  </Button>
-                                )}
-                                {platform.platform === "Twitter" && (
-                                  <Button 
-                                    variant="ghost" 
-                                    size="icon"
-                                    className="p-0"
-                                  >
-                                    <Twitter className="h-5 w-5 text-blue-400" />
-                                  </Button>
-                                )}
-                                {platform.platform}
-                              </h4>
-                              <Badge variant="secondary">{platform.status}</Badge>
-                            </div>
+                            <Card className="p-3">
+                              <div className="flex justify-between items-center">
+                                <h4 className="font-medium flex items-center gap-2">
+                                  {platform.platform === "YouTube" && (
+                                    <Button 
+                                      variant="ghost" 
+                                      size="icon"
+                                      className="p-0"
+                                    >
+                                      <Youtube className="h-5 w-5 text-red-600" />
+                                    </Button>
+                                  )}
+                                  {platform.platform === "TikTok" && (
+                                    <Button 
+                                      variant="ghost" 
+                                      size="icon"
+                                      className="p-0"
+                                    >
+                                      <Music className="h-5 w-5 text-black" />
+                                    </Button>
+                                  )}
+                                  {platform.platform === "Twitter" && (
+                                    <Button 
+                                      variant="ghost" 
+                                      size="icon"
+                                      className="p-0"
+                                    >
+                                      <Twitter className="h-5 w-5 text-blue-400" />
+                                    </Button>
+                                  )}
+                                  {platform.platform}
+                                </h4>
+                                <Badge variant="secondary">{platform.status}</Badge>
+                              </div>
+                            </Card>
 
                             <div className="grid gap-3">
                               {platform.content.map((item, j) => (
-                                <div key={j} className="flex items-center gap-3 p-2 hover:bg-accent rounded-lg">
-                                  {item.thumbnail && (
-                                    <div className="w-24 h-16 bg-muted rounded overflow-hidden">
-                                      <div className="w-full h-full bg-center bg-cover" style={{backgroundImage: `url(${item.thumbnail})`}} />
-                                    </div>
-                                  )}
-                                  <div className="flex-1">
-                                    <p className="font-medium text-sm">{item.title || item.text}</p>
-                                    <div className="flex gap-2 text-xs text-muted-foreground mt-1">
-                                      {item.views && <span>{item.views}</span>}
-                                      {item.likes && <span>{item.likes} likes</span>}
-                                      {item.retweets && <span>{item.retweets} retweets</span>}
-                                      {item.date || item.time && <span>• {item.date || item.time}</span>}
+                                <Card key={j} className="p-2">
+                                  <div className="flex items-center gap-3 hover:bg-accent rounded-lg">
+                                    {item.thumbnail && (
+                                      <div className="w-24 h-16 bg-muted rounded overflow-hidden">
+                                        <div className="w-full h-full bg-center bg-cover" style={{backgroundImage: `url(${item.thumbnail})`}} />
+                                      </div>
+                                    )}
+                                    <div className="flex-1">
+                                      <p className="font-medium text-sm">{item.title || item.text}</p>
+                                      <div className="flex gap-2 text-xs text-muted-foreground mt-1">
+                                        {item.views && <span>{item.views}</span>}
+                                        {item.likes && <span>{item.likes} likes</span>}
+                                        {item.retweets && <span>{item.retweets} retweets</span>}
+                                        {item.date || item.time && <span>• {item.date || item.time}</span>}
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
+                                </Card>
                               ))}
                             </div>
 
-                            <div className="pt-2 border-t">
+                            <Card className="p-3">
                               <div className="flex justify-between items-center">
                                 <div className="flex gap-4 text-sm text-muted-foreground">
                                   {platform.channelInfo && (
@@ -1875,7 +1883,7 @@ export default function MentorshipPortal() {
                                   Open
                                 </Button>
                               </div>
-                            </div>
+                            </Card>
                           </div>
                         </CardContent>
                       </Card>
@@ -1982,7 +1990,6 @@ export default function MentorshipPortal() {
     );
   };
 
-
   const YoutubeView = () => {
     const [channelData] = useState({
       snippet: {
@@ -2050,58 +2057,165 @@ export default function MentorshipPortal() {
     ]);
 
     return (
-      <div className="space-y-8 pt-16">
-        {/* Channel Overview */}
-        <div className="bg-card rounded-lg p-6 shadow-sm">
-          <div className="flex items-center space-x-4">
-            {channelData.snippet?.thumbnails?.default && (
-              <img 
-                src={channelData.snippet.thumbnails.default.url}
-                alt="Channel thumbnail"
-                className="w-16 h-16 rounded-full"
-              />
-            )}
-            <div>
-              <h2 className="text-2xl font-bold">{channelData.snippet?.title}</h2>
-              <p className="text-muted-foreground">{channelData.statistics?.subscriberCount} subscribers</p>
+      <div className="flex h-screen w-full overflow-hidden bg-background pt-12">
+        {/* Main Content - 2/3 width */}
+        <div className="w-2/3 h-full flex flex-col px-8">
+          {/* Title Section */}
+          <h1 className="text-3xl font-bold tracking-tight mb-6">Building a Modern Web Application with React and TypeScript</h1>
+          
+          {/* Video Player Section */}
+          <div className="h-[45%] w-full rounded-xl overflow-hidden shadow-lg">
+            <div className="relative w-full h-full">
+              <iframe
+                src="https://www.youtube.com/embed/qh3NGpYRG3I?si=4rb-zSdDkVK9qxxb"
+                title="Channel Trailer"
+                className="absolute top-0 left-0 w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
             </div>
           </div>
-          
-          <div className="grid grid-cols-3 gap-4 mt-6">
-            <div className="bg-background p-4 rounded-md text-center">
-              <p className="text-2xl font-bold">{channelData.statistics?.videoCount}</p>
-              <p className="text-sm text-muted-foreground">Videos</p>
-            </div>
-            <div className="bg-background p-4 rounded-md text-center">
-              <p className="text-2xl font-bold">{channelData.statistics?.viewCount}</p>
-              <p className="text-sm text-muted-foreground">Total Views</p>
-            </div>
-            <div className="bg-background p-4 rounded-md text-center">
-              <p className="text-2xl font-bold">{channelData.statistics?.commentCount}</p>
-              <p className="text-sm text-muted-foreground">Comments</p>
+
+          {/* Video Info Section */}
+          <div className="flex-1 mt-6">
+            <div className="flex flex-col space-y-4">
+              {/* Video title and controls row */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-12 w-12 ring-2 ring-primary/10">
+                    <AvatarImage src="/avatars/channel-avatar.png" />
+                    <AvatarFallback>CH</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="font-semibold text-lg">Code Horizons</h3>
+                    <p className="text-sm text-muted-foreground">256K subscribers</p>
+                  </div>
+                  <Button className="ml-4" variant="default" size="sm">Subscribe</Button>
+                  
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" className="flex items-center gap-2 px-4">
+                    <ThumbsUp className="h-5 w-5" />
+                    12K
+                  </Button>
+                  <Button variant="ghost" className="flex items-center gap-2 px-4">
+                    <Share className="h-5 w-5" />
+                    Share
+                  </Button>
+                  <div>
+                    <Menubar className="border-none">
+                      <MenubarMenu>
+                        <MenubarTrigger className="cursor-pointer hover:bg-accent/50">
+                          <MoreVertical className="h-5 w-5" />
+                        </MenubarTrigger>
+                        <MenubarContent>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <MenubarItem>Show Description</MenubarItem>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px]">
+                              <DialogHeader>
+                                <DialogTitle>Video Description</DialogTitle>
+                              </DialogHeader>
+                              <div className="grid gap-4 py-4">
+                                <p className="text-sm text-muted-foreground">
+                                  Learn how to build modern web applications using React and TypeScript. This comprehensive tutorial covers everything from setup to deployment, including best practices and advanced patterns.
+                                </p>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                          
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <MenubarItem>Show Subtitles</MenubarItem>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px]">
+                              <DialogHeader>
+                                <DialogTitle>Live Subtitles</DialogTitle>
+                              </DialogHeader>
+                              <div className="grid gap-4 py-4">
+                                <iframe 
+                                  src="https://www.youtube.com/embed/qh3NGpYRG3I?si=4rb-zSdDkVK9qxxb&cc_load_policy=1"
+                                  className="w-full h-[200px]"
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                ></iframe>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                        </MenubarContent>
+                      </MenubarMenu>
+                    </Menubar>
+                  </div>
+                </div>
+              </div>
+
+              {/* Video details section */}
+              <div className="flex flex-col gap-4">
+                <div className="bg-accent/20 rounded-lg p-4">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Learn how to build modern web applications using React and TypeScript. This comprehensive tutorial covers everything from setup to deployment, including best practices and advanced patterns.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Videos Grid */}
-        <div>
-          <h3 className="text-xl font-semibold mb-4">Recent Videos</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {videos.map((video: any) => (
-              <div key={video.id} className="bg-card rounded-lg overflow-hidden shadow-sm">
-                <img 
-                  src={video.snippet.thumbnails.medium.url}
-                  alt={video.snippet.title}
-                  className="w-full aspect-video object-cover"
-                />
-                <div className="p-4">
-                  <h4 className="font-semibold line-clamp-2">{video.snippet.title}</h4>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    {video.statistics?.viewCount} views • {new Date(video.snippet.publishedAt).toLocaleDateString()}
-                  </p>
-                </div>
+        {/* Sidebar */}
+        <div className="w-1/3 h-full">
+          <div className="h-full flex flex-col">
+            <div className="flex items-center justify-between px-6">
+              <h3 className="font-semibold text-lg pl-8">Similar Videos</h3>
+              <Menubar className="border-none">
+                <MenubarMenu>
+                  <MenubarTrigger className="cursor-pointer hover:bg-accent/50">
+                    <Filter className="h-4 w-4" />
+                  </MenubarTrigger>
+                  <MenubarContent>
+                    <MenubarItem>Most Recent</MenubarItem>
+                    <MenubarItem>Most Viewed</MenubarItem>
+                    <MenubarItem>Most Liked</MenubarItem>
+                  </MenubarContent>
+                </MenubarMenu>
+              </Menubar>
+            </div>
+
+            <ScrollArea className="flex-1">
+              <div className="space-y-4 p-6">
+                {videos.map((video) => (
+                  <div 
+                    key={video.id}
+                    className="group p-3 hover:bg-accent/50 rounded-lg cursor-pointer transition-colors"
+                  >
+                    <div className="flex gap-4">
+                      <div className="relative w-44 aspect-video rounded-md overflow-hidden">
+                        <img
+                          src="/default-avatar.png"
+                          alt={video.snippet.title}
+                          className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                        />
+                        <div className="absolute bottom-2 right-2 bg-black/75 text-white text-xs px-2 py-1 rounded">
+                          10:30
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-medium line-clamp-2 group-hover:text-primary transition-colors">
+                          {video.snippet.title}
+                        </h4>
+                        <p className="text-xs text-muted-foreground mt-2">Code Horizons</p>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1.5">
+                          <span>{video.statistics.viewCount} views</span>
+                          <span>•</span>
+                          <span>{new Date(video.snippet.publishedAt).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </ScrollArea>
           </div>
         </div>
       </div>
