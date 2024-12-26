@@ -113,7 +113,13 @@ import {
   ThumbsUp,
   ThumbsDown,
   Download,
-  Subtitles
+  Subtitles,
+  ArrowUpDown,
+  BarChart2,
+  Repeat,
+  Share2,
+  Bookmark,
+  MoreHorizontal
 } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
@@ -1612,16 +1618,12 @@ export default function MentorshipPortal() {
       fetchResources();
     }, []);
 
-    function setView(arg0: string): void {
-      throw new Error('Function not implemented.');
-    }
-
     return (
     <div className="space-y-6 pt-10">
         <Card>
           <CardHeader>
             <div className="flex justify-between items-center">
-              <CardTitle>Learning Resources</CardTitle>
+              <CardTitle className='pl-10'>Creator Content Hub</CardTitle>
               <Button onClick={() => setShowAddDialog(true)}>
                 Add Resource
               </Button>
@@ -1631,38 +1633,44 @@ export default function MentorshipPortal() {
             <div className="grid md:grid-cols-2 gap-6">
               {/* Recommended Resources */}
               <div>
-                <h3 className="font-semibold mb-4">Recommended by Your Mentor</h3>
-                <div className="space-y-4">
+                <Card className="p-4">
+                  <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight text-center pt-2 pb-2">Info Products</h3>
+                </Card>
+                <div className="pt-10 space-y-4">
                   {resources.map((resource, i) => (
-                    <Card key={i}>
+                    <Card key={i} className="hover:bg-accent transition-colors">
                       <CardContent className="p-4">
-                        <div className="space-y-4">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <h4 className="font-medium">{resource.title}</h4>
-                              <div className="text-sm text-muted-foreground">
-                                Recommended by {resource.recommended}
-                              </div>
-                              <p className="text-sm mt-2">{resource.description}</p>
-                              <Badge variant="secondary" className="mt-2">
-                                {resource.type}
-                              </Badge>
+                        <div className="flex items-start gap-4">
+                          <div className="flex-1">
+                            <h4 className="font-medium text-lg mb-2">{resource.title}</h4>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                              <span>{resource.recommended}</span>
+                              <span>•</span>
+                              <Badge variant="secondary">{resource.type}</Badge>
                             </div>
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button variant="ghost" size="sm">
-                                  <BookOpen className="h-4 w-4 mr-2" />
-                                  Open
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className="sm:max-w-[500px]">
-                                <DialogHeader>
-                                  <DialogTitle>Join Our Mentorship Program</DialogTitle>
-                                  <DialogDescription>
-                                    Get personalized guidance and unlock premium resources
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <div className="space-y-6">
+                            <p className="text-sm text-muted-foreground line-clamp-2">{resource.description}</p>
+                          </div>
+                          
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button variant="ghost" size="sm" className="mt-1">
+                                <BookOpen className="h-4 w-4 mr-2" />
+                                View Details
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[500px]">
+                              <Card className="mb-6 pt-5">
+                                <CardContent>
+                                  <DialogHeader>
+                                    <DialogTitle>Join Our Mentorship Program</DialogTitle>
+                                    <DialogDescription>
+                                      Get personalized guidance and unlock premium resources
+                                    </DialogDescription>
+                                  </DialogHeader>
+                                </CardContent>
+                              </Card>
+                              <Card>
+                                <CardContent className="space-y-6">
                                   <div className="text-center">
                                     <h4 className="font-medium mb-4">Premium Mentorship Benefits</h4>
                                     <ul className="text-sm space-y-3">
@@ -1685,7 +1693,7 @@ export default function MentorshipPortal() {
                                     </ul>
                                   </div>
 
-                                  <div className="text-center space-y-4">
+                                  <div className="text-center space-y-4 p-6 border rounded-lg">
                                     <div>
                                       <span className="text-3xl font-bold">$199</span>
                                       <span className="text-sm text-muted-foreground">/month</span>
@@ -1704,10 +1712,10 @@ export default function MentorshipPortal() {
                                   <div className="text-center text-sm text-muted-foreground">
                                     <p>Have questions? <span className="text-primary cursor-pointer hover:underline">Contact us</span></p>
                                   </div>
-                                </div>
-                              </DialogContent>
-                            </Dialog>
-                          </div>
+                                </CardContent>
+                              </Card>
+                            </DialogContent>
+                          </Dialog>
                         </div>
                       </CardContent>
                     </Card>
@@ -1717,13 +1725,18 @@ export default function MentorshipPortal() {
 
               {/* Learning Path */}
               <div>
-                <h3 className="font-semibold mb-4">Creator Content Hub</h3>
+                <Card className="p-4">
+                  <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight text-center pt-2 pb-2">Socials</h3>
+                </Card>
+                <div className='pt-10'></div>
                 {currentView === "youtube" ? (
                   <YoutubeView />
                 ) : currentView === "tiktok" ? (
                   <TikTokView />
                 ) : currentView === "twitter" ? (
                   <TwitterView />
+                ) : currentView === "instagram" ? (
+                  <InstagramView />
                 ) : (
                   <div className="space-y-4">
                     {[
@@ -1747,6 +1760,29 @@ export default function MentorshipPortal() {
                         channelInfo: {
                           subscribers: "50K",
                           totalVideos: "125"
+                        }
+                      },
+                      {
+                        platform: "Instagram",
+                        status: "Recent Posts",
+                        content: [
+                          {
+                            caption: "Sharing some web development tips! 💻 #webdev #coding",
+                            likes: "2.5K",
+                            comments: "156",
+                            thumbnail: "/instagram-post-1.jpg"
+                          },
+                          {
+                            caption: "Check out this cool React project! 🚀 #reactjs #javascript",
+                            likes: "3.2K", 
+                            comments: "234",
+                            thumbnail: "/instagram-post-2.jpg"
+                          }
+                        ],
+                        profileInfo: {
+                          followers: "25K",
+                          posts: "342",
+                          following: "1.2K"
                         }
                       },
                       {
@@ -1809,7 +1845,9 @@ export default function MentorshipPortal() {
                                       size="icon"
                                       className="p-0"
                                     >
-                                      <Youtube className="h-5 w-5 text-red-600" />
+                                      <svg className="h-5 w-5 dark:text-red-500 text-red-600" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                                      </svg>
                                     </Button>
                                   )}
                                   {platform.platform === "TikTok" && (
@@ -1818,7 +1856,9 @@ export default function MentorshipPortal() {
                                       size="icon"
                                       className="p-0"
                                     >
-                                      <Music className="h-5 w-5 text-black" />
+                                      <svg className="h-5 w-5 dark:text-white text-black" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                                      </svg>
                                     </Button>
                                   )}
                                   {platform.platform === "Twitter" && (
@@ -1827,7 +1867,20 @@ export default function MentorshipPortal() {
                                       size="icon"
                                       className="p-0"
                                     >
-                                      <Twitter className="h-5 w-5 text-blue-400" />
+                                      <svg className="h-5 w-5 dark:text-white text-black" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                      </svg>
+                                    </Button>
+                                  )}
+                                  {platform.platform === "Instagram" && (
+                                    <Button 
+                                      variant="ghost" 
+                                      size="icon"
+                                      className="p-0"
+                                    >
+                                      <svg className="h-5 w-5 dark:text-white text-black" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                                      </svg>
                                     </Button>
                                   )}
                                   {platform.platform}
@@ -2223,16 +2276,15 @@ export default function MentorshipPortal() {
   };
 
   const TikTokView = () => {
-    const [tiktokData, setTiktokData] = useState<any>({
-      statistics: {
-        followers: "100K",
-        likes: "1.2M",
-        videos: "450"
-      },
-      profile: {
-        username: "@codingmentor",
-        bio: "Teaching code one video at a time 👨‍💻",
-        avatar: "/tiktok-avatar.jpg"
+    const [sortBy, setSortBy] = useState("recent");
+    const [profile] = useState({
+      handle: "@codehorizons",
+      name: "Code Horizons",
+      description: "Teaching code through short-form content 👨‍💻✨\nDaily tips and tutorials on web development",
+      stats: {
+        followers: "125K",
+        following: "892",
+        likes: "1.2M"
       }
     });
 
@@ -2243,77 +2295,127 @@ export default function MentorshipPortal() {
         stats: {
           likes: "45K",
           comments: "1.2K",
-          shares: "2.3K"
+          shares: "2.3K",
+          views: "250K"
         },
-        thumbnail: "/tiktok-thumb-1.jpg",
-        posted: "2 days ago"
+        duration: "0:45",
+        publishedAt: "2024-01-15T12:00:00Z"
       },
       {
-        id: "2", 
+        id: "2",
         caption: "JavaScript Tips & Tricks ⚡️",
         stats: {
-          likes: "32K",
+          likes: "32K", 
           comments: "890",
-          shares: "1.5K"
+          shares: "1.5K",
+          views: "180K"
         },
-        thumbnail: "/tiktok-thumb-2.jpg",
-        posted: "5 days ago"
+        duration: "1:00",
+        publishedAt: "2024-01-12T15:30:00Z"
+      },
+      {
+        id: "3",
+        caption: "React Hooks Explained Simply 💡",
+        stats: {
+          likes: "28K",
+          comments: "750",
+          shares: "1.2K",
+          views: "165K"
+        },
+        duration: "0:55",
+        publishedAt: "2024-01-10T14:20:00Z"
       }
     ]);
 
     return (
-      <div className="space-y-8">
-        {/* Profile Header */}
-        <div className="bg-card p-6 rounded-lg">
-          <div className="flex items-center gap-6">
-            {tiktokData.profile.avatar && (
+      <div className="flex flex-col space-y-6 pt-10">
+        {/* Profile Section */}
+        <div className="bg-card rounded-lg p-6">
+          <div className="flex flex-col items-center text-center gap-6">
+            <div className="relative">
               <img
-                src={tiktokData.profile.avatar}
-                alt="TikTok Profile"
-                className="w-16 h-16 rounded-full"
+                src="/default-avatar.png"
+                alt="Profile"
+                className="w-24 h-24 rounded-full object-cover border-2 border-primary"
               />
-            )}
-            <div>
-              <h2 className="text-2xl font-bold">{tiktokData.profile.username}</h2>
-              <p className="text-muted-foreground">{tiktokData.profile.bio}</p>
+              <div className="absolute -bottom-2 right-0 bg-primary text-white text-xs px-2 py-1 rounded-full">
+                Pro
+              </div>
             </div>
-          </div>
-          
-          <div className="grid grid-cols-3 gap-4 mt-6">
-            <div className="bg-background p-4 rounded-md text-center">
-              <p className="text-2xl font-bold">{tiktokData.statistics.followers}</p>
-              <p className="text-sm text-muted-foreground">Followers</p>
-            </div>
-            <div className="bg-background p-4 rounded-md text-center">
-              <p className="text-2xl font-bold">{tiktokData.statistics.likes}</p>
-              <p className="text-sm text-muted-foreground">Total Likes</p>
-            </div>
-            <div className="bg-background p-4 rounded-md text-center">
-              <p className="text-2xl font-bold">{tiktokData.statistics.videos}</p>
-              <p className="text-sm text-muted-foreground">Videos</p>
+            
+            <div className="flex flex-col items-center">
+              <div className="flex flex-col items-center mb-2">
+                <h2 className="text-2xl font-bold">{profile.name}</h2>
+                <span className="text-muted-foreground text-sm">{profile.handle}</span>
+              </div>
+              <p className="text-muted-foreground whitespace-pre-line mb-4 max-w-lg">{profile.description}</p>
+              <div className="flex justify-center gap-12">
+                <div className="text-center">
+                  <div className="font-bold">{profile.stats.followers}</div>
+                  <div className="text-sm text-muted-foreground">Followers</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-bold">{profile.stats.following}</div>
+                  <div className="text-sm text-muted-foreground">Following</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-bold">{profile.stats.likes}</div>
+                  <div className="text-sm text-muted-foreground">Likes</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Posts Grid */}
+        {/* Content Section */}
         <div>
-          <h3 className="text-xl font-semibold mb-4">Recent Posts</h3>
+          <div className="flex items-center justify-center mb-6">
+            <div className="flex items-center gap-4">
+              <h3 className="text-xl font-semibold">Latest Shorts</h3>
+              <Menubar>
+                <MenubarMenu>
+                  <MenubarTrigger className="gap-2">
+                    <ArrowUpDown className="h-4 w-4" />
+                    Sort by
+                  </MenubarTrigger>
+                  <MenubarContent>
+                    <MenubarItem onClick={() => setSortBy("recent")}>Most Recent</MenubarItem>
+                    <MenubarItem onClick={() => setSortBy("views")}>Most Viewed</MenubarItem>
+                    <MenubarItem onClick={() => setSortBy("likes")}>Most Liked</MenubarItem>
+                  </MenubarContent>
+                </MenubarMenu>
+              </Menubar>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts.map((post) => (
-              <div key={post.id} className="bg-card rounded-lg overflow-hidden shadow-sm">
-                <img 
-                  src={post.thumbnail}
-                  alt={post.caption}
-                  className="w-full aspect-[9/16] object-cover"
-                />
-                <div className="p-4">
-                  <h4 className="font-semibold line-clamp-2">{post.caption}</h4>
-                  <div className="flex gap-4 text-sm text-muted-foreground mt-2">
-                    <span>{post.stats.likes} likes</span>
-                    <span>{post.stats.comments} comments</span>
-                    <span>{post.stats.shares} shares</span>
+              <div
+                key={post.id}
+                className="group bg-card rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+              >
+                <div className="relative aspect-[9/16]">
+                  <img
+                    src="/default-avatar.png"
+                    alt={post.caption}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute bottom-2 right-2 bg-black/75 text-white text-xs px-2 py-1 rounded">
+                    {post.duration}
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2">{post.posted}</p>
+                </div>
+                <div className="p-4">
+                  <h4 className="font-medium line-clamp-2 group-hover:text-primary transition-colors">
+                    {post.caption}
+                  </h4>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground mt-3">
+                    <span>❤️ {post.stats.likes}</span>
+                    <span>💬 {post.stats.comments}</span>
+                    <span>↗️ {post.stats.shares}</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-2">
+                    {new Date(post.publishedAt).toLocaleDateString()}
+                  </div>
                 </div>
               </div>
             ))}
@@ -2324,141 +2426,338 @@ export default function MentorshipPortal() {
   };
 
   const TwitterView = () => {
-    const [twitterData] = useState({
-      statistics: {
-        followers: "75.2K",
-        following: "1.2K", 
-        tweets: "3.2K"
-      },
-      profile: {
-        handle: "@sarahcodes",
-        name: "Sarah Wilson",
-        bio: "Senior Software Engineer | Teaching web development and React | Building in public | Join me on my coding journey! 👩‍💻",
-        avatar: "/avatars/sarah.jpg",
-        banner: "/banners/twitter-banner.jpg",
-        location: "San Francisco, CA",
-        website: "sarahcodes.dev"
-      }
-    });
-
-    const [tweets] = useState([
+    const [tweets, setTweets] = useState([
       {
         id: "1",
-        text: "🔥 Just launched my new React course! Early bird pricing available for the next 48 hours.\n\nLearn React from the ground up including:\n• Hooks\n• State Management\n• Performance Optimization\n• Testing\n\nLink in bio! 🚀",
-        media: "/course-promo.jpg",
-        stats: {
-          retweets: "3.2K",
-          likes: "15.7K",
-          replies: "428",
-          views: "102K"
+        snippet: {
+          title: "🔥 Just launched my new React course! Early bird pricing available for the next 48 hours.",
+          description: "Learn React from the ground up including:\n• Hooks\n• State Management\n• Performance Optimization\n• Testing\n\nLink in bio! 🚀",
+          thumbnails: {
+            medium: {
+              url: "/course-promo.jpg"
+            }
+          },
+          publishedAt: "2024-01-20T10:30:00Z"
         },
-        posted: "2h ago"
+        statistics: {
+          retweetCount: "3.2K",
+          likeCount: "15.7K",
+          replyCount: "428",
+          viewCount: "102K"
+        }
       },
       {
-        id: "2", 
-        text: "💡 Pro Tip: When debugging React components, use the React DevTools extension.\n\nIt lets you:\n• Inspect component props\n• View state changes\n• Profile performance\n• Debug hooks\n\nA must-have for React developers!",
-        stats: {
-          retweets: "2.1K",
-          likes: "9.3K", 
-          replies: "156",
-          views: "78K"
+        id: "2",
+        snippet: {
+          title: "💡 Pro Tip: When debugging React components, use the React DevTools extension.",
+          description: "It lets you:\n• Inspect component props\n• View state changes\n• Profile performance\n• Debug hooks\n\nA must-have for React developers!",
+          publishedAt: "2024-01-20T07:30:00Z"
         },
-        posted: "5h ago"
+        statistics: {
+          retweetCount: "2.1K",
+          likeCount: "9.3K",
+          replyCount: "156", 
+          viewCount: "78K"
+        }
       },
       {
         id: "3",
-        text: "Today's coding session:\n\n• Built a new authentication system\n• Added real-time updates\n• Fixed that pesky bug in production\n\nRemember: coding is a journey, not a race. Take breaks and celebrate small wins! 🎉",
-        stats: {
-          retweets: "1.8K",
-          likes: "7.2K",
-          replies: "203",
-          views: "65K"
+        snippet: {
+          title: "Today's coding session:",
+          description: "• Built a new authentication system\n• Added real-time updates\n• Fixed that pesky bug in production\n\nRemember: coding is a journey, not a race. Take breaks and celebrate small wins! 🎉",
+          publishedAt: "2024-01-20T04:30:00Z"
         },
-        posted: "8h ago"
+        statistics: {
+          retweetCount: "1.8K",
+          likeCount: "7.2K",
+          replyCount: "203",
+          viewCount: "65K"
+        }
       }
     ]);
 
     return (
-      <div className="space-y-8">
-        {/* Profile Header */}
-        <div className="bg-card rounded-lg overflow-hidden">
-          <div className="h-32 bg-gradient-to-r from-blue-400 to-blue-600"></div>
-          <div className="p-6">
-            <div className="flex items-center gap-6">
-              <img
-                src={twitterData.profile.avatar}
-                alt={twitterData.profile.name}
-                className="w-20 h-20 rounded-full border-4 border-background -mt-12"
-              />
-              <div>
-                <h2 className="text-2xl font-bold">{twitterData.profile.name}</h2>
-                <p className="text-muted-foreground">{twitterData.profile.handle}</p>
-              </div>
+      <div className="space-y-6 pt-12">
+        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle>Twitter Profile</CardTitle>
+              <Button variant="outline" size="sm" className="hover:bg-accent/50 transition-colors">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh
+              </Button>
             </div>
-            
-            <p className="mt-4 text-muted-foreground">{twitterData.profile.bio}</p>
-            
-            <div className="flex gap-4 mt-4 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <MapPin className="h-4 w-4" />
-                {twitterData.profile.location}
-              </span>
-              <span className="flex items-center gap-1">
-                <Globe className="h-4 w-4" />
-                {twitterData.profile.website}
-              </span>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-3 gap-4 px-6 pb-6">
-            <div className="bg-background p-4 rounded-md text-center">
-              <p className="text-2xl font-bold">{twitterData.statistics.followers}</p>
-              <p className="text-sm text-muted-foreground">Followers</p>
-            </div>
-            <div className="bg-background p-4 rounded-md text-center">
-              <p className="text-2xl font-bold">{twitterData.statistics.following}</p>
-              <p className="text-sm text-muted-foreground">Following</p>
-            </div>
-            <div className="bg-background p-4 rounded-md text-center">
-              <p className="text-2xl font-bold">{twitterData.statistics.tweets}</p>
-              <p className="text-sm text-muted-foreground">Tweets</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Tweets List */}
-        <div>
-          <h3 className="text-xl font-semibold mb-4">Recent Tweets</h3>
-          <div className="space-y-4">
-            {tweets.map((tweet) => (
-              <div key={tweet.id} className="bg-card p-6 rounded-lg">
-                <p className="whitespace-pre-line text-base">{tweet.text}</p>
-                {tweet.media && (
-                  <img src={tweet.media} alt="" className="mt-4 rounded-lg w-full" />
-                )}
-                <div className="flex gap-6 mt-4 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <MessageCircle className="h-4 w-4" /> {tweet.stats.replies}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <ReplyIcon className="h-4 w-4" /> {tweet.stats.retweets}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Heart className="h-4 w-4" /> {tweet.stats.likes}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Eye className="h-4 w-4" /> {tweet.stats.views}
-                  </span>
-                  <span className="ml-auto">{tweet.posted}</span>
+          </CardHeader>
+          <CardContent>
+            <Card className="overflow-hidden">
+              {/* Profile Banner */}
+              <div className="relative mb-16">
+                <div className="h-32 bg-gradient-to-r from-blue-400 to-blue-600 rounded-t-lg"></div>
+                <div className="absolute -bottom-12 left-6">
+                  <Avatar className="h-24 w-24 ring-4 ring-background shadow-xl">
+                    <AvatarImage src="/avatars/sarah.jpg" />
+                    <AvatarFallback>SW</AvatarFallback>
+                  </Avatar>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
+
+              {/* Profile Info */}
+              <Card className="border-0 shadow-none">
+                <CardContent className="px-6">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-xl font-bold">Sarah Wilson</h3>
+                      <p className="text-muted-foreground">@sarahcodes</p>
+                    </div>
+                    <Button className="hover:bg-primary/90 transition-colors">Follow</Button>
+                  </div>
+
+                  <p className="mt-4">Senior Software Engineer | Teaching web development and React | Building in public</p>
+
+                  <Card className="mt-4 bg-accent/10">
+                    <CardContent className="py-4">
+                      <div className="flex gap-4 text-sm text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <MapPin className="h-4 w-4" />
+                          San Francisco, CA
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4" />
+                          Joined March 2020
+                        </span>
+                      </div>
+
+                      <div className="flex gap-6 mt-4">
+                        <span className="text-sm">
+                          <strong>75.2K</strong> <span className="text-muted-foreground">Followers</span>
+                        </span>
+                        <span className="text-sm">
+                          <strong>1.2K</strong> <span className="text-muted-foreground">Following</span>
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </CardContent>
+              </Card>
+            </Card>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle>Recent Tweets</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-6">
+              {tweets.map((tweet) => (
+                <Card key={tweet.id} className="hover:shadow-lg transition-shadow duration-300">
+                  <CardHeader className="pb-2">
+                    <div className="flex gap-4">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src="/avatars/sarah.jpg" />
+                        <AvatarFallback>SW</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold">Sarah Wilson</span>
+                          <span className="text-muted-foreground">@sarahcodes</span>
+                        </div>
+                        <span className="text-sm text-muted-foreground">
+                          {new Date(tweet.snippet.publishedAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  
+                  <CardContent>
+                    <Card className="bg-accent/5 border-0">
+                      <CardContent className="py-3">
+                        <p className="font-medium">{tweet.snippet.title}</p>
+                        <p className="mt-2 text-muted-foreground whitespace-pre-line">{tweet.snippet.description}</p>
+                      </CardContent>
+                    </Card>
+                    
+                    {tweet.snippet.thumbnails?.medium.url && (
+                      <Card className="mt-4 overflow-hidden border-0">
+                        <img 
+                          src={tweet.snippet.thumbnails.medium.url}
+                          alt=""
+                          className="w-full rounded-lg"
+                        />
+                      </Card>
+                    )}
+
+                    <Card className="mt-4 bg-background">
+                      <CardContent className="py-2">
+                        <div className="flex justify-between text-muted-foreground">
+                          <Button variant="ghost" size="sm" className="hover:text-blue-500 hover:bg-blue-500/10">
+                            <MessageCircle className="h-4 w-4 mr-2" />
+                            {tweet.statistics.replyCount}
+                          </Button>
+                          <Button variant="ghost" size="sm" className="hover:text-green-500 hover:bg-green-500/10">
+                            <Repeat className="h-4 w-4 mr-2" />
+                            {tweet.statistics.retweetCount}
+                          </Button>
+                          <Button variant="ghost" size="sm" className="hover:text-red-500 hover:bg-red-500/10">
+                            <Heart className="h-4 w-4 mr-2" />
+                            {tweet.statistics.likeCount}
+                          </Button>
+                          <Button variant="ghost" size="sm" className="hover:text-blue-500 hover:bg-blue-500/10">
+                            <BarChart2 className="h-4 w-4 mr-2" />
+                            {tweet.statistics.viewCount}
+                          </Button>
+                          <Button variant="ghost" size="sm" className="hover:bg-accent/50">
+                            <Share2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   };
+  const InstagramView = () => {
+    return (
+      <div className="space-y-6 pt-16">
+        <Card className="shadow-lg">
+          <CardContent className="p-6">
+            <Card className="mb-6">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <Avatar className="h-20 w-20 ring-2 ring-offset-2 ring-primary/10">
+                      <AvatarImage src="/default-avatar.png" />
+                      <AvatarFallback>IG</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="font-semibold text-lg">username</h3>
+                      <p className="text-muted-foreground">Full Name</p>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm" className="hover:bg-accent/50">
+                    Edit Profile
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
+            <Card className="mb-6">
+              <CardContent className="p-4">
+                <div className="flex justify-between text-center">
+                  <div className="p-2">
+                    <p className="font-semibold">234</p>
+                    <p className="text-sm text-muted-foreground">Posts</p>
+                  </div>
+                  <div className="p-2">
+                    <p className="font-semibold">14.3k</p>
+                    <p className="text-sm text-muted-foreground">Followers</p>
+                  </div>
+                  <div className="p-2">
+                    <p className="font-semibold">1,234</p>
+                    <p className="text-sm text-muted-foreground">Following</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="mb-6">
+              <CardContent className="p-4">
+                <p className="text-sm">
+                  Bio description goes here
+                  <br />📍 Location
+                  <br />🔗 website.com
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-4">
+                <div className="grid grid-cols-3 gap-2">
+                  {[1, 2, 3, 4, 5, 6].map((post) => (
+                    <Card key={post} className="aspect-square overflow-hidden hover:opacity-90 transition-opacity">
+                      <CardContent className="p-0">
+                        <img
+                          src="/default-avatar.png"
+                          alt=""
+                          className="w-full h-full object-cover"
+                        />
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-lg">
+          <CardContent className="p-0">
+            {[1, 2].map((post) => (
+              <Card key={post} className="mb-4 last:mb-0">
+                <CardContent className="p-0">
+                  <Card className="border-0">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8 ring-2 ring-offset-1 ring-primary/10">
+                            <AvatarImage src="/default-avatar.png" />
+                            <AvatarFallback>U</AvatarFallback>
+                          </Avatar>
+                          <span className="font-medium">username</span>
+                        </div>
+                        <Button variant="ghost" size="icon" className="hover:bg-accent/50">
+                          <MoreHorizontal className="h-5 w-5" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <div className="aspect-square">
+                    <img
+                      src="/default-avatar.png"
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  <Card className="border-0">
+                    <CardContent className="p-4">
+                      <div className="flex justify-between text-muted-foreground">
+                        <div className="flex gap-4">
+                          <Button variant="ghost" size="sm" className="hover:text-red-500 hover:bg-red-500/10">
+                            <Heart className="h-5 w-5" />
+                          </Button>
+                          <Button variant="ghost" size="sm" className="hover:text-blue-500 hover:bg-blue-500/10">
+                            <MessageCircle className="h-5 w-5" />
+                          </Button>
+                          <Button variant="ghost" size="sm" className="hover:text-blue-500 hover:bg-blue-500/10">
+                            <Send className="h-5 w-5" />
+                          </Button>
+                        </div>
+                        <Button variant="ghost" size="sm" className="hover:text-blue-500 hover:bg-blue-500/10">
+                          <Bookmark className="h-5 w-5" />
+                        </Button>
+                      </div>
+                      <p className="mt-2 text-sm">
+                        <span className="font-medium">username</span> Caption text goes here...
+                      </p>
+                      <p className="mt-1 text-sm text-muted-foreground">View all 123 comments</p>
+                      <p className="mt-1 text-xs text-muted-foreground">2 HOURS AGO</p>
+                    </CardContent>
+                  </Card>
+                </CardContent>
+              </Card>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
   
   const CourseView = () => {
     const [courses, setCourses] = useState<any[]>([]);
@@ -4075,6 +4374,7 @@ export default function MentorshipPortal() {
         {currentView === 'youtube' && <YoutubeView/>}
         {currentView === 'tiktok' && <TikTokView/>}
         {currentView === 'twitter' && <TwitterView/>}
+        {currentView === 'instagram' && <InstagramView/>}
       </div>
     </div>
   );
