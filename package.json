@@ -10,6 +10,7 @@
     "create-env": "echo \"API_KEY=my_api_key\" > .env"
   },
   "dependencies": {
+    "@cometchat/chat-uikit-react": "^4.3.24",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-avatar": "^1.1.2",
@@ -46,6 +47,8 @@
     "react-hot-toast": "^2.4.1",
     "recharts": "^2.15.0",
     "sonner": "^1.7.1",
+    "stream-chat": "^8.49.0",
+    "stream-chat-react": "^12.8.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.1.2",

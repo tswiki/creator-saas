@@ -132,6 +132,7 @@ import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, Me
 import { cn } from '@/lib/utils';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@radix-ui/react-tabs';
 import Marquee from './marquee';
+import SpacesView from '../spaces/chatView';
 
 
 const DashboardView = () => {
@@ -211,182 +212,203 @@ const DashboardView = () => {
 
       <div className="grid grid-cols-3 gap-6 h-[calc(100vh-160px)]">
         <Card className="col-span-2 h-full">
-          <CardHeader className="py-4">
-            <div className="mb-4 px-2 text-center">
-              <Card className="w-48 p-3 mx-auto">
-                <h2 className="text-2xl font-semibold flex items-center justify-center gap-2">
-                  <Inbox className="h-6 w-6" />
-                  Inbox
-                </h2>
-              </Card>
-            </div>
-            <Card className="p-4">
-              <div className="px-2">
-                <div className="flex justify-between items-center">
-                  <div className="flex-1 flex space-x-3">
-                    <Input placeholder="Search emails..." className="max-w-md" />
-                    <Button variant="outline" className="px-4">
-                      <Filter className="h-4 w-4 mr-2" />
-                      Filter
-                    </Button>
+          {(() => {
+            const [currentView, setCurrentView] = useState<'inbox' | 'activity'>('inbox');
+            const [activityFeed] = useState([
+              {
+                id: 1,
+                user: "Alex Thompson",
+                action: "shared a resource",
+                content: "Check out this great article on React performance optimization!",
+                timestamp: "2 hours ago"
+              },
+              {
+                id: 2,
+                user: "Maria Garcia",
+                action: "completed a milestone",
+                content: "Just finished the Advanced React Patterns module!",
+                timestamp: "4 hours ago"
+              },
+              {
+                id: 3,
+                user: "James Wilson",
+                action: "asked a question",
+                content: "Has anyone worked with GraphQL subscriptions?",
+                timestamp: "Yesterday"
+              }
+            ]);
+
+            return (
+              <>
+                <CardHeader className="py-4">
+                  <div className="mb-4 px-2 text-center">
+                    <div className="flex justify-center gap-4 mb-4">
+                      <Button
+                        variant={currentView === 'activity' ? 'default' : 'outline'} 
+                        onClick={() => setCurrentView('activity')}
+                        className="w-48"
+                      >
+                        <Activity className="h-5 w-5 mr-2" />
+                        Activity Feed
+                      </Button>
+                      <Button
+                        variant={currentView === 'inbox' ? 'default' : 'outline'}
+                        onClick={() => setCurrentView('inbox')}
+                        className="w-48"
+                      >
+                        <Inbox className="h-5 w-5 mr-2" />
+                        Inbox
+                      </Button>
+                    </div>
                   </div>
-                  <Button className="ml-4 px-4">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Compose
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          </CardHeader>
-          
-          <CardContent className="p-6 h-[calc(100vh-100px)]">
-            <Card className="h-full">
-              <div className="h-full flex flex-col">
-                <ScrollArea className="flex-1 p-4 ">
-                  <div className="space-y-4 pr-4">
-                    {messages.map(msg => (
-                      <Dialog key={msg.id}>
-                        <DialogTrigger asChild>
-                          <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
-                            <CardContent className="p-5">
-                              <div className="grid grid-cols-[80px_1fr] gap-4">
-                                <div className="flex items-center justify-center">
-                                  <Avatar className="h-12 w-12">
-                                    <AvatarFallback>{msg.sender[0]}</AvatarFallback>
-                                  </Avatar>
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex justify-between mb-1">
-                                    <p className="font-medium text-base truncate">{msg.sender}</p>
-                                    <span className="text-sm text-muted-foreground">{msg.timestamp}</span>
-                                  </div>
-                                  <p className="text-sm font-medium mb-1">{msg.subject}</p>
-                                  <p className="text-sm text-muted-foreground truncate">{msg.content}</p>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[525px]">
-                          <DialogHeader>
-                            <DialogTitle className="flex items-center gap-2">
-                              <Avatar className="h-8 w-8">
-                                <AvatarFallback>{msg.sender[0]}</AvatarFallback>
-                              </Avatar>
-                              {msg.sender}
-                            </DialogTitle>
-                            <DialogDescription className="text-sm text-muted-foreground">
-                              {msg.timestamp}
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="mt-4">
-                            <p className="font-medium mb-2">{msg.subject}</p>
-                            <p className="text-base">{msg.content}</p>
+
+                  {currentView === 'inbox' ? (
+                    <Card className="p-4">
+                      <div className="px-2">
+                        <div className="flex justify-between items-center">
+                          <div className="flex-1 flex space-x-3">
+                            <Input placeholder="Search emails..." className="max-w-md" />
+                            <Button variant="outline" className="px-4">
+                              <Filter className="h-4 w-4 mr-2" />
+                              Filter
+                            </Button>
                           </div>
-                          <DialogFooter className="mt-6">
-                            <Button>Reply</Button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-                    ))}
-                    {/* Sample Messages */}
-                    {[
-                      {
-                        id: 'sample1',
-                        sender: 'John Mentor',
-                        subject: 'Project Milestone Check-in',
-                        timestamp: '15 March',
-                        content: 'Hey there! Just checking in on your progress with the latest project milestone.'
-                      },
-                      {
-                        id: 'sample2',
-                        sender: 'Sarah Coach',
-                        subject: 'Presentation Feedback',
-                        timestamp: '14 March',
-                        content: 'Great work on your presentation! I have some feedback to share when you have a moment.'
-                      },
-                      {
-                        id: 'sample3',
-                        sender: 'Tech Team',
-                        subject: 'Workshop Resources Available',
-                        timestamp: '13 March',
-                        content: 'New resources available for the upcoming workshop. Please review before Thursday.'
-                      },
-                      {
-                        id: 'sample4',
-                        sender: 'Career Services',
-                        subject: 'Mock Interview Opportunity',
-                        timestamp: '12 March',
-                        content: 'Exciting opportunity: Mock interviews scheduled for next week. Sign up now!'
-                      }
-                    ].map(msg => (
-                      <Dialog key={msg.id}>
-                        <DialogTrigger asChild>
-                          <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
-                            <CardContent className="p-5">
-                              <div className="grid grid-cols-[80px_1fr] gap-4">
-                                <div className="flex items-center justify-center">
-                                  <Avatar className="h-12 w-12">
-                                    <AvatarFallback>{msg.sender[0]}</AvatarFallback>
-                                  </Avatar>
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex justify-between mb-1">
-                                    <p className="font-medium text-base truncate">{msg.sender}</p>
-                                    <span className="text-sm text-muted-foreground">{msg.timestamp}</span>
-                                  </div>
-                                  <p className="text-sm font-medium mb-1">{msg.subject}</p>
-                                  <p className="text-sm text-muted-foreground truncate">{msg.content}</p>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[525px]">
-                          <DialogHeader>
-                            <DialogTitle className="flex items-center gap-2">
-                              <Avatar className="h-8 w-8">
-                                <AvatarFallback>{msg.sender[0]}</AvatarFallback>
-                              </Avatar>
-                              {msg.sender}
-                            </DialogTitle>
-                            <DialogDescription className="text-sm text-muted-foreground">
-                              {msg.timestamp}
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="mt-4">
-                            <p className="font-medium mb-2">{msg.subject}</p>
-                            <p className="text-base">{msg.content}</p>
+                          <Button className="ml-4 px-4">
+                            <Plus className="h-4 w-4 mr-2" />
+                            Compose
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  ) : (
+                    <Card className="p-4">
+                      <div className="px-2">
+                        <div className="flex justify-between items-center">
+                          <div className="flex-1 flex space-x-3">
+                            <Input placeholder="Search activities..." className="max-w-md" />
+                            <Button variant="outline" className="px-4">
+                              <Filter className="h-4 w-4 mr-2" />
+                              Filter
+                            </Button>
                           </div>
-                          <DialogFooter className="mt-6">
-                            <Button>Reply</Button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </div>
-            </Card>
-          </CardContent>
-          <Card>
-            <div className="h-[calc(100vh-var(--header-height)-2rem)]">
-              <CardFooter className="flex flex-col gap-2 p-4">
-                <Card className="w-fit p-3">
-                  <div className="flex items-center justify-center gap-2 text-sm">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span>Last Updated: {new Date().toLocaleTimeString()}</span>
+                          <Button className="ml-4 px-4">
+                            <Plus className="h-4 w-4 mr-2" />
+                            New Post
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  )}
+                </CardHeader>
+                
+                <CardContent className="p-6 h-[calc(100vh-100px)]">
+                  <Card className="h-full">
+                    <div className="h-full flex flex-col">
+                      <ScrollArea className="flex-1 p-4">
+                        <div className="space-y-4 pr-4">
+                          {currentView === 'inbox' ? (
+                            <>
+                              {messages.map(msg => (
+                                <Dialog key={msg.id}>
+                                  <DialogTrigger asChild>
+                                    <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
+                                      <CardContent className="p-5">
+                                        <div className="grid grid-cols-[80px_1fr] gap-4">
+                                          <div className="flex items-center justify-center">
+                                            <Avatar className="h-12 w-12">
+                                              <AvatarFallback>{msg.sender[0]}</AvatarFallback>
+                                            </Avatar>
+                                          </div>
+                                          <div className="flex-1 min-w-0">
+                                            <div className="flex justify-between mb-1">
+                                              <p className="font-medium text-base truncate">{msg.sender}</p>
+                                              <span className="text-sm text-muted-foreground">{msg.timestamp}</span>
+                                            </div>
+                                            <p className="text-sm font-medium mb-1">{msg.subject}</p>
+                                            <p className="text-sm text-muted-foreground truncate">{msg.content}</p>
+                                          </div>
+                                        </div>
+                                      </CardContent>
+                                    </Card>
+                                  </DialogTrigger>
+                                  <DialogContent className="sm:max-w-[525px]">
+                                    <DialogHeader>
+                                      <DialogTitle className="flex items-center gap-2">
+                                        <Avatar className="h-8 w-8">
+                                          <AvatarFallback>{msg.sender[0]}</AvatarFallback>
+                                        </Avatar>
+                                        {msg.sender}
+                                      </DialogTitle>
+                                      <DialogDescription className="text-sm text-muted-foreground">
+                                        {msg.timestamp}
+                                      </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="mt-4">
+                                      <p className="font-medium mb-2">{msg.subject}</p>
+                                      <p className="text-base">{msg.content}</p>
+                                    </div>
+                                    <DialogFooter className="mt-6">
+                                      <Button>Reply</Button>
+                                    </DialogFooter>
+                                  </DialogContent>
+                                </Dialog>
+                              ))}
+                            </>
+                          ) : (
+                            <>
+                              {activityFeed.map((activity) => (
+                                <Card key={activity.id} className="cursor-pointer hover:bg-muted/50 transition-colors">
+                                  <CardContent className="p-5">
+                                    <div className="flex gap-4">
+                                      <Avatar className="h-12 w-12">
+                                        <AvatarFallback>{activity.user[0]}</AvatarFallback>
+                                      </Avatar>
+                                      <div className="flex-1">
+                                        <div className="flex justify-between mb-1">
+                                          <p className="font-medium">{activity.user}</p>
+                                          <span className="text-sm text-muted-foreground">{activity.timestamp}</span>
+                                        </div>
+                                        <p className="text-sm">{activity.action}</p>
+                                        {activity.content && (
+                                          <Card className="mt-2 p-3 bg-muted">
+                                            <p className="text-sm">{activity.content}</p>
+                                          </Card>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              ))}
+                            </>
+                          )}
+                        </div>
+                      </ScrollArea>
+                    </div>
+                  </Card>
+                </CardContent>
+                <Card>
+                  <div className="h-[calc(100vh-var(--header-height)-2rem)]">
+                    <CardFooter className="flex flex-col gap-2 p-4">
+                      <Card className="w-fit p-3">
+                        <div className="flex items-center justify-center gap-2 text-sm">
+                          <Clock className="h-4 w-4 text-muted-foreground" />
+                          <span>Last Updated: {new Date().toLocaleTimeString()}</span>
+                        </div>
+                      </Card>
+                      <Card className="w-fit p-3">
+                        <div className="flex items-center justify-center gap-2">
+                          <Mail className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm">
+                            {currentView === 'inbox' ? '3 unread messages' : '5 new activities'}
+                          </span>
+                        </div>
+                      </Card>
+                    </CardFooter>
                   </div>
                 </Card>
-                <Card className="w-fit p-3">
-                  <div className="flex items-center justify-center gap-2">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">3 unread messages</span>
-                  </div>
-                </Card>
-              </CardFooter>
-            </div>
-          </Card>
+              </>
+            );
+          })()}
         </Card>
 
         {/* Right Sidebar */}
@@ -1618,12 +1640,219 @@ export default function MentorshipPortal() {
       fetchResources();
     }, []);
 
+    function setShowSecondStep(arg0: boolean): void {
+      throw new Error('Function not implemented.');
+    }
+
     return (
     <div className="space-y-6 pt-10">
         <Card>
           <CardHeader>
             <div className="flex justify-between items-center">
-              <CardTitle className='pl-10'>Creator Content Hub</CardTitle>
+              <CardTitle className='pl-10 text-transparent'>sample</CardTitle>
+              <Card>
+          <CardContent className="p-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold pr-5"> {(() => {
+              const { auth } = require('@/firebase/firebaseConfig');
+              const [firstName, setFirstName] = useState('');
+              
+              useEffect(() => {
+                const unsubscribe = auth.onAuthStateChanged(async (user: { displayName: string; }) => {
+                  if (user) {
+                    // Get user's display name and split to get first name
+                    const displayName = user.displayName || '';
+                    const firstName = displayName.split(' ')[0];
+                    setFirstName(firstName);
+                  }
+                });
+                
+                return () => unsubscribe();
+              }, []);
+
+              return `${firstName || 'there'}'s Library`
+            })()}</h3>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Bookmark className="h-4 w-4 mr-2" />
+                    View Collections
+                  </Button>                  
+                </DialogTrigger>
+                <DialogContent className="w-[95vw] max-w-7xl h-[90vh] flex flex-col overflow-hidden">
+                  <div className="w-full max-w-2xl mx-auto">
+                    <div className="flex flex-col items-center w-full px-4">
+                      <div className="flex items-center justify-between w-full p-2">
+                        <DialogHeader className="shrink-0 space-y-2">
+                          <DialogTitle className="text-base text-center">
+                            Collections
+                          </DialogTitle>
+                        </DialogHeader>
+                        
+                        <div className="flex items-center gap-4">
+                          <Menubar>
+                            <MenubarMenu>
+                              <div className="flex justify-center">
+                                <MenubarTrigger className="flex items-center gap-2 justify-center">
+                                  <Filter className="h-4 w-4" />
+                                  Filter
+                                </MenubarTrigger>
+                              </div>
+                              <MenubarContent>
+                                <MenubarItem>
+                                  All Resources
+                                </MenubarItem>
+                                <MenubarSeparator />
+                                <MenubarItem>
+                                  Collections
+                                </MenubarItem>
+                                <MenubarItem>
+                                  Favorites
+                                </MenubarItem>
+                                <MenubarItem>
+                                  Recently Added
+                                </MenubarItem>
+                              </MenubarContent>
+                            </MenubarMenu>
+                          </Menubar>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex-1 overflow-hidden flex flex-col">
+
+                    <div className="grid grid-cols-1 lg:grid-cols-[2fr,1fr] gap-4 h-[calc(90vh-12rem)] border-2 border-white rounded-lg mx-auto w-[95%]">
+                      <Card className="w-full h-full flex flex-col">
+                        <CardContent className="w-full h-full p-0">
+                          <div className="grid gap-4 p-4 w-full">
+                            {[
+                              {
+                                title: "Advanced JavaScript Concepts",
+                                dateAdded: "2 days ago",
+                                collection: "JavaScript", 
+                                type: "Article",
+                                isStarred: true
+                              },
+                              {
+                                title: "React Performance Optimization Guide",
+                                dateAdded: "1 week ago",
+                                collection: "React",
+                                type: "Tutorial", 
+                                isStarred: false
+                              },
+                              {
+                                title: "Building Scalable Architecture",
+                                dateAdded: "2 weeks ago",
+                                collection: "System Design",
+                                type: "Course",
+                                isStarred: true
+                              },
+                              {
+                                title: "TypeScript Best Practices",
+                                dateAdded: "3 days ago",
+                                collection: "TypeScript",
+                                type: "Guide",
+                                isStarred: false
+                              },
+                              {
+                                title: "Modern CSS Techniques",
+                                dateAdded: "5 days ago",
+                                collection: "Frontend",
+                                type: "Video",
+                                isStarred: true
+                              },
+                              {
+                                title: "Node.js Design Patterns",
+                                dateAdded: "1 month ago",
+                                collection: "Backend",
+                                type: "Book",
+                                isStarred: false
+                              }
+                            ].map((resource, i) => (
+                              <ScrollArea className="h-[calc(90vh-16rem)]">
+                                <Card key={i} className="w-full transition-all hover:shadow-md">
+                                  <CardContent className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 gap-4 w-full">
+                                    <div className="flex items-center gap-4 w-full sm:w-auto overflow-hidden">
+                                      <BookOpen className="h-8 w-8 shrink-0 text-muted-foreground" />
+                                      <div className="min-w-0 flex-1">
+                                        <h4 className="font-medium truncate">{resource.title}</h4>
+                                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+                                          <span className="truncate">Added {resource.dateAdded}</span>
+                                          <span className="hidden sm:inline">•</span>
+                                          <span className="truncate">Collection: {resource.collection}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                                      <Badge variant="secondary" className="shrink-0">{resource.type}</Badge>
+                                      <Button variant="ghost" size="icon" className="shrink-0">
+                                        <MoreVertical className="h-4 w-4" />
+                                      </Button>
+                                      <Star 
+                                        className={`h-4 w-4 shrink-0 cursor-pointer transition-colors ${
+                                          resource.isStarred ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground hover:text-yellow-400"
+                                        }`}
+                                      />
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              </ScrollArea>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="h-full flex flex-col">
+                        <CardContent className="h-full p-0">
+                          <ScrollArea className="h-full">
+                            <div className="p-4">
+                              <CardHeader className="px-2">
+                              </CardHeader>
+                              <CardContent>
+                                <ScrollArea className="h-[400px]">
+                                  <div className="space-y-2">
+                                    <div className="border-2 border-dashed rounded-lg p-6 text-center">
+                                      <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                                      <p className="text-sm text-muted-foreground">
+                                        Drag and drop files here or click to browse
+                                      </p>
+                                    </div>
+                                    <div className="space-y-2">
+                                      <Label>Add to Collection</Label>
+                                      <Select>
+                                        <SelectTrigger>
+                                          <SelectValue placeholder="Select collection" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="learning">Learning Path</SelectItem>
+                                          <SelectItem value="favorites">Favorites</SelectItem>
+                                          <SelectItem value="starred">Starred</SelectItem>
+                                          <SelectItem value="new">Create New Collection...</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                      <Button className="w-full mt-2 mb-2">Upload Resources</Button>
+                                    </div>
+                                  </div>
+                                </ScrollArea>
+                              </CardContent>
+                            </div>
+                          </ScrollArea>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
+
+                  <DialogFooter className="shrink-0 mt-4">
+                    <Button variant="outline">
+                      Export Collection
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </CardContent>
+        </Card>
               <Button onClick={() => setShowAddDialog(true)}>
                 Add Resource
               </Button>
@@ -1634,7 +1863,7 @@ export default function MentorshipPortal() {
               {/* Recommended Resources */}
               <div>
                 <Card className="p-4">
-                  <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight text-center pt-2 pb-2">Info Products</h3>
+                  <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight text-center pt-2 pb-2">Product Hub</h3>
                 </Card>
                 <div className="pt-10 space-y-4">
                   {resources.map((resource, i) => (
@@ -1726,7 +1955,7 @@ export default function MentorshipPortal() {
               {/* Learning Path */}
               <div>
                 <Card className="p-4">
-                  <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight text-center pt-2 pb-2">Socials</h3>
+                  <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight text-center pt-2 pb-2">Content Hub</h3>
                 </Card>
                 <div className='pt-10'></div>
                 {currentView === "youtube" ? (
@@ -1950,93 +2179,151 @@ export default function MentorshipPortal() {
 
         <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
           <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New Resource</DialogTitle>
-              <DialogDescription>
-                Add a new course or information product to your resources
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <label htmlFor="title">Title</label>
-                <input
-                  id="title"
-                  value={newResource.title}
-                  onChange={(e) => setNewResource({...newResource, title: e.target.value})}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                />
-              </div>
-              <div className="grid gap-2">
-                <label htmlFor="type">Type</label>
-                <Select onValueChange={(value) => setNewResource({...newResource, type: value})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Course">Course</SelectItem>
-                    <SelectItem value="Book">Book</SelectItem>
-                    <SelectItem value="Document">Document</SelectItem>
-                    <SelectItem value="Video">Video</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid gap-2">
-                <label htmlFor="author">Author</label>
-                <input
-                  id="author"
-                  value={newResource.author}
-                  onChange={(e) => setNewResource({...newResource, author: e.target.value})}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                />
-              </div>
-              <div className="grid gap-2">
-                <label htmlFor="description">Description</label>
-                <textarea
-                  id="description"
-                  value={newResource.description}
-                  onChange={(e) => setNewResource({...newResource, description: e.target.value})}
-                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button onClick={async () => {
-                try {
-                  // Call the resources API endpoint to create new resource
-                  const response = await fetch('/api/resources', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(newResource)
-                  });
+            {/* Step 1: Resource Details */}
+            {!setShowSecondStep ? (
+              <>
+                <div className="flex justify-center">
+                  <Card className="w-full">
+                    <CardContent className="flex flex-col items-center py-4">
+                      <DialogHeader className="text-center">
+                        <DialogTitle>Add New Resource - Details</DialogTitle>
+                        <DialogDescription>
+                          First, let's add the resource details and metadata
+                        </DialogDescription>
+                      </DialogHeader>
+                    </CardContent>
+                  </Card>
+                </div>
+                <div className="grid gap-4 py-4">
+                  <div className="grid gap-2">
+                    <label htmlFor="recommended">Recommended For</label>
+                    <input
+                      id="recommended"
+                      value={newResource.recommended}
+                      onChange={(e) => setNewResource({...newResource, recommended: e.target.value})}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      placeholder="e.g. Beginners, Advanced Developers"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <label htmlFor="url">Resource URL</label>
+                    <input
+                      id="url"
+                      value={newResource.url}
+                      onChange={(e) => setNewResource({...newResource, url: e.target.value})}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      placeholder="https://"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <label htmlFor="tags">Tags</label>
+                    <input
+                      id="tags"
+                      value={newResource.tags}
+                      onChange={(e) => setNewResource({...newResource, tags: e.target.value})}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      placeholder="Enter comma-separated tags"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button 
+                    onClick={() => setShowSecondStep(true)}
+                    disabled={!newResource.recommended || !newResource.url || !newResource.tags}
+                  >
+                    Continue to Course Details
+                  </Button>
+                </DialogFooter>
+              </>
+            ) : (
+              <>
+                {/* Step 2: Course Information */}
+                <div className="flex justify-center">
+                  <Card className="w-full">
+                    <CardContent className="flex flex-col items-center py-4">
+                      <DialogHeader className="text-center">
+                        <DialogTitle>Course Information</DialogTitle>
+                        <DialogDescription>
+                          Now, let's add the core details about your course
+                        </DialogDescription>
+                      </DialogHeader>
+                    </CardContent>
+                  </Card>
+                </div>
+                <div className="grid gap-4 py-4">
+                  <div className="grid gap-2">
+                    <label htmlFor="title">Course Title</label>
+                    <input
+                      id="title"
+                      value={newResource.title}
+                      onChange={(e) => setNewResource({...newResource, title: e.target.value})}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <label htmlFor="type">Course Type</label>
+                    <Select onValueChange={(value) => setNewResource({...newResource, type: value})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Video Course">Video Course</SelectItem>
+                        <SelectItem value="Interactive Course">Interactive Course</SelectItem>
+                        <SelectItem value="Workshop">Workshop</SelectItem>
+                        <SelectItem value="Tutorial Series">Tutorial Series</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <label htmlFor="description">Course Description</label>
+                    <textarea
+                      id="description"
+                      value={newResource.description}
+                      onChange={(e) => setNewResource({...newResource, description: e.target.value})}
+                      className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      placeholder="Provide a detailed overview of the course content and learning outcomes"
+                    />
+                  </div>
+                </div>
+                <DialogFooter className="flex justify-between">
+                  <Button variant="outline" onClick={() => setShowSecondStep(false)}>
+                    Back to Resource Details
+                  </Button>
+                  <Button onClick={async () => {
+                    try {
+                      const response = await fetch('/api/resources', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(newResource)
+                      });
 
-                  if (!response.ok) {
-                    throw new Error('Failed to add resource');
-                  }
+                      if (!response.ok) {
+                        throw new Error('Failed to add resource');
+                      }
 
-                  // Fetch updated resources
-                  const updatedResponse = await fetch('/api/resources');
-                  const updatedData = await updatedResponse.json();
-                  setResources(updatedData);
+                      const updatedResponse = await fetch('/api/resources');
+                      const updatedData = await updatedResponse.json();
+                      setResources(updatedData);
 
-                  // Reset form
-                  setNewResource({
-                    title: '',
-                    type: '',
-                    platform: '',
-                    author: '',
-                    description: '',
-                  });
-                  
-                  // Close dialog
-                  setShowAddDialog(false);
-                } catch (error) {
-                  console.error('Error adding resource:', error);
-                  // Here you could show an error toast/alert to the user
-                }
-              }}>Add Resource</Button>
-            </DialogFooter>
+                      setNewResource({
+                        title: '',
+                        type: '',
+                        platform: '',
+                        author: '',
+                        description: '',
+                      });
+                      
+                      setShowSecondStep(false);
+                      setShowAddDialog(false);
+                    } catch (error) {
+                      console.error('Error adding resource:', error);
+                    }
+                  }}>Create Course</Button>
+                </DialogFooter>
+              </>
+            )}
           </DialogContent>
         </Dialog>
       </div>
@@ -3950,402 +4237,6 @@ export default function MentorshipPortal() {
     );
   };
 
-  
-  const SpacesView = () => {
-    const [selectedChannel, setSelectedChannel] = useState('general');
-    const [isCallActive, setIsCallActive] = useState(false);
-    const [localStreamRef, setLocalStreamRef] = useState<MediaStream | null>(null);
-    const [isAudioEnabled, setIsAudioEnabled] = useState(true);
-    const [isVideoEnabled, setIsVideoEnabled] = useState(true);
-    const [isScreenSharing, setIsScreenSharing] = useState(false);
-    const [showVideoDialog, setShowVideoDialog] = useState(false);
-    const [messages, setMessages] = useState<any[]>([
-      {
-        id: 1,
-        user: "Sarah Johnson",
-        message: "Hey everyone! Who's working on the new React project?",
-        timestamp: "10:30 AM"
-      },
-      {
-        id: 2,
-        user: "Mike Chen",
-        message: "I am! Having some issues with hooks though.",
-        timestamp: "10:32 AM"
-      }
-    ]);
-
-    const [channels, setChannels] = useState([
-      { id: 'general', name: 'General' },
-      { id: 'study-room', name: 'Study Room' },
-      { id: 'coding-help', name: 'Coding Help' },
-      { id: 'career-advice', name: 'Career Advice' }
-    ]);
-
-    const [timeline, setTimeline] = useState([
-      { time: '9:00 AM', event: 'Daily Standup' },
-      { time: '11:00 AM', event: 'Code Review' },
-      { time: '2:00 PM', event: 'Mentorship Session' },
-      { time: '4:00 PM', event: 'Team Meeting' }
-    ]);
-
-    const startCall = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: true
-        });
-        setLocalStreamRef(stream);
-        setIsCallActive(true);
-        setShowVideoDialog(true);
-      } catch (error) {
-        console.error('Error accessing media devices:', error);
-      }
-    };
-
-    const stopCall = () => {
-      if (localStreamRef) {
-        localStreamRef.getTracks().forEach(track => track.stop());
-        setLocalStreamRef(null);
-      }
-      setIsCallActive(false);
-      setShowVideoDialog(false);
-      setIsScreenSharing(false);
-    };
-
-    const toggleScreenShare = async () => {
-      try {
-        if (!isScreenSharing) {
-          const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-          setLocalStreamRef(screenStream);
-          setIsScreenSharing(true);
-        } else {
-          const videoStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-          setLocalStreamRef(videoStream);
-          setIsScreenSharing(false);
-        }
-      } catch (error) {
-        console.error('Error toggling screen share:', error);
-      }
-    };
-
-    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      if (file) {
-        // Handle file upload logic here
-        console.log('File selected:', file);
-      }
-    };
-
-    return (
-      <div className="h-[calc(100vh-4rem)] pt-10">
-        <Card className="h-full">
-          <div className="flex h-full">
-            <div className="w-72 border-r p-4 flex flex-col gap-4">
-              <Select
-                value={selectedChannel}
-                onValueChange={setSelectedChannel}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select channel" />
-                </SelectTrigger>
-                <SelectContent>
-                  {channels.map(channel => (
-                    <SelectItem key={channel.id} value={channel.id}>
-                      <div className="flex items-center gap-2">
-                        <Hash className="h-4 w-4" />
-                        {channel.name}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" className="w-full">
-                    View Highlights
-                    <Star className="h-4 w-4 ml-2" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="w-[90vw] max-w-[500px] h-[90vh] max-h-[800px] p-0">
-                  <DialogHeader className="absolute top-0 left-0 right-0 z-10 bg-black/50 p-4">
-                    <DialogTitle className="text-white">Channel Highlights</DialogTitle>
-                  </DialogHeader>
-                  <div className="w-full h-full relative overflow-hidden bg-black">
-                    <div 
-                      className="absolute inset-0 overflow-y-auto snap-y snap-mandatory"
-                      style={{
-                        scrollbarWidth: 'none',
-                        msOverflowStyle: 'none',
-                        '::-webkit-scrollbar': {
-                          display: 'none'
-                        }
-                      }}
-                    >
-                      {[
-                        {
-                          type: 'video' as const,
-                          url: '/sample-video.mp4',
-                          description: 'Weekly Mentorship Session Highlights',
-                          likes: 245,
-                          comments: 12
-                        },
-                        {
-                          type: 'image' as const,
-                          url: '/project-showcase.jpg',
-                          description: 'Student Project Showcase',
-                          likes: 189,
-                          comments: 8
-                        },
-                        {
-                          type: 'text' as const,
-                          description: 'Key learning outcomes from this week\'s sessions',
-                          likes: 156,
-                          comments: 5
-                        }
-                      ].map((content, index) => (
-                          <div 
-                            key={index} 
-                            className="w-full h-full snap-start relative bg-gradient-to-br from-gray-900 to-black"
-                          >
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              {content.type === 'video' ? (
-                                <video 
-                                  src={content.url}
-                                  className="w-full h-full object-cover"
-                                  controls
-                                  loop
-                                  autoPlay
-                                  muted
-                                />
-                              ) : content.type === 'image' ? (
-                                <img
-                                  src={content.url} 
-                                  alt={content.description}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-purple-600 to-blue-600 p-8">
-                                  <p className="text-2xl text-white text-center">{content.description}</p>
-                                </div>
-                              )}
-                            </div>
-                            <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
-                              <p className="text-white text-xl font-medium mb-3">{content.description}</p>
-                              <div className="flex gap-6">
-                                <button className="flex items-center gap-2 text-white hover:text-pink-500 transition-colors">
-                                  <Heart className="h-6 w-6" />
-                                  {content.likes}
-                                </button>
-                                <button className="flex items-center gap-2 text-white hover:text-blue-500 transition-colors">
-                                  <MessageCircle className="h-6 w-6" />
-                                  {content.comments}
-                                </button>
-                                <button className="flex items-center gap-2 text-white hover:text-green-500 transition-colors ml-auto">
-                                  <Share className="h-6 w-6" />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                      ))}
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
-
-              <div className="mt-6 flex-1 overflow-y-auto">
-                <h3 className="font-semibold mb-4">Today's Timeline</h3>
-                <div className="space-y-4">
-                  {timeline.map((item, index) => (
-                    <div key={index} className="flex items-center gap-3">
-                      <div className="w-20 text-sm text-muted-foreground">
-                        {item.time}
-                      </div>
-                      <div className="flex-1 text-sm bg-muted p-2 rounded-md">
-                        {item.event}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              {!isCallActive ? (
-                <Button onClick={startCall} variant="outline" className="w-full">
-                  <Video className="h-4 w-4 mr-2" />
-                  Join Voice
-                </Button>
-              ) : (
-                <Button onClick={stopCall} variant="destructive" className="w-full">
-                  <PhoneOff className="h-4 w-4 mr-2" />
-                  Leave Call
-                </Button>
-              )}
-            </div>
-
-            <div className="flex-1 flex flex-col h-full">
-              <Card className="flex-1 flex flex-col h-full">
-                <CardHeader className="pb-2">
-                  <CardTitle>{selectedChannel || "Chat"}</CardTitle>
-                </CardHeader>
-                <CardContent className="flex-1 p-4 overflow-hidden">
-                  <Card className="h-full flex flex-col">
-                    <CardContent className="flex-1 space-y-4 p-4 overflow-y-auto">
-                      {messages.map((msg) => (
-                        <div key={msg.id} className="flex gap-3 items-start">
-                          <Avatar className="h-8 w-8">
-                            <AvatarFallback>{msg.user[0]}</AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <p className="font-medium">{msg.user}</p>
-                              <span className="text-xs text-muted-foreground">{msg.timestamp}</span>
-                            </div>
-                            <p className="text-sm">{msg.message}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                </CardContent>
-
-                <CardFooter className="p-4 border-t mt-auto">
-                  <div className="flex gap-2 w-full">
-                    <div className="flex-1 relative">
-                      <Input placeholder="Type a message..." />
-                      <label htmlFor="file-upload" className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer">
-                        <Paperclip className="h-4 w-4 text-muted-foreground" />
-                        <input
-                          id="file-upload"
-                          type="file"
-                          className="hidden"
-                          onChange={handleFileUpload}
-                        />
-                      </label>
-                    </div>
-                    <Button>
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardFooter>
-              </Card>
-            </div>
-          </div>
-        </Card>
-
-        <Dialog open={showVideoDialog} onOpenChange={setShowVideoDialog}>
-          <DialogContent className="max-w-4xl">
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                {localStreamRef && (
-                  <div className="relative">
-                    <video
-                      ref={(video) => {
-                        if (video) video.srcObject = localStreamRef;
-                      }}
-                      autoPlay
-                      muted
-                      className="w-full rounded-lg"
-                    />
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                      <Button
-                        size="sm"
-                        variant={isAudioEnabled ? "default" : "destructive"}
-                        onClick={() => {
-                          if (localStreamRef) {
-                            localStreamRef.getAudioTracks().forEach(track => {
-                              track.enabled = !isAudioEnabled;
-                            });
-                            setIsAudioEnabled(!isAudioEnabled);
-                          }
-                        }}
-                      >
-                        {isAudioEnabled ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
-                      </Button>
-                      
-                      <Button
-                        size="sm"
-                        variant={isVideoEnabled ? "default" : "destructive"}
-                        onClick={() => {
-                          if (localStreamRef) {
-                            localStreamRef.getVideoTracks().forEach(track => {
-                              track.enabled = !isVideoEnabled;
-                            });
-                            setIsVideoEnabled(!isVideoEnabled);
-                          }
-                        }}
-                      >
-                        {isVideoEnabled ? <Video className="h-4 w-4" /> : <VideoOff className="h-4 w-4" />}
-                      </Button>
-
-                      <Button
-                        size="sm"
-                        variant={isScreenSharing ? "destructive" : "default"}
-                        onClick={async () => {
-                          try {
-                            if (!isScreenSharing) {
-                              const screenStream = await navigator.mediaDevices.getDisplayMedia({
-                                video: true
-                              });
-                              const videoTrack = screenStream.getVideoTracks()[0];
-                              videoTrack.onended = () => {
-                                setIsScreenSharing(false);
-                                if (localStreamRef) {
-                                  const originalVideoTrack = localStreamRef.getVideoTracks()[0];
-                                  if (originalVideoTrack) originalVideoTrack.enabled = true;
-                                }
-                              };
-                              setIsScreenSharing(true);
-                              if (localStreamRef) {
-                                const originalVideoTrack = localStreamRef.getVideoTracks()[0];
-                                if (originalVideoTrack) originalVideoTrack.enabled = false;
-                                localStreamRef.addTrack(videoTrack);
-                              }
-                            } else {
-                              const screenTrack = localStreamRef?.getVideoTracks().find(track => track.label.includes('screen'));
-                              if (screenTrack) {
-                                screenTrack.stop();
-                                localStreamRef?.removeTrack(screenTrack);
-                              }
-                              if (localStreamRef) {
-                                const originalVideoTrack = localStreamRef.getVideoTracks()[0];
-                                if (originalVideoTrack) originalVideoTrack.enabled = true;
-                              }
-                              setIsScreenSharing(false);
-                            }
-                          } catch (error) {
-                            console.error('Error sharing screen:', error);
-                          }
-                        }}
-                      >
-                        {isScreenSharing ? <MonitorOff className="h-4 w-4" /> : <MonitorPlay className="h-4 w-4" />}
-                      </Button>
-
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => {
-                          if (localStreamRef) {
-                            localStreamRef.getTracks().forEach(track => track.stop());
-                            setLocalStreamRef(null);
-                          }
-                          setIsCallActive(false);
-                          setShowVideoDialog(false);
-                          setIsAudioEnabled(true);
-                          setIsVideoEnabled(true);
-                          setIsScreenSharing(false);
-                        }}
-                      >
-                        <PhoneOff className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
-    );
-  };
 
   return (
     <div className="min-h-screen flex">
