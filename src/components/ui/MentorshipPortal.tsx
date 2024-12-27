@@ -268,7 +268,7 @@ const DashboardView = () => {
 
             return (
               <>
-                <CardHeader className="py-4">
+                <CardHeader className="py-4 pt-10">
                   <div className="mb-4 px-2 text-center">
                     <div className="flex justify-center gap-4 mb-4">
                       <Button

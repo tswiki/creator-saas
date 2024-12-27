@@ -1,11 +1,55 @@
 
-import { useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { MessageCircle, Users2, X } from "lucide-react";
 import { Input } from "../ui/input";
+
+import {
+  Chat,
+  Channel,
+  ChannelList,
+  Window,
+  ChannelHeader,
+  MessageList,
+  MessageInput,
+  Thread,
+  useCreateChatClient,
+} from "stream-chat-react";
+import "stream-chat-react/dist/css/v2/index.css";
+
+const useAuthenticatedUser = () => {
+  const [userId, setUserId] = useState(null);
+  const [authToken, setAuthToken] = useState(null);
+
+  useEffect(() => {
+    const { auth } = require('@/firebase/firebaseConfig');
+    
+    const unsubscribe = auth.onAuthStateChanged(async (user: { uid: SetStateAction<null>; getIdToken: () => any; }) => {
+      if (user) {
+        // Set user ID from Firebase auth
+        setUserId(user.uid);
+        
+        // Get ID token for Stream Chat auth
+        try {
+          const token = await user.getIdToken();
+          setAuthToken(token);
+        } catch (error) {
+          console.error("Error getting auth token:", error);
+        }
+      } else {
+        setUserId(null);
+        setAuthToken(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  return { userId, authToken };
+};
 
 
 // Input import can be removed since it's not used
@@ -39,7 +83,7 @@ export function SpacesView() {
 
   const [activeSpace, setActiveSpace] = useState(null);
 
-  const handleJoinSpace = (space) => {
+  const handleJoinSpace = (space: { id?: number; name: any; description?: string; members?: number; messages?: number; type?: string; }) => {
     setActiveSpace(space.name);
   };
 
@@ -213,55 +257,47 @@ const TelegramView = () => {
 };
 
 const UIUXView = () => {
-  const [discussions, setDiscussions] = useState([
-    {
-      id: 1,
-      user: "Alex Thompson",
-      avatar: "/avatars/alex.jpg",
-      topic: "Modern Design Principles",
-      content: "Let's discuss the latest trends in UI/UX design",
-      timestamp: "4:00 PM"
-    }
-  ]);
+  const { userId, authToken } = useAuthenticatedUser();
+  const apiKey = process.env.NEXT_PUBLIC_STREAMIO_API_KEY;
+
+  const filters = { type: 'messaging', members: { $in: [userId] } };
+  const options = { presence: true, state: true, watch: true };
+  const sort = { last_updated: -1 };
+
+  const client = useCreateChatClient({
+    apiKey: apiKey || '',
+    tokenOrProvider: authToken || '',
+    userData: { id: userId || '' },
+  });
+
+  if (!client || !userId) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <Card className="mt-6">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>UI/UX Discussion</CardTitle>
-          <CardDescription>Share and learn design insights</CardDescription>
+    <div className="h-[600px]">
+      <Chat client={client}>
+        <div className="flex h-full">
+          <div className="w-1/4 border-r">
+            <ChannelList 
+              filters={filters}
+              sort={sort}
+              options={options}
+            />
+          </div>
+          <div className="flex-1">
+            <Channel>
+              <Window>
+                <ChannelHeader />
+                <MessageList />
+                <MessageInput focus />
+              </Window>
+              <Thread />
+            </Channel>
+          </div>
         </div>
-        <Button variant="ghost" size="icon">
-          <X className="h-4 w-4" />
-        </Button>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {discussions.map((discussion) => (
-            <div key={discussion.id} className="flex gap-3">
-              <Avatar>
-                <AvatarImage src={discussion.avatar} />
-                <AvatarFallback>{discussion.user[0]}</AvatarFallback>
-              </Avatar>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">{discussion.user}</span>
-                  <span className="text-xs text-muted-foreground">{discussion.timestamp}</span>
-                </div>
-                <h4 className="font-medium">{discussion.topic}</h4>
-                <p className="text-sm">{discussion.content}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-      <CardFooter>
-        <div className="flex w-full gap-2">
-          <Input placeholder="Start a new discussion..." className="flex-1" />
-          <Button>Post</Button>
-        </div>
-      </CardFooter>
-    </Card>
+      </Chat>
+    </div>
   );
 };
 
