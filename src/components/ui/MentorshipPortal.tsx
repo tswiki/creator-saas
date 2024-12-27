@@ -213,7 +213,7 @@ const DashboardView = () => {
       <div className="grid grid-cols-3 gap-6 h-[calc(100vh-160px)]">
         <Card className="col-span-2 h-full">
           {(() => {
-            const [currentView, setCurrentView] = useState<'inbox' | 'activity'>('inbox');
+            const [currentView, setCurrentView] = useState<'inbox' | 'activity'>('activity');
             const [activityFeed] = useState([
               {
                 id: 1,
@@ -237,6 +237,34 @@ const DashboardView = () => {
                 timestamp: "Yesterday"
               }
             ]);
+
+            const [messages] = useState([
+              {
+                id: 1,
+                from: "Sarah Chen",
+                subject: "Weekly Mentoring Session",
+                preview: "Hi! Just wanted to confirm our mentoring session for tomorrow at 2pm...",
+                timestamp: "10:30 AM",
+                unread: true
+              },
+              {
+                id: 2,
+                from: "David Kumar",
+                subject: "Code Review Request",
+                preview: "Could you take a look at my latest PR when you have a chance?",
+                timestamp: "Yesterday",
+                unread: false
+              },
+              {
+                id: 3,
+                from: "Lisa Park",
+                subject: "Resource Recommendation",
+                preview: "Based on our last discussion, I think you'll find this tutorial helpful...",
+                timestamp: "2 days ago",
+                unread: false
+              }
+            ]);
+            
 
             return (
               <>
@@ -316,16 +344,16 @@ const DashboardView = () => {
                                         <div className="grid grid-cols-[80px_1fr] gap-4">
                                           <div className="flex items-center justify-center">
                                             <Avatar className="h-12 w-12">
-                                              <AvatarFallback>{msg.sender[0]}</AvatarFallback>
+                                              <AvatarFallback>{msg.from[0]}</AvatarFallback>
                                             </Avatar>
                                           </div>
                                           <div className="flex-1 min-w-0">
                                             <div className="flex justify-between mb-1">
-                                              <p className="font-medium text-base truncate">{msg.sender}</p>
+                                              <p className="font-medium text-base truncate">{msg.from}</p>
                                               <span className="text-sm text-muted-foreground">{msg.timestamp}</span>
                                             </div>
                                             <p className="text-sm font-medium mb-1">{msg.subject}</p>
-                                            <p className="text-sm text-muted-foreground truncate">{msg.content}</p>
+                                            <p className="text-sm text-muted-foreground truncate">{msg.preview}</p>
                                           </div>
                                         </div>
                                       </CardContent>
@@ -335,9 +363,9 @@ const DashboardView = () => {
                                     <DialogHeader>
                                       <DialogTitle className="flex items-center gap-2">
                                         <Avatar className="h-8 w-8">
-                                          <AvatarFallback>{msg.sender[0]}</AvatarFallback>
+                                          <AvatarFallback>{msg.from[0]}</AvatarFallback>
                                         </Avatar>
-                                        {msg.sender}
+                                        {msg.from}
                                       </DialogTitle>
                                       <DialogDescription className="text-sm text-muted-foreground">
                                         {msg.timestamp}
@@ -345,7 +373,7 @@ const DashboardView = () => {
                                     </DialogHeader>
                                     <div className="mt-4">
                                       <p className="font-medium mb-2">{msg.subject}</p>
-                                      <p className="text-base">{msg.content}</p>
+                                      <p className="text-base">{msg.preview}</p>
                                     </div>
                                     <DialogFooter className="mt-6">
                                       <Button>Reply</Button>
@@ -386,26 +414,30 @@ const DashboardView = () => {
                     </div>
                   </Card>
                 </CardContent>
-                <Card>
                   <div className="h-[calc(100vh-var(--header-height)-2rem)]">
-                    <CardFooter className="flex flex-col gap-2 p-4">
-                      <Card className="w-fit p-3">
-                        <div className="flex items-center justify-center gap-2 text-sm">
-                          <Clock className="h-4 w-4 text-muted-foreground" />
-                          <span>Last Updated: {new Date().toLocaleTimeString()}</span>
-                        </div>
-                      </Card>
-                      <Card className="w-fit p-3">
-                        <div className="flex items-center justify-center gap-2">
-                          <Mail className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm">
-                            {currentView === 'inbox' ? '3 unread messages' : '5 new activities'}
-                          </span>
+                    <CardFooter className="p-4 flex justify-center">
+                      <Card className="p-4">
+                        <div className="px-2">
+                          <div className="flex flex-col items-center justify-center space-y-3">
+                            <Card className="p-2">
+                              <div className="flex items-center gap-2 text-sm">
+                                <Clock className="h-4 w-4 text-muted-foreground" />
+                                <span>Last Updated: {new Date().toLocaleTimeString()}</span>
+                              </div>
+                            </Card>
+                            <Card className="p-2">
+                              <div className="flex items-center gap-2 text-sm">
+                                <Mail className="h-4 w-4 text-muted-foreground" />
+                                <span>
+                                  {currentView === 'inbox' ? '3 unread messages' : '5 new activities'}
+                                </span>
+                              </div>
+                            </Card>
+                          </div>
                         </div>
                       </Card>
                     </CardFooter>
                   </div>
-                </Card>
               </>
             );
           })()}
