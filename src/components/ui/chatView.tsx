@@ -1,11 +1,11 @@
 
-import { SetStateAction, useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
+import { SetStateAction, useEffect, useMemo, useState } from "react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./card";
+import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
+import { Badge } from "./badge";
+import { Button } from "./button";
 import { MessageCircle, Users2, X } from "lucide-react";
-import { Input } from "../ui/input";
+import { Input } from "./input";
 
 import {
   Chat,
@@ -257,18 +257,24 @@ const TelegramView = () => {
 };
 
 const UIUXView = () => {
-  const { userId, authToken } = useAuthenticatedUser();
+  const userId  = process.env.USER_ID_STREAMIO;
   const apiKey = process.env.NEXT_PUBLIC_STREAMIO_API_KEY;
+  const authToken = process.env.JWT_AUTH_TOKEN;
 
   const filters = { type: 'messaging', members: { $in: [userId] } };
   const options = { presence: true, state: true, watch: true };
   const sort = { last_updated: -1 };
 
-  const client = useCreateChatClient({
-    apiKey: apiKey || '',
-    tokenOrProvider: authToken || '',
-    userData: { id: userId || '' },
-  });
+  // Move client creation to useMemo to prevent infinite re-renders
+  const client = useMemo(() => {
+    if (!apiKey || !authToken || !userId) return null;
+    
+    return useCreateChatClient({
+      apiKey: apiKey,
+      tokenOrProvider: authToken,
+      userData: { id: userId },
+    });
+  }, [apiKey, authToken, userId]);
 
   if (!client || !userId) {
     return <div>Loading...</div>;

@@ -48,27 +48,38 @@ function AuthSection() {
   const handleGoogleSignIn = async (e: any) => {
     try {
       const provider = new GoogleAuthProvider();
+
+      provider.addScope('https://www.googleapis.com/auth/gmail.readonly');
+      provider.addScope('https://www.googleapis.com/auth/calendar');
+      provider.addScope('https://www.googleapis.com/auth/drive.readonly');
+  
+      // Optional: Request offline access (to get refresh token)
+      provider.setCustomParameters({
+      access_type: 'offline',
+      prompt: 'consent'
+      });
+
       const result = await signInWithPopup(auth, provider);
 
        // Get the ID token
-    const idToken = await result.user.getIdToken()
+      const idToken = await result.user.getIdToken()
     
-    // Send to your backend to set the cookie
-    const response = await fetch('/api/auth/session', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ idToken }),
-    })
-    if (response.ok){
-      router.push('/cohort');
-    }
+      // Send to your backend to set the cookie
+      const response = await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ idToken }),
+      })
+      if (response.ok){
+        router.push('/cohort');
+      }
 
-    } catch (error) {
-      console.error('Error signing in with Google:', error);
+      } catch (error) {
+        console.error('Error signing in with Google:', error);
+      }
     }
-  }
 
   return (
     <div className="flex items-center justify-center w-full lg:w-1/2 h-screen bg-gray-50 p-8">

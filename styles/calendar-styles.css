@@ -1,0 +1,29 @@
+.react-calendar {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1;
+}
+
+.react-calendar__month-view__days {
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.react-calendar__month-view__days__day {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(0.8rem, 2vw, 1rem);
+}
+
+.react-calendar__navigation__label__labelText {
+  font-size: clamp(1rem, 3vw, 1.2rem);
+}
+
+.react-calendar__navigation button {
+  min-width: 30px;
+  font-size: clamp(1.2rem, 4vw, 1.5rem);
+}
+

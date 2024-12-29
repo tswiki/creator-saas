@@ -132,8 +132,12 @@ import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, Me
 import { cn } from '@/lib/utils';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@radix-ui/react-tabs';
 import Marquee from './marquee';
-import SpacesView from '../spaces/chatView';
-
+import SpacesView from './chatView';
+import {EmailDialog} from '../email-dialog';
+import {ActivityDialog} from '../activity-dialog'
+import {EventCreationDialog} from '../event-creation-dialog'
+import { ViewCollectionsDialog } from '../view-collections-dialog';
+import { ResourceCreationDialog } from '../resource-creation-dialog';
 
 const DashboardView = () => {
   const [selectedChat, setSelectedChat] = useState({
@@ -301,10 +305,9 @@ const DashboardView = () => {
                               Filter
                             </Button>
                           </div>
-                          <Button className="ml-4 px-4">
-                            <Plus className="h-4 w-4 mr-2" />
-                            Compose
-                          </Button>
+                          <div className='px-4'>
+                            <EmailDialog />
+                          </div>
                         </div>
                       </div>
                     </Card>
@@ -319,10 +322,9 @@ const DashboardView = () => {
                               Filter
                             </Button>
                           </div>
-                          <Button className="ml-4 px-4">
-                            <Plus className="h-4 w-4 mr-2" />
-                            New Post
-                          </Button>
+                          <div className='px-4'>
+                            <ActivityDialog />
+                          </div>
                         </div>
                       </div>
                     </Card>
@@ -1063,10 +1065,9 @@ const ScheduleView = () => {
                       </MenubarContent>
                     </MenubarMenu>
                   </Menubar>
-                  <Button onClick={() => setShowAddDialog(true)}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Item
-                  </Button>
+                  <div>
+                  <EventCreationDialog />
+                  </div>
                 </div>
               </div>
             </CardHeader>
@@ -1704,190 +1705,11 @@ export default function MentorshipPortal() {
 
               return `${firstName || 'there'}'s Library`
             })()}</h3>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Bookmark className="h-4 w-4 mr-2" />
-                    View Collections
-                  </Button>                  
-                </DialogTrigger>
-                <DialogContent className="w-[95vw] max-w-7xl h-[90vh] flex flex-col overflow-hidden">
-                  <div className="w-full max-w-2xl mx-auto">
-                    <div className="flex flex-col items-center w-full px-4">
-                      <div className="flex items-center justify-between w-full p-2">
-                        <DialogHeader className="shrink-0 space-y-2">
-                          <DialogTitle className="text-base text-center">
-                            Collections
-                          </DialogTitle>
-                        </DialogHeader>
-                        
-                        <div className="flex items-center gap-4">
-                          <Menubar>
-                            <MenubarMenu>
-                              <div className="flex justify-center">
-                                <MenubarTrigger className="flex items-center gap-2 justify-center">
-                                  <Filter className="h-4 w-4" />
-                                  Filter
-                                </MenubarTrigger>
-                              </div>
-                              <MenubarContent>
-                                <MenubarItem>
-                                  All Resources
-                                </MenubarItem>
-                                <MenubarSeparator />
-                                <MenubarItem>
-                                  Collections
-                                </MenubarItem>
-                                <MenubarItem>
-                                  Favorites
-                                </MenubarItem>
-                                <MenubarItem>
-                                  Recently Added
-                                </MenubarItem>
-                              </MenubarContent>
-                            </MenubarMenu>
-                          </Menubar>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex-1 overflow-hidden flex flex-col">
-
-                    <div className="grid grid-cols-1 lg:grid-cols-[2fr,1fr] gap-4 h-[calc(90vh-12rem)] border-2 border-white rounded-lg mx-auto w-[95%]">
-                      <Card className="w-full h-full flex flex-col">
-                        <CardContent className="w-full h-full p-0">
-                          <div className="grid gap-4 p-4 w-full">
-                            {[
-                              {
-                                title: "Advanced JavaScript Concepts",
-                                dateAdded: "2 days ago",
-                                collection: "JavaScript", 
-                                type: "Article",
-                                isStarred: true
-                              },
-                              {
-                                title: "React Performance Optimization Guide",
-                                dateAdded: "1 week ago",
-                                collection: "React",
-                                type: "Tutorial", 
-                                isStarred: false
-                              },
-                              {
-                                title: "Building Scalable Architecture",
-                                dateAdded: "2 weeks ago",
-                                collection: "System Design",
-                                type: "Course",
-                                isStarred: true
-                              },
-                              {
-                                title: "TypeScript Best Practices",
-                                dateAdded: "3 days ago",
-                                collection: "TypeScript",
-                                type: "Guide",
-                                isStarred: false
-                              },
-                              {
-                                title: "Modern CSS Techniques",
-                                dateAdded: "5 days ago",
-                                collection: "Frontend",
-                                type: "Video",
-                                isStarred: true
-                              },
-                              {
-                                title: "Node.js Design Patterns",
-                                dateAdded: "1 month ago",
-                                collection: "Backend",
-                                type: "Book",
-                                isStarred: false
-                              }
-                            ].map((resource, i) => (
-                              <ScrollArea className="h-[calc(90vh-16rem)]">
-                                <Card key={i} className="w-full transition-all hover:shadow-md">
-                                  <CardContent className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 gap-4 w-full">
-                                    <div className="flex items-center gap-4 w-full sm:w-auto overflow-hidden">
-                                      <BookOpen className="h-8 w-8 shrink-0 text-muted-foreground" />
-                                      <div className="min-w-0 flex-1">
-                                        <h4 className="font-medium truncate">{resource.title}</h4>
-                                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
-                                          <span className="truncate">Added {resource.dateAdded}</span>
-                                          <span className="hidden sm:inline">•</span>
-                                          <span className="truncate">Collection: {resource.collection}</span>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-                                      <Badge variant="secondary" className="shrink-0">{resource.type}</Badge>
-                                      <Button variant="ghost" size="icon" className="shrink-0">
-                                        <MoreVertical className="h-4 w-4" />
-                                      </Button>
-                                      <Star 
-                                        className={`h-4 w-4 shrink-0 cursor-pointer transition-colors ${
-                                          resource.isStarred ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground hover:text-yellow-400"
-                                        }`}
-                                      />
-                                    </div>
-                                  </CardContent>
-                                </Card>
-                              </ScrollArea>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      <Card className="h-full flex flex-col">
-                        <CardContent className="h-full p-0">
-                          <ScrollArea className="h-full">
-                            <div className="p-4">
-                              <CardHeader className="px-2">
-                              </CardHeader>
-                              <CardContent>
-                                <ScrollArea className="h-[400px]">
-                                  <div className="space-y-2">
-                                    <div className="border-2 border-dashed rounded-lg p-6 text-center">
-                                      <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                                      <p className="text-sm text-muted-foreground">
-                                        Drag and drop files here or click to browse
-                                      </p>
-                                    </div>
-                                    <div className="space-y-2">
-                                      <Label>Add to Collection</Label>
-                                      <Select>
-                                        <SelectTrigger>
-                                          <SelectValue placeholder="Select collection" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          <SelectItem value="learning">Learning Path</SelectItem>
-                                          <SelectItem value="favorites">Favorites</SelectItem>
-                                          <SelectItem value="starred">Starred</SelectItem>
-                                          <SelectItem value="new">Create New Collection...</SelectItem>
-                                        </SelectContent>
-                                      </Select>
-                                      <Button className="w-full mt-2 mb-2">Upload Resources</Button>
-                                    </div>
-                                  </div>
-                                </ScrollArea>
-                              </CardContent>
-                            </div>
-                          </ScrollArea>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </div>
-
-                  <DialogFooter className="shrink-0 mt-4">
-                    <Button variant="outline">
-                      Export Collection
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+            <ViewCollectionsDialog />
             </div>
           </CardContent>
         </Card>
-              <Button onClick={() => setShowAddDialog(true)}>
-                Add Resource
-              </Button>
+        <ResourceCreationDialog/>
             </div>
           </CardHeader>
           <CardContent>

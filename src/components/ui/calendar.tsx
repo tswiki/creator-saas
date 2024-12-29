@@ -1,184 +1,70 @@
-import { Dialog } from "@radix-ui/react-dialog";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@radix-ui/react-tabs";
-import { Users, Palette, Calendar, Filter, Plus, Video, Edit2, ChevronLeft, ChevronRight } from "lucide-react";
-import { format, addDays, startOfWeek, startOfMonth, addMonths } from "date-fns";
-import { useState, useEffect, useRef } from "react";
-import { Button } from "./button";
-import { Card, CardHeader, CardContent, CardFooter } from "./card";
-import { DialogContent } from "./dialog";
+"use client"
 
-const ScheduleView = () => {
-  const [view, setView] = useState<'day' | 'week' | 'month'>('week');
-  const [date, setDate] = useState<Date>(new Date());
-  const [selectedSession, setSelectedSession] = useState<any>(null);
-  const [showSessionDetailsDialog, setShowSessionDetailsDialog] = useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date());
+import * as React from "react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
+import { DayPicker } from "react-day-picker"
 
-  // Constants for layout
-  const SIDEBAR_WIDTH = 256; // 64px * 4 = 256px
-  const HEADER_HEIGHT = 64;
-  const TIME_COLUMN_WIDTH = 100;
+import { cn } from "@/lib/utils"
+import { buttonVariants } from "@/components/ui/button"
 
-  // Time slots in 3-hour groups
-  const timeGroups = [
-    "00:00 - 03:00",
-    "03:00 - 06:00",
-    "06:00 - 09:00",
-    "09:00 - 12:00",
-    "12:00 - 15:00",
-    "15:00 - 18:00",
-    "18:00 - 21:00",
-    "21:00 - 00:00"
-  ];
+export type CalendarProps = React.ComponentProps<typeof DayPicker>
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 60000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Mock sessions data
-  const sessions = [
-    {
-      id: 1,
-      title: "Meeting with Client",
-      day: format(new Date(), 'EEEE'),
-      startTime: '10:00',
-      endTime: '12:00',
-      type: "meeting",
-      icon: <Users className="h-4 w-4" />,
-      attendees: [
-        { name: "Bayu Sasmita", avatar: "/avatars/bayu.png", status: "Accepted" },
-        { name: "Fridolina Lina", avatar: "/avatars/lina.png", status: "Accepted" },
-      ],
-      host: { name: "John Doe", avatar: "/avatars/john.png" },
-      description: "Project discussion and planning"
-    }
-  ];
-
-  const getDaysToShow = () => {
-    switch(view) {
-      case 'day':
-        return [date];
-      case 'week':
-        return Array.from({length: 7}, (_, i) => addDays(startOfWeek(date), i));
-      case 'month':
-        return Array.from({length: 31}, (_, i) => addDays(startOfMonth(date), i));
-      default:
-        return [];
-    }
-  };
-
+function Calendar({
+  className,
+  classNames,
+  showOutsideDays = true,
+  ...props
+}: CalendarProps) {
   return (
-    <div className="flex h-screen" style={{ marginLeft: SIDEBAR_WIDTH, marginTop: HEADER_HEIGHT }}>
-      <div className="flex-1 flex flex-col">
-        {/* View selector */}
-        <div className="p-4 border-b">
-          <Tabs value={view} onValueChange={(v: any) => setView(v)} className="w-full">
-            <TabsList className="grid w-[400px] grid-cols-3">
-              <TabsTrigger value="day">Day</TabsTrigger>
-              <TabsTrigger value="week">Week</TabsTrigger>
-              <TabsTrigger value="month">Month</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
+    <DayPicker
+      showOutsideDays={showOutsideDays}
+      className={cn("w-full p-3 pt-10", className)} // Added pt-8 for top padding
+      classNames={{
+        months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 w-full",
+        month: "space-y-4 w-full",
+        caption: "flex justify-center pt-1 relative items-center w-full pb-5",
+        caption_label: "text-sm font-medium absolute left-1/2 transform -translate-x-1/2 pb-5 pt-5",
+        nav: "space-x-1 flex items-center w-full",
+        nav_button: cn(
+          buttonVariants({ variant: "outline" }),
+          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+        ),
+        nav_button_previous: "absolute left-1",
+        nav_button_next: "absolute right-1",
+        table: "w-full border-collapse space-y-1",
+        head_row: "flex w-full justify-between",
+        head_cell:
+          "text-neutral-500 rounded-md flex-1 font-normal text-[0.8rem] dark:text-neutral-400",
+        row: "flex w-full mt-2 justify-between",
+        cell: "flex-1 h-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-neutral-100/50 [&:has([aria-selected])]:bg-neutral-100 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 dark:[&:has([aria-selected].day-outside)]:bg-neutral-800/50 dark:[&:has([aria-selected])]:bg-neutral-800",
+        day: cn(
+          buttonVariants({ variant: "ghost" }),
+          "h-9 w-full p-0 font-normal aria-selected:opacity-100"
+        ),
+        day_range_end: "day-range-end",
+        day_selected:
+          "bg-neutral-900 text-neutral-50 hover:bg-neutral-900 hover:text-neutral-50 focus:bg-neutral-900 focus:text-neutral-50 dark:bg-neutral-50 dark:text-neutral-900 dark:hover:bg-neutral-50 dark:hover:text-neutral-900 dark:focus:bg-neutral-50 dark:focus:text-neutral-900",
+        day_today: "bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-50",
+        day_outside:
+          "day-outside text-neutral-500 aria-selected:bg-neutral-100/50 aria-selected:text-neutral-500 dark:text-neutral-400 dark:aria-selected:bg-neutral-800/50 dark:aria-selected:text-neutral-400",
+        day_disabled: "text-neutral-500 opacity-50 dark:text-neutral-400",
+        day_range_middle:
+          "aria-selected:bg-neutral-100 aria-selected:text-neutral-900 dark:aria-selected:bg-neutral-800 dark:aria-selected:text-neutral-50",
+        day_hidden: "invisible",
+        ...classNames,
+      }}
+      components={{
+        IconLeft: ({ className, ...props }) => (
+          <ChevronLeft className={cn("h-4 w-4", className)} {...props} />
+        ),
+        IconRight: ({ className, ...props }) => (
+          <ChevronRight className={cn("h-4 w-4", className)} {...props} />
+        ),
+      }}
+      {...props}
+    />
+  )
+}
+Calendar.displayName = "Calendar"
 
-        {/* Calendar Grid */}
-        <div className="flex-1 overflow-auto">
-          <div className="grid" style={{ 
-            gridTemplateColumns: `${TIME_COLUMN_WIDTH}px repeat(${getDaysToShow().length}, 1fr)`,
-            minHeight: '100%'
-          }}>
-            {/* Day Columns */}
-            {getDaysToShow().map((day) => (
-              <div key={format(day, 'd')} className="min-w-[200px]">
-                <div className="sticky top-0 z-10 bg-background border-b p-2">
-                  <div className="text-sm font-medium">{format(day, 'EEEE')}</div>
-                  <div className="text-sm text-muted-foreground">{format(day, 'd MMM')}</div>
-                </div>
-
-                {timeGroups.map((timeGroup) => (
-                  <div 
-                    key={`${format(day, 'd')}-${timeGroup}`}
-                    className="border-b border-r p-2 relative h-24"
-                  >
-                    {sessions.map(session => (
-                      <Card 
-                        key={session.id}
-                        className="cursor-pointer hover:shadow-md transition-shadow"
-                        onClick={() => {
-                          setSelectedSession(session);
-                          setShowSessionDetailsDialog(true);
-                        }}
-                      >
-                        <CardHeader className="p-2">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              {session.icon}
-                              <div className="font-medium text-sm">{session.title}</div>
-                            </div>
-                            <Button variant="ghost" size="sm">
-                              <Edit2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </CardHeader>
-                      </Card>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Session Details Dialog */}
-      <Dialog open={showSessionDetailsDialog} onOpenChange={setShowSessionDetailsDialog}>
-        <DialogContent className="max-w-2xl">
-          {selectedSession && (
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {selectedSession.icon}
-                    <h3 className="text-lg font-semibold">{selectedSession.title}</h3>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {selectedSession.startTime} - {selectedSession.endTime}
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h4 className="font-medium mb-2">Description</h4>
-                  <p className="text-sm text-muted-foreground">{selectedSession.description}</p>
-                </div>
-                <div>
-                  <h4 className="font-medium mb-2">Attendees</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedSession.attendees.map((attendee: any) => (
-                      <div key={attendee.name} className="flex items-center gap-2 text-sm">
-                        <div className="w-8 h-8 rounded-full bg-muted" />
-                        <span>{attendee.name}</span>
-                        <span className="text-muted-foreground">({attendee.status})</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button className="w-full">
-                  <Video className="h-4 w-4 mr-2" />
-                  Join Meeting
-                </Button>
-              </CardFooter>
-            </Card>
-          )}
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-};
-
-export default ScheduleView;
+export { Calendar }

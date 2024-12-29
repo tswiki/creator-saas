@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { UserCircle, BellRing, Menu, X, Calendar, Users, MessageSquare, Search } from 'lucide-react';
+import { UserCircle, BellRing, Menu, X, Calendar, Users, MessageSquare, Search, Bell } from 'lucide-react';
 import { useState } from 'react';
 import Profile from '@/components/ui/profile'
 import { useTheme } from 'next-themes';
@@ -24,7 +24,7 @@ interface HeaderProps {
   brandName?: string;
 }
 
-export default function Header({ logoSrc, brandName = "ACME.COM" }: HeaderProps) {
+export default function Header({ logoSrc, brandName = "Concrete Manifest" }: HeaderProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const { theme } = useTheme();
@@ -47,18 +47,6 @@ export default function Header({ logoSrc, brandName = "ACME.COM" }: HeaderProps)
     }
   ];
 
-  const communityUpdates = [
-    {
-      title: "New Learning Resources Added",
-      description: "Check out our new tutorials on TypeScript and Next.js",
-      time: "2 hours ago"
-    },
-    {
-      title: "Mentorship Program Launch",
-      description: "Applications now open for our Spring 2024 mentorship cohort",
-      time: "1 day ago"
-    }
-  ];
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 border-b dark:bg-slate-900/75 backdrop-blur-sm transition-colors duration-200">
@@ -126,11 +114,11 @@ export default function Header({ logoSrc, brandName = "ACME.COM" }: HeaderProps)
           </div>
 
           {/* Right side - Features */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 pr-20">
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="ghost" size="icon">
-                  <Calendar className="h-5 w-5" />
+                  <Bell className="h-5 w-5" />
                 </Button>
               </DialogTrigger>
               <DialogContent>
@@ -148,49 +136,6 @@ export default function Header({ logoSrc, brandName = "ACME.COM" }: HeaderProps)
                     ))}
                   </div>
                 </ScrollArea>
-              </DialogContent>
-            </Dialog>
-
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Users className="h-5 w-5" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Community Updates</DialogTitle>
-                </DialogHeader>
-                <ScrollArea className="h-[400px] pr-4">
-                  <div className="space-y-4">
-                    {communityUpdates.map((update, i) => (
-                      <div key={i} className="p-4 rounded-lg border">
-                        <h3 className="font-semibold">{update.title}</h3>
-                        <p className="text-sm mt-2">{update.description}</p>
-                        <p className="text-xs text-muted-foreground mt-2">{update.time}</p>
-                      </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </DialogContent>
-            </Dialog>
-
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <MessageSquare className="h-5 w-5" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Quick Actions</DialogTitle>
-                </DialogHeader>
-                <div className="grid grid-cols-2 gap-4 p-4">
-                  <Button variant="outline" className="w-full">Start Discussion</Button>
-                  <Button variant="outline" className="w-full">Ask Question</Button>
-                  <Button variant="outline" className="w-full">Share Resource</Button>
-                  <Button variant="outline" className="w-full">Give Feedback</Button>
-                </div>
               </DialogContent>
             </Dialog>
           </div>
