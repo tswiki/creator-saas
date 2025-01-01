@@ -57,26 +57,50 @@ export function SpacesView() {
   const [spaces] = useState([
     {
       id: 1,
-      name: "Discord",
-      description: "A space for React developers to collaborate and learn",
-      members: 156,
-      messages: 1234,
+      name: "Live Streams",
+      description: "Join weekly live coding sessions and interactive workshops",
+      members: 2341,
+      messages: 15678,
       type: "public"
     },
     {
-      id: 2, 
-      name: "Telegram",
-      description: "Deep dive into TypeScript features and best practices",
-      members: 89,
-      messages: 567,
-      type: "private"
+      id: 2,
+      name: "Discord Community",
+      description: "Connect with other developers, share resources and get help",
+      members: 8934,
+      messages: 234567,
+      type: "public" 
     },
     {
       id: 3,
-      name: "UI/UX Discussion",
-      description: "Share and discuss UI/UX design patterns and principles",
-      members: 203,
-      messages: 2341,
+      name: "Premium Mentorship",
+      description: "Exclusive access to 1-on-1 mentoring and advanced content",
+      members: 156,
+      messages: 4532,
+      type: "private"
+    },
+    {
+      id: 4,
+      name: "YouTube Live",
+      description: "Watch and interact during live YouTube tutorial recordings",
+      members: 12453,
+      messages: 89234,
+      type: "public"
+    },
+    {
+      id: 5,
+      name: "Study Groups",
+      description: "Join focused study groups for different tech topics",
+      members: 342,
+      messages: 7845,
+      type: "private"
+    },
+    {
+      id: 6,
+      name: "Office Hours",
+      description: "Weekly Q&A sessions and code reviews with mentors",
+      members: 567,
+      messages: 3421,
       type: "public"
     }
   ]);
@@ -138,9 +162,54 @@ export function SpacesView() {
         </Card>
       ) : (
         <>
-          {activeSpace === "Discord" && <DiscordView onClose={() => setActiveSpace(null)} />}
-          {activeSpace === "Telegram" && <TelegramView onClose={() => setActiveSpace(null)} />}
-          {activeSpace === "UI/UX Discussion" && <UIUXView onClose={() => setActiveSpace(null)} />}
+          {activeSpace === "Discord" && (
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Discord Community</CardTitle>
+                  <CardDescription>Connect with fellow developers</CardDescription>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => setActiveSpace(null)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <DiscordView />
+              </CardContent>
+            </Card>
+          )}
+          {activeSpace === "Telegram" && (
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Telegram Group</CardTitle>
+                  <CardDescription>Join our Telegram community</CardDescription>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => setActiveSpace(null)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <TelegramView />
+              </CardContent>
+            </Card>
+          )}
+          {activeSpace === "UI/UX Discussion" && (
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>UI/UX Discussion</CardTitle>
+                  <CardDescription>Share and discuss UI/UX topics</CardDescription>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => setActiveSpace(null)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <UIUXView />
+              </CardContent>
+            </Card>
+          )}
         </>
       )}
     </div>

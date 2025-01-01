@@ -7,7 +7,6 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { ThemeProvider } from '@/components/ui/theme-provider'
 
-
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
