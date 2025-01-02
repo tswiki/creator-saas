@@ -381,8 +381,13 @@ const DashboardView = () => {
         <div className="relative h-full w-full overflow-hidden">
           <div className="flex items-center justify-center gap-6 p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300">
             <Card className="flex flex-col items-center p-3">
-              <h2 className="text-2xl font-bold">Your Dashboard</h2>
-              <p className="text-muted-foreground">{slides[currentSlide].description}</p>
+              <h2 className="text-2xl font-bold">
+                {(() => {
+                  const hour = new Date().getHours();
+                  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+                  return `${greeting}, ${auth.currentUser?.displayName?.split(' ')[0] || 'Guest'}`
+                })()}
+              </h2>
             </Card>
           </div>
           <div className="absolute inset-0 flex justify-center items-center px-6">
