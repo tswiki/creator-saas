@@ -268,8 +268,8 @@ const DashboardView = () => {
   };
 
   return (
-    <div className="relative mt-12">
-      <div className="flex items-center justify-between mb-4">
+    <div className="relative h-[calc(100vh-4rem)] w-[calc(100vw-16rem)] ml-64 mt-16 overflow-hidden">
+      <div className="flex items-center justify-between p-6 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div>
           <h2 className="text-2xl font-bold">{slides[currentSlide].title}</h2>
           <p className="text-muted-foreground">{slides[currentSlide].description}</p>
@@ -291,7 +291,7 @@ const DashboardView = () => {
           </Button>
         </div>
       </div>
-      <div className="relative overflow-visible h-[500px] flex justify-center items-center">
+      <div className="relative h-[calc(100%-8rem)] flex justify-center items-center px-6">
         {slides.map((slide, index) => {
           // Calculate distance from current slide, accounting for wrap-around
           let distance = Math.abs(currentSlide - index);
@@ -318,24 +318,23 @@ const DashboardView = () => {
           return (
             <div
               key={index}
-              className="absolute transition-all duration-300"
+              className="absolute transition-all duration-300 h-full w-full"
               style={{
                 transform: `translateX(${overlap}%) scale(${isCenter ? 1 : 0.9})`,
-                left: '0',
-                right: '0',
                 opacity: isCenter ? 1 : 0.7,
                 zIndex: isCenter ? 10 : position === -1 ? 5 : 1,
-                width: '100%',
                 pointerEvents: isCenter ? 'auto' : 'none',
                 boxShadow: isCenter ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' : 'none'
               }}
             >
-              {slide.component}
+              <div className="h-full w-full overflow-auto">
+                {slide.component}
+              </div>
             </div>
           );
         })}
       </div>
-      <div className="flex justify-center mt-4 gap-2">
+      <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
         {slides.map((_, index) => (
           <Button
             key={index}
