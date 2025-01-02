@@ -140,478 +140,216 @@ import { ViewCollectionsDialog } from '../view-collections-dialog';
 import { ResourceCreationDialog } from '../resource-creation-dialog';
 
 const DashboardView = () => {
-  const [selectedChat, setSelectedChat] = useState({
-    name: "John Doe",
-    avatar: "/avatars/john.jpg", 
-    lastMessage: "Thanks for the help!",
-    lastMessageTime: "2:30 PM"
-  });
+  const [currentSlide, setCurrentSlide] = useState(0);
 
-  const [messages, setMessages] = useState([
-  ]);
-
-  const cohortMembers = [
+  const slides = [
     {
-      name: "Sarah Wilson",
-      avatar: "/avatars/sarah.jpg",
-      email: "sarah@example.com"
-    },
-    {
-      name: "Mike Johnson", 
-      avatar: "/avatars/mike.jpg",
-      email: "mike@example.com"
-    },
-    {
-      name: "Emily Brown",
-      avatar: "/avatars/emily.jpg",
-      email: "emily@example.com" 
-    }
-  ];
-
-  const upcomingEvent = {
-    name: "Weekly Mentorship Session",
-    description: "Group discussion on advanced React patterns",
-    startTime: "3:00 PM",
-    duration: "1 hour",
-    date: "Oct 15, 2023",
-    attendees: cohortMembers
-  };
-
-  return (
-    <div className="h-screen pt-16 px-6">
-      <Card className="mb-6">
-        <CardHeader className="py-4 flex flex-col items-center text-center">
-          <CardTitle className="text-2xl">
-            {(() => {
-              const { auth } = require('@/firebase/firebaseConfig');
-              const [firstName, setFirstName] = useState('');
-              
-              useEffect(() => {
-                const unsubscribe = auth.onAuthStateChanged(async (user: { displayName: string; }) => {
-                  if (user) {
-                    // Get user's display name and split to get first name
-                    const displayName = user.displayName || '';
-                    const firstName = displayName.split(' ')[0];
-                    setFirstName(firstName);
-                  }
-                });
-                
-                return () => unsubscribe();
-              }, []);
-
-              const hour = new Date().getHours();
-              let greeting = '';
-              if (hour < 12) greeting = 'Good morning';
-              else if (hour < 17) greeting = 'Good afternoon'; 
-              else greeting = 'Good evening';
-              
-              return `${greeting}, ${firstName || 'there'}!`
-            })()}
-          </CardTitle>
-          <CardDescription className="text-base">
-            Welcome to your mentorship dashboard
-          </CardDescription>
-        </CardHeader>
-      </Card>
-
-      <div className="grid grid-cols-3 gap-6 h-[calc(100vh-160px)]">
-        <Card className="col-span-2 h-full">
-          {(() => {
-            const [currentView, setCurrentView] = useState<'inbox' | 'activity'>('activity');
-            const [activityFeed] = useState([
-              {
-                id: 1,
-                user: "Alex Thompson",
-                action: "shared a resource",
-                content: "Check out this great article on React performance optimization!",
-                timestamp: "2 hours ago"
-              },
-              {
-                id: 2,
-                user: "Maria Garcia",
-                action: "completed a milestone",
-                content: "Just finished the Advanced React Patterns module!",
-                timestamp: "4 hours ago"
-              },
-              {
-                id: 3,
-                user: "James Wilson",
-                action: "asked a question",
-                content: "Has anyone worked with GraphQL subscriptions?",
-                timestamp: "Yesterday"
-              }
-            ]);
-
-            const [messages] = useState([
-              {
-                id: 1,
-                from: "Sarah Chen",
-                subject: "Weekly Mentoring Session",
-                preview: "Hi! Just wanted to confirm our mentoring session for tomorrow at 2pm...",
-                timestamp: "10:30 AM",
-                unread: true
-              },
-              {
-                id: 2,
-                from: "David Kumar",
-                subject: "Code Review Request",
-                preview: "Could you take a look at my latest PR when you have a chance?",
-                timestamp: "Yesterday",
-                unread: false
-              },
-              {
-                id: 3,
-                from: "Lisa Park",
-                subject: "Resource Recommendation",
-                preview: "Based on our last discussion, I think you'll find this tutorial helpful...",
-                timestamp: "2 days ago",
-                unread: false
-              }
-            ]);
-            
-
-            return (
-              <>
-                <CardHeader className="py-4 pt-10">
-                  <div className="mb-4 px-2 text-center">
-                    <div className="flex justify-center gap-4 mb-4">
-                      <Button
-                        variant={currentView === 'activity' ? 'default' : 'outline'} 
-                        onClick={() => setCurrentView('activity')}
-                        className="w-48"
-                      >
-                        <Activity className="h-5 w-5 mr-2" />
-                        Activity Feed
-                      </Button>
-                      <Button
-                        variant={currentView === 'inbox' ? 'default' : 'outline'}
-                        onClick={() => setCurrentView('inbox')}
-                        className="w-48"
-                      >
-                        <Inbox className="h-5 w-5 mr-2" />
-                        Inbox
-                      </Button>
-                    </div>
-                  </div>
-
-                  {currentView === 'inbox' ? (
-                    <Card className="p-4">
-                      <div className="px-2">
-                        <div className="flex justify-between items-center">
-                          <div className="flex-1 flex space-x-3">
-                            <Input placeholder="Search emails..." className="max-w-md" />
-                            <Button variant="outline" className="px-4">
-                              <Filter className="h-4 w-4 mr-2" />
-                              Filter
-                            </Button>
-                          </div>
-                          <div className='px-4'>
-                            <EmailDialog />
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  ) : (
-                    <Card className="p-4">
-                      <div className="px-2">
-                        <div className="flex justify-between items-center">
-                          <div className="flex-1 flex space-x-3">
-                            <Input placeholder="Search activities..." className="max-w-md" />
-                            <Button variant="outline" className="px-4">
-                              <Filter className="h-4 w-4 mr-2" />
-                              Filter
-                            </Button>
-                          </div>
-                          <div className='px-4'>
-                            <ActivityDialog />
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  )}
-                </CardHeader>
-                
-                <CardContent className="p-6 h-[calc(100vh-100px)]">
-                  <Card className="h-full">
-                    <div className="h-full flex flex-col">
-                      <ScrollArea className="flex-1 p-4">
-                        <div className="space-y-4 pr-4">
-                          {currentView === 'inbox' ? (
-                            <>
-                              {messages.map(msg => (
-                                <Dialog key={msg.id}>
-                                  <DialogTrigger asChild>
-                                    <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
-                                      <CardContent className="p-5">
-                                        <div className="grid grid-cols-[80px_1fr] gap-4">
-                                          <div className="flex items-center justify-center">
-                                            <Avatar className="h-12 w-12">
-                                              <AvatarFallback>{msg.from[0]}</AvatarFallback>
-                                            </Avatar>
-                                          </div>
-                                          <div className="flex-1 min-w-0">
-                                            <div className="flex justify-between mb-1">
-                                              <p className="font-medium text-base truncate">{msg.from}</p>
-                                              <span className="text-sm text-muted-foreground">{msg.timestamp}</span>
-                                            </div>
-                                            <p className="text-sm font-medium mb-1">{msg.subject}</p>
-                                            <p className="text-sm text-muted-foreground truncate">{msg.preview}</p>
-                                          </div>
-                                        </div>
-                                      </CardContent>
-                                    </Card>
-                                  </DialogTrigger>
-                                  <DialogContent className="sm:max-w-[525px]">
-                                    <DialogHeader>
-                                      <DialogTitle className="flex items-center gap-2">
-                                        <Avatar className="h-8 w-8">
-                                          <AvatarFallback>{msg.from[0]}</AvatarFallback>
-                                        </Avatar>
-                                        {msg.from}
-                                      </DialogTitle>
-                                      <DialogDescription className="text-sm text-muted-foreground">
-                                        {msg.timestamp}
-                                      </DialogDescription>
-                                    </DialogHeader>
-                                    <div className="mt-4">
-                                      <p className="font-medium mb-2">{msg.subject}</p>
-                                      <p className="text-base">{msg.preview}</p>
-                                    </div>
-                                    <DialogFooter className="mt-6">
-                                      <Button>Reply</Button>
-                                    </DialogFooter>
-                                  </DialogContent>
-                                </Dialog>
-                              ))}
-                            </>
-                          ) : (
-                            <>
-                              {activityFeed.map((activity) => (
-                                <Card key={activity.id} className="cursor-pointer hover:bg-muted/50 transition-colors">
-                                  <CardContent className="p-5">
-                                    <div className="flex gap-4">
-                                      <Avatar className="h-12 w-12">
-                                        <AvatarFallback>{activity.user[0]}</AvatarFallback>
-                                      </Avatar>
-                                      <div className="flex-1">
-                                        <div className="flex justify-between mb-1">
-                                          <p className="font-medium">{activity.user}</p>
-                                          <span className="text-sm text-muted-foreground">{activity.timestamp}</span>
-                                        </div>
-                                        <p className="text-sm">{activity.action}</p>
-                                        {activity.content && (
-                                          <Card className="mt-2 p-3 bg-muted">
-                                            <p className="text-sm">{activity.content}</p>
-                                          </Card>
-                                        )}
-                                      </div>
-                                    </div>
-                                  </CardContent>
-                                </Card>
-                              ))}
-                            </>
-                          )}
-                        </div>
-                      </ScrollArea>
-                    </div>
-                  </Card>
-                </CardContent>
-                  <div className="h-[calc(100vh-var(--header-height)-2rem)]">
-                    <CardFooter className="p-4 flex justify-center">
-                      <Card className="p-4">
-                        <div className="px-2">
-                          <div className="flex flex-col items-center justify-center space-y-3">
-                            <Card className="p-2">
-                              <div className="flex items-center gap-2 text-sm">
-                                <Clock className="h-4 w-4 text-muted-foreground" />
-                                <span>Last Updated: {new Date().toLocaleTimeString()}</span>
-                              </div>
-                            </Card>
-                            <Card className="p-2">
-                              <div className="flex items-center gap-2 text-sm">
-                                <Mail className="h-4 w-4 text-muted-foreground" />
-                                <span>
-                                  {currentView === 'inbox' ? '3 unread messages' : '5 new activities'}
-                                </span>
-                              </div>
-                            </Card>
-                          </div>
-                        </div>
-                      </Card>
-                    </CardFooter>
-                  </div>
-              </>
-            );
-          })()}
-        </Card>
-
-        {/* Right Sidebar */}
-        <div className="space-y-6">
-          {/* Cohort Section */}
+      title: "Schedule Overview",
+      description: "Upcoming meetings and deadlines",
+      component: (
+        <div className="p-4">
           <Card>
-            <CardHeader className="py-4">
-              <div className="flex items-center justify-center gap-2">
-                <Card className="p-2 w-full">
-                  <CardTitle className="text-lg text-center flex items-center justify-center gap-2">
-                    <Users2 className="h-5 w-5" />
-                    Cohort
-                  </CardTitle>
-                </Card>
-              </div>
+            <CardHeader>
+              <CardTitle>This Week's Schedule</CardTitle>
+              <CardDescription>Your upcoming events and tasks</CardDescription>
             </CardHeader>
-            <CardContent className="p-0">
-              <ScrollArea className="h-[300px] px-4">
-                <div className="space-y-3 py-4">
-                  <Card className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10 shadow-sm">
-                    <CardHeader className="py-3">
-                      <CardTitle className="text-sm">Active Members</CardTitle>
-                    </CardHeader>
-                  </Card>
-                  <Card className="relative">
-                    <div className="space-y-2">
-                      {[
-                        {
-                          name: "Sarah Johnson",
-                          email: "sarah.j@example.com",
-                          avatar: "/avatars/sarah.png"
-                        },
-                        {
-                          name: "Michael Chen", 
-                          email: "m.chen@example.com",
-                          avatar: "/avatars/michael.png"
-                        },
-                        {
-                          name: "Emma Wilson",
-                          email: "emma.w@example.com", 
-                          avatar: "/avatars/emma.png"
-                        },
-                        {
-                          name: "James Rodriguez",
-                          email: "james.r@example.com",
-                          avatar: "/avatars/james.png"
-                        },
-                        {
-                          name: "Sophia Lee",
-                          email: "sophia.l@example.com",
-                          avatar: "/avatars/sophia.png"
-                        },
-                        {
-                          name: "David Kim",
-                          email: "david.k@example.com",
-                          avatar: "/avatars/david.png"
-                        },
-                        ...cohortMembers
-                      ].map((member, i) => (
-                        <Dialog key={i}>
-                          <DialogTrigger asChild>
-                            <Card className="p-3 cursor-pointer hover:bg-muted/50 transition-colors">
-                              <div className="flex items-center space-x-3">
-                                <Avatar className="h-10 w-10">
-                                  <AvatarImage src={member.avatar} />
-                                  <AvatarFallback>{member.name[0]}</AvatarFallback>
-                                </Avatar>
-                                <div className="flex-1">
-                                  <p className="font-medium text-sm mb-1">{member.name}</p>
-                                  <div className="flex items-center text-xs text-muted-foreground">
-                                    <Mail className="h-3 w-3 mr-1" />
-                                    {member.email}
-                                  </div>
-                                </div>
-                              </div>
-                            </Card>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Send Message</DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4 py-4">
-                              <div className="flex items-center space-x-3">
-                                <Avatar className="h-12 w-12">
-                                  <AvatarImage src={member.avatar} />
-                                  <AvatarFallback>{member.name[0]}</AvatarFallback>
-                                </Avatar>
-                                <div>
-                                  <p className="font-medium">{member.name}</p>
-                                  <p className="text-sm text-muted-foreground">{member.email}</p>
-                                </div>
-                              </div>
-                              <div className="space-y-2">
-                                <div className="text-sm font-medium">Message</div>
-                                <Textarea id="message" placeholder="Type your message here..." />
-                              </div>
-                            </div>
-                            <DialogFooter>
-                              <Button variant="outline">Cancel</Button>
-                              <Button>Send Message</Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-                      ))}
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Calendar className="h-5 w-5" />
+                    <div>
+                      <p className="font-medium">Weekly Team Standup</p>
+                      <p className="text-sm text-muted-foreground">Today at 2:00 PM</p>
                     </div>
-                  </Card>
+                  </div>
+                  <Badge>Meeting</Badge>
                 </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
-
-          {/* Event Section */}
-          <Card>
-            <div className="flex justify-center">
-              <CardHeader className="py-4 text-center">
-                <div>
-                  <Card className="p-4">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <Calendar className="h-5 w-5" />
-                      Upcoming Event
-                    </CardTitle>
-                  </Card>
+                <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <FileText className="h-5 w-5" />
+                    <div>
+                      <p className="font-medium">Project Deadline</p>
+                      <p className="text-sm text-muted-foreground">In 2 days</p>
+                    </div>
+                  </div>
+                  <Badge variant="destructive">High Priority</Badge>
                 </div>
-              </CardHeader>
-            </div>
-            <CardContent className="space-y-4 p-2">
-              <Card className="flex justify-center">
-                <CardContent className="space-y-4 p-4 text-center">
-                  <div>
-                    <h3 className="font-semibold text-base mb-1">{upcomingEvent.name}</h3>
-                    <p className="text-sm text-muted-foreground">{upcomingEvent.description}</p>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex items-center text-xs justify-center">
-                      <Clock className="h-3 w-3 mr-2" />
-                      {upcomingEvent.startTime} ({upcomingEvent.duration})
-                    </div>
-                    <div className="flex items-center text-xs justify-center">
-                      <Calendar className="h-3 w-3 mr-2" />
-                      {upcomingEvent.date}
-                    </div>
-                  </div>
-
-                  <div>
-                    <p className="text-xs font-medium mb-2">Attendees</p>
-                    <div className="flex -space-x-2 justify-center">
-                      {upcomingEvent.attendees.map((attendee, i) => (
-                        <Avatar key={i} className="h-8 w-8 border-2 border-background">
-                          <AvatarImage src={attendee.avatar} />
-                          <AvatarFallback>{attendee.name[0]}</AvatarFallback>
-                        </Avatar>
-                      ))}
-                    </div>
-                  </div>
-
-                  <Button className="w-full text-sm py-2" variant="outline">
-                    <Share className="h-3 w-3 mr-2" />
-                    Share Invitation Link
-                  </Button>
-                </CardContent>
-              </Card>
+              </div>
             </CardContent>
           </Card>
         </div>
+      )
+    },
+    {
+      title: "Chat Spaces", 
+      description: "Community discussions and mentorship",
+      component: (
+        <div className="p-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Active Spaces</CardTitle>
+              <CardDescription>Connect with mentors and peers</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Users2 className="h-5 w-5" />
+                    <div>
+                      <p className="font-medium">Discord Community</p>
+                      <p className="text-sm text-muted-foreground">125 members online</p>
+                    </div>
+                  </div>
+                  <Button size="sm">Join</Button>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <MonitorPlay className="h-5 w-5" />
+                    <div>
+                      <p className="font-medium">Live Streams</p>
+                      <p className="text-sm text-muted-foreground">2 streams active</p>
+                    </div>
+                  </div>
+                  <Button size="sm">Watch</Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )
+    },
+    {
+      title: "Resources",
+      description: "Learning materials and documentation", 
+      component: (
+        <div className="p-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Latest Resources</CardTitle>
+              <CardDescription>Recently added learning materials</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <FileText className="h-5 w-5" />
+                    <div>
+                      <p className="font-medium">React Best Practices Guide</p>
+                      <p className="text-sm text-muted-foreground">Added 2 days ago</p>
+                    </div>
+                  </div>
+                  <Button size="sm" variant="outline">View</Button>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Youtube className="h-5 w-5" />
+                    <div>
+                      <p className="font-medium">TypeScript Tutorial Series</p>
+                      <p className="text-sm text-muted-foreground">8 videos</p>
+                    </div>
+                  </div>
+                  <Button size="sm" variant="outline">Watch</Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )
+    }
+  ];
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  };
+
+  return (
+    <div className="relative mt-12">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h2 className="text-2xl font-bold">{slides[currentSlide].title}</h2>
+          <p className="text-muted-foreground">{slides[currentSlide].description}</p>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={prevSlide}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={nextSlide}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+      <div className="relative overflow-visible h-[500px] flex justify-center items-center">
+        {slides.map((slide, index) => {
+          // Calculate distance from current slide, accounting for wrap-around
+          let distance = Math.abs(currentSlide - index);
+          // Handle wrap-around distance calculation
+          if (distance > slides.length / 2) {
+            distance = slides.length - distance;
+          }
+          if (distance > 1) return null; // Only render adjacent slides
+          
+          // Calculate position and styling based on position relative to current slide
+          const isCenter = distance === 0;
+          let position;
+          if (index === (currentSlide + 1) % slides.length) {
+            position = 1;
+          } else if (index === (currentSlide - 1 + slides.length) % slides.length) {
+            position = -1;
+          } else {
+            position = 0;
+          }
+          
+          // Calculate overlap effect
+          const overlap = position * 85; // 85% overlap for adjacent slides
+          
+          return (
+            <div
+              key={index}
+              className="absolute transition-all duration-300"
+              style={{
+                transform: `translateX(${overlap}%) scale(${isCenter ? 1 : 0.9})`,
+                left: '0',
+                right: '0',
+                opacity: isCenter ? 1 : 0.7,
+                zIndex: isCenter ? 10 : position === -1 ? 5 : 1,
+                width: '100%',
+                pointerEvents: isCenter ? 'auto' : 'none',
+                boxShadow: isCenter ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' : 'none'
+              }}
+            >
+              {slide.component}
+            </div>
+          );
+        })}
+      </div>
+      <div className="flex justify-center mt-4 gap-2">
+        {slides.map((_, index) => (
+          <Button
+            key={index}
+            variant={currentSlide === index ? "default" : "outline"}
+            size="sm"
+            className="w-2 h-2 p-0 rounded-full"
+            onClick={() => setCurrentSlide(index)}
+          />
+        ))}
       </div>
     </div>
   );
 };
+
 
 const ScheduleView = () => {
   const [tasks, setTasks] = useState<any[]>([
