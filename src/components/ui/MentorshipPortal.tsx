@@ -256,6 +256,70 @@ const DashboardView = () => {
       )
     },
     {
+      title: "Recent Activity",
+      description: "Your recent and most accessed content",
+      component: (
+        <div className="p-4">
+          <Card className="relative">
+            <div className="absolute top-6 right-6">
+              <Card className="p-2">
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="icon" onClick={prevSlide}>
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={nextSlide}>
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </Card>
+            </div>
+            <CardHeader>
+              <CardTitle>Recent Activities</CardTitle>
+              <CardDescription>Your most accessed resources and actions</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Card className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Clock className="h-5 w-5" />
+                    <div>
+                      <p className="font-medium">TypeScript Tutorial Series</p>
+                      <p className="text-sm text-muted-foreground">Last accessed 2 hours ago</p>
+                    </div>
+                  </div>
+                  <Button size="sm" variant="outline">Resume</Button>
+                </div>
+              </Card>
+              <Card className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <MessageSquare className="h-5 w-5" />
+                    <div>
+                      <p className="font-medium">Discord Community Chat</p>
+                      <p className="text-sm text-muted-foreground">Active 30 minutes ago</p>
+                    </div>
+                  </div>
+                  <Button size="sm" variant="outline">Rejoin</Button>
+                </div>
+              </Card>
+              <Card className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Bookmark className="h-5 w-5" />
+                    <div>
+                      <p className="font-medium">React Best Practices Guide</p>
+                      <p className="text-sm text-muted-foreground">Bookmarked yesterday</p>
+                    </div>
+                  </div>
+                  <Button size="sm" variant="outline">Continue</Button>
+                </div>
+              </Card>
+            </CardContent>
+          </Card>
+        </div>
+      )
+    }
+    ,{
       title: "Resources",
       description: "Learning materials and documentation", 
       component: (
@@ -312,16 +376,16 @@ const DashboardView = () => {
   
 
   return (
-    <div className="h-[calc(100vh-4rem)] w-[calc(100vw-20rem)] ml-64 mt-16 p-6">
-      <Card className="h-full w-[calc(100%-2rem)] mx-auto">
+    <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-hidden">
+      <Card className="h-full w-full">
         <div className="relative h-full w-full overflow-hidden">
-          <div className="flex items-center justify-center gap-6 p-6 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <Card className="flex flex-col items-center p-4">
-              <h2 className="text-2xl font-bold">{slides[currentSlide].title}</h2>
+          <div className="flex items-center justify-center gap-6 p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300">
+            <Card className="flex flex-col items-center p-3">
+              <h2 className="text-2xl font-bold">Your Dashboard</h2>
               <p className="text-muted-foreground">{slides[currentSlide].description}</p>
             </Card>
           </div>
-          <div className="relative h-[calc(100%-8rem)] flex justify-center items-center px-6">
+          <div className="absolute inset-0 flex justify-center items-center px-6">
             {slides.map((slide, index) => {
               let distance = Math.abs(currentSlide - index);
               if (distance > slides.length / 2) {
@@ -344,13 +408,14 @@ const DashboardView = () => {
               return (
                 <div
                   key={index}
-                  className="absolute transition-all duration-300 h-auto min-h-[60%] max-h-[90%] w-[70%] max-w-2xl"
+                  className="absolute transition-all duration-500 h-auto min-h-[60%] max-h-[90%] w-[70%] max-w-2xl"
                   style={{
-                    transform: `translateX(${overlap}%) scale(${isCenter ? 1 : 0.9})`,
-                    opacity: isCenter ? 1 : 0.7,
-                    zIndex: isCenter ? 10 : position === -1 ? 5 : 1,
+                    transform: `translateX(${overlap}%) scale(${isCenter ? 1.05 : 0.9})`,
+                    opacity: isCenter ? 1 : 0.5,
+                    zIndex: isCenter ? 20 : position === -1 ? 5 : 1,
                     pointerEvents: isCenter ? 'auto' : 'none',
-                    boxShadow: isCenter ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' : 'none'
+                    boxShadow: isCenter ? '0 25px 50px -12px rgba(0, 0, 0, 0.25)' : 'none',
+                    filter: isCenter ? 'none' : 'blur(3px)'
                   }}
                 >
                   <div className="h-full w-full overflow-auto rounded-lg bg-background">
@@ -360,7 +425,7 @@ const DashboardView = () => {
               );
             })}
           </div>
-          <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+          <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2 z-30">
             {slides.map((_, index) => (
               <Button
                 key={index}
