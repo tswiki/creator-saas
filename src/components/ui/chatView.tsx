@@ -6,6 +6,8 @@ import { Badge } from "./badge";
 import { Button } from "./button";
 import { MessageCircle, Users2, X } from "lucide-react";
 import { Input } from "./input";
+import DiscordApp from '../spaces/discordView';
+import VidView from '../spaces/videoView';
 
 import {
   Chat,
@@ -162,28 +164,26 @@ export function SpacesView() {
         </Card>
       ) : (
         <>
-          {activeSpace === "Discord" && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle>Discord Community</CardTitle>
-                  <CardDescription>Connect with fellow developers</CardDescription>
-                </div>
-                <Button variant="ghost" size="icon" onClick={() => setActiveSpace(null)}>
-                  <X className="h-4 w-4" />
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <DiscordView />
-              </CardContent>
+          {activeSpace === "Live Streams" && (
+            <div className="h-[calc(100vh-4rem)]">
+            <Card className="h-full">
+              <VidView/>
             </Card>
+          </div>
           )}
-          {activeSpace === "Telegram" && (
+          {activeSpace === "Discord Community" && (
+            <div className="h-[calc(100vh-4rem)]">
+              <Card className="h-full">
+                <DiscordApp/>
+              </Card>
+            </div>
+          )}
+          {activeSpace === "Premium Mentorship" && (
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                  <CardTitle>Telegram Group</CardTitle>
-                  <CardDescription>Join our Telegram community</CardDescription>
+                  <CardTitle>Premium Mentorship</CardTitle>
+                  <CardDescription>1-on-1 mentoring sessions</CardDescription>
                 </div>
                 <Button variant="ghost" size="icon" onClick={() => setActiveSpace(null)}>
                   <X className="h-4 w-4" />
@@ -194,12 +194,89 @@ export function SpacesView() {
               </CardContent>
             </Card>
           )}
-          {activeSpace === "UI/UX Discussion" && (
+          {activeSpace === "YouTube Live" && (
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                  <CardTitle>UI/UX Discussion</CardTitle>
-                  <CardDescription>Share and discuss UI/UX topics</CardDescription>
+                  <CardTitle>Activity Feed</CardTitle>
+                  <CardDescription>Recent events and updates</CardDescription>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => setActiveSpace(null)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-4">
+                  <div className="flex items-start space-x-4 p-4 border rounded-lg">
+                    <Avatar>
+                      <AvatarImage src="/avatars/sarah.jpg" />
+                      <AvatarFallback>SJ</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <p className="font-medium">Sarah Johnson</p>
+                      <p className="text-sm text-gray-500">Started a new course: Advanced React Patterns</p>
+                      <div className="flex items-center mt-2 space-x-2">
+                        <Badge variant="secondary">Course</Badge>
+                        <span className="text-xs text-gray-400">2 hours ago</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start space-x-4 p-4 border rounded-lg">
+                    <Avatar>
+                      <AvatarImage src="/avatars/mike.jpg" />
+                      <AvatarFallback>MP</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <p className="font-medium">Mike Peters</p>
+                      <p className="text-sm text-gray-500">Completed project milestone: E-commerce Dashboard</p>
+                      <div className="flex items-center mt-2 space-x-2">
+                        <Badge variant="secondary">Project</Badge>
+                        <span className="text-xs text-gray-400">5 hours ago</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start space-x-4 p-4 border rounded-lg">
+                    <Avatar>
+                      <AvatarImage src="/avatars/alex.jpg" />
+                      <AvatarFallback>AK</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <p className="font-medium">Alex Kim</p>
+                      <p className="text-sm text-gray-500">Shared a resource: "Ultimate Guide to TypeScript"</p>
+                      <div className="flex items-center mt-2 space-x-2">
+                        <Badge variant="secondary">Resource</Badge>
+                        <span className="text-xs text-gray-400">1 day ago</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          {activeSpace === "Study Groups" && (
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Study Groups</CardTitle>
+                  <CardDescription>Topic-focused study groups</CardDescription>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => setActiveSpace(null)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <UIUXView />
+              </CardContent>
+            </Card>
+          )}
+          {activeSpace === "Office Hours" && (
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Office Hours</CardTitle>
+                  <CardDescription>Q&A and code reviews</CardDescription>
                 </div>
                 <Button variant="ghost" size="icon" onClick={() => setActiveSpace(null)}>
                   <X className="h-4 w-4" />
@@ -215,64 +292,6 @@ export function SpacesView() {
     </div>
   );
 }
-
-const DiscordView = () => {
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      user: "Sarah Wilson",
-      avatar: "/avatars/sarah.jpg",
-      content: "Hey everyone! Welcome to the Discord space!",
-      timestamp: "2:30 PM"
-    },
-    {
-      id: 2, 
-      user: "Mike Johnson",
-      avatar: "/avatars/mike.jpg", 
-      content: "Thanks for having us here. Looking forward to the discussions!",
-      timestamp: "2:32 PM"
-    }
-  ]);
-
-  return (
-    <Card className="mt-6">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>Discord Community</CardTitle>
-          <CardDescription>Connect with fellow developers</CardDescription>
-        </div>
-        <Button variant="ghost" size="icon">
-          <X className="h-4 w-4" />
-        </Button>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {messages.map((message) => (
-            <div key={message.id} className="flex gap-3">
-              <Avatar>
-                <AvatarImage src={message.avatar} />
-                <AvatarFallback>{message.user[0]}</AvatarFallback>
-              </Avatar>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">{message.user}</span>
-                  <span className="text-xs text-muted-foreground">{message.timestamp}</span>
-                </div>
-                <p className="text-sm">{message.content}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-      <CardFooter>
-        <div className="flex w-full gap-2">
-          <Input placeholder="Type a message..." className="flex-1" />
-          <Button>Send</Button>
-        </div>
-      </CardFooter>
-    </Card>
-  );
-};
 
 const TelegramView = () => {
   const [messages, setMessages] = useState([
