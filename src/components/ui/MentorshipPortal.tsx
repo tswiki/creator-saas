@@ -142,20 +142,40 @@ import { ResourceCreationDialog } from '../resource-creation-dialog';
 const DashboardView = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  };
+
   const slides = [
     {
       title: "Schedule Overview",
       description: "Upcoming meetings and deadlines",
       component: (
         <div className="p-4">
-          <Card>
+          <Card className="relative">
+            <div className="absolute top-6 right-6">
+              <Card className="p-2">
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="icon" onClick={prevSlide}>
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={nextSlide}>
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </Card>
+            </div>
             <CardHeader>
               <CardTitle>This Week's Schedule</CardTitle>
               <CardDescription>Your upcoming events and tasks</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
+            <CardContent className="space-y-4">
+              <Card className="p-4">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Calendar className="h-5 w-5" />
                     <div>
@@ -165,7 +185,9 @@ const DashboardView = () => {
                   </div>
                   <Badge>Meeting</Badge>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
+              </Card>
+              <Card className="p-4">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <FileText className="h-5 w-5" />
                     <div>
@@ -175,7 +197,7 @@ const DashboardView = () => {
                   </div>
                   <Badge variant="destructive">High Priority</Badge>
                 </div>
-              </div>
+              </Card>
             </CardContent>
           </Card>
         </div>
@@ -186,14 +208,26 @@ const DashboardView = () => {
       description: "Community discussions and mentorship",
       component: (
         <div className="p-4">
-          <Card>
+          <Card className="relative">
+            <div className="absolute top-6 right-6">
+              <Card className="p-2">
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="icon" onClick={prevSlide}>
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={nextSlide}>
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </Card>
+            </div>
             <CardHeader>
               <CardTitle>Active Spaces</CardTitle>
               <CardDescription>Connect with mentors and peers</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
+            <CardContent className="space-y-4">
+              <Card className="p-4">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Users2 className="h-5 w-5" />
                     <div>
@@ -203,7 +237,9 @@ const DashboardView = () => {
                   </div>
                   <Button size="sm">Join</Button>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
+              </Card>
+              <Card className="p-4">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <MonitorPlay className="h-5 w-5" />
                     <div>
@@ -213,7 +249,7 @@ const DashboardView = () => {
                   </div>
                   <Button size="sm">Watch</Button>
                 </div>
-              </div>
+              </Card>
             </CardContent>
           </Card>
         </div>
@@ -224,14 +260,26 @@ const DashboardView = () => {
       description: "Learning materials and documentation", 
       component: (
         <div className="p-4">
-          <Card>
+          <Card className="relative">
+            <div className="absolute top-6 right-6">
+              <Card className="p-2">
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="icon" onClick={prevSlide}>
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={nextSlide}>
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </Card>
+            </div>
             <CardHeader>
               <CardTitle>Latest Resources</CardTitle>
               <CardDescription>Recently added learning materials</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
+            <CardContent className="space-y-4">
+              <Card className="p-4">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <FileText className="h-5 w-5" />
                     <div>
@@ -241,7 +289,9 @@ const DashboardView = () => {
                   </div>
                   <Button size="sm" variant="outline">View</Button>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
+              </Card>
+              <Card className="p-4">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Youtube className="h-5 w-5" />
                     <div>
@@ -251,7 +301,7 @@ const DashboardView = () => {
                   </div>
                   <Button size="sm" variant="outline">Watch</Button>
                 </div>
-              </div>
+              </Card>
             </CardContent>
           </Card>
         </div>
@@ -259,92 +309,70 @@ const DashboardView = () => {
     }
   ];
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  };
+  
 
   return (
-    <div className="relative h-[calc(100vh-4rem)] w-[calc(100vw-16rem)] ml-64 mt-16 overflow-hidden">
-      <div className="flex items-center justify-between p-6 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div>
-          <h2 className="text-2xl font-bold">{slides[currentSlide].title}</h2>
-          <p className="text-muted-foreground">{slides[currentSlide].description}</p>
+    <div className="h-[calc(100vh-4rem)] w-[calc(100vw-20rem)] ml-64 mt-16 p-6">
+      <Card className="h-full w-[calc(100%-2rem)] mx-auto">
+        <div className="relative h-full w-full overflow-hidden">
+          <div className="flex items-center justify-center gap-6 p-6 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <Card className="flex flex-col items-center p-4">
+              <h2 className="text-2xl font-bold">{slides[currentSlide].title}</h2>
+              <p className="text-muted-foreground">{slides[currentSlide].description}</p>
+            </Card>
+          </div>
+          <div className="relative h-[calc(100%-8rem)] flex justify-center items-center px-6">
+            {slides.map((slide, index) => {
+              let distance = Math.abs(currentSlide - index);
+              if (distance > slides.length / 2) {
+                distance = slides.length - distance;
+              }
+              if (distance > 1) return null;
+              
+              const isCenter = distance === 0;
+              let position;
+              if (index === (currentSlide + 1) % slides.length) {
+                position = 1;
+              } else if (index === (currentSlide - 1 + slides.length) % slides.length) {
+                position = -1;
+              } else {
+                position = 0;
+              }
+              
+              const overlap = position * 85;
+              
+              return (
+                <div
+                  key={index}
+                  className="absolute transition-all duration-300 h-auto min-h-[60%] max-h-[90%] w-[70%] max-w-2xl"
+                  style={{
+                    transform: `translateX(${overlap}%) scale(${isCenter ? 1 : 0.9})`,
+                    opacity: isCenter ? 1 : 0.7,
+                    zIndex: isCenter ? 10 : position === -1 ? 5 : 1,
+                    pointerEvents: isCenter ? 'auto' : 'none',
+                    boxShadow: isCenter ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' : 'none'
+                  }}
+                >
+                  <div className="h-full w-full overflow-auto rounded-lg bg-background">
+                    {slide.component}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+            {slides.map((_, index) => (
+              <Button
+                key={index}
+                variant={currentSlide === index ? "default" : "outline"}
+                size="sm"
+                className="w-2 h-2 p-0 rounded-full"
+                onClick={() => setCurrentSlide(index)}
+              />
+            ))}
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={prevSlide}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={nextSlide}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-      <div className="relative h-[calc(100%-8rem)] flex justify-center items-center px-6">
-        {slides.map((slide, index) => {
-          // Calculate distance from current slide, accounting for wrap-around
-          let distance = Math.abs(currentSlide - index);
-          // Handle wrap-around distance calculation
-          if (distance > slides.length / 2) {
-            distance = slides.length - distance;
-          }
-          if (distance > 1) return null; // Only render adjacent slides
-          
-          // Calculate position and styling based on position relative to current slide
-          const isCenter = distance === 0;
-          let position;
-          if (index === (currentSlide + 1) % slides.length) {
-            position = 1;
-          } else if (index === (currentSlide - 1 + slides.length) % slides.length) {
-            position = -1;
-          } else {
-            position = 0;
-          }
-          
-          // Calculate overlap effect
-          const overlap = position * 85; // 85% overlap for adjacent slides
-          
-          return (
-            <div
-              key={index}
-              className="absolute transition-all duration-300 h-full w-full"
-              style={{
-                transform: `translateX(${overlap}%) scale(${isCenter ? 1 : 0.9})`,
-                opacity: isCenter ? 1 : 0.7,
-                zIndex: isCenter ? 10 : position === -1 ? 5 : 1,
-                pointerEvents: isCenter ? 'auto' : 'none',
-                boxShadow: isCenter ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' : 'none'
-              }}
-            >
-              <div className="h-full w-full overflow-auto">
-                {slide.component}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-        {slides.map((_, index) => (
-          <Button
-            key={index}
-            variant={currentSlide === index ? "default" : "outline"}
-            size="sm"
-            className="w-2 h-2 p-0 rounded-full"
-            onClick={() => setCurrentSlide(index)}
-          />
-        ))}
-      </div>
+      </Card>
     </div>
   );
 };
