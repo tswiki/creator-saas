@@ -1538,7 +1538,7 @@ export default function MentorshipPortal() {
                 return () => unsubscribe();
               }, []);
 
-              return `${firstName || 'there'}'s Library`
+              return `${firstName || 'there'}'s Archive`
             })()}</h3>
             <ViewCollectionsDialog />
             </div>

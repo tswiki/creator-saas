@@ -2,6 +2,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Star, File, MessageSquare, Folder, MoreHorizontal } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Card } from "@/components/ui/card"
 
 interface FavoritesListProps {
   filter: string
@@ -13,63 +14,100 @@ interface FavoriteItem {
   type: "'resource'" | "'message'" | "'collection'"
   title: string
   collection: string
+  description: string
   icon: React.ReactNode
 }
 
 export function FavoritesList({ filter, searchQuery }: FavoritesListProps) {
-  // This is mock data. In a real application, you'd fetch this from an API
+  // Sample data with more details
   const favorites: FavoriteItem[] = [
-    { id: 1, type: "'resource'", title: "'Important Document'", collection: "'Work'", icon: <File className="h-4 w-4" /> },
-    { id: 2, type: "'message'", title: "'Team Update'", collection: "'Project X'", icon: <MessageSquare className="h-4 w-4" /> },
-    { id: 3, type: "'collection'", title: "'Project X Files'", collection: "'Work'", icon: <Folder className="h-4 w-4" /> },
-    // Add more items as needed
+    { 
+      id: 1, 
+      type: "'resource'", 
+      title: "'Product Requirements Doc'", 
+      collection: "'Work Documents'",
+      description: "'Key requirements and specifications for Q1 2024'", 
+      icon: <File className="h-4 w-4" /> 
+    },
+    { 
+      id: 2, 
+      type: "'message'", 
+      title: "'Team Sync Notes'", 
+      collection: "'Project Alpha'",
+      description: "'Weekly sync meeting notes from engineering team'", 
+      icon: <MessageSquare className="h-4 w-4" /> 
+    },
+    { 
+      id: 3, 
+      type: "'collection'", 
+      title: "'Design Assets'", 
+      collection: "'Marketing'",
+      description: "'Brand guidelines and marketing materials'", 
+      icon: <Folder className="h-4 w-4" /> 
+    }
   ]
 
   const filteredFavorites = favorites
-    .filter(fav => filter === "'all'" || fav.type === filter.slice(0, -1)) // Remove 's' from filter
+    .filter(fav => filter === "'all'" || fav.type === filter.slice(0, -1))
     .filter(fav => fav.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                    fav.collection.toLowerCase().includes(searchQuery.toLowerCase()))
 
   const handleUnstar = (id: number) => {
-    // Here you would typically update the favorites list in your state or database
     console.log("'Unstarred item with id:'", id)
+  }
+
+  if (filteredFavorites.length === 0) {
+    return (
+      <div className="h-full w-full flex flex-col items-center justify-center text-muted-foreground">
+        <Star className="h-12 w-12 mb-4" />
+        <p className="text-lg font-medium">No favorites yet</p>
+        <p className="text-sm">Star items to see them here</p>
+      </div>
+    )
   }
 
   return (
     <ScrollArea className="h-full w-full">
-      <h3 className="font-semibold mb-4">Favorites</h3>
-      <ul className="space-y-4">
+      <div className="space-y-4 p-1">
         {filteredFavorites.map((fav) => (
-          <li key={fav.id} className="flex items-center justify-between space-x-2 p-2 hover:bg-gray-100 rounded-md">
-            <div className="flex items-center space-x-2 overflow-hidden">
-              {fav.icon}
-              <div className="overflow-hidden">
-                <p className="font-medium truncate">{fav.title}</p>
-                <p className="text-sm text-gray-500 truncate">{fav.collection} • {fav.type}</p>
+          <Card key={fav.id} className="p-4 hover:bg-accent transition-colors">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3 flex-1">
+                <div className="p-2 bg-muted rounded-md">
+                  {fav.icon}
+                </div>
+                <div className="overflow-hidden flex-1">
+                  <p className="font-medium truncate">{fav.title}</p>
+                  <p className="text-sm text-muted-foreground truncate">
+                    {fav.collection} • {fav.type}
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                    {fav.description}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2 ml-4">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem>View</DropdownMenuItem>
+                    <DropdownMenuItem>Edit</DropdownMenuItem>
+                    <DropdownMenuItem>Share</DropdownMenuItem>
+                    <DropdownMenuItem>Delete</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <Button variant="ghost" size="sm" onClick={() => handleUnstar(fav.id)}>
+                  <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                </Button>
               </div>
             </div>
-            <div className="flex items-center space-x-2 flex-shrink-0">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem>View</DropdownMenuItem>
-                  <DropdownMenuItem>Edit</DropdownMenuItem>
-                  <DropdownMenuItem>Share</DropdownMenuItem>
-                  <DropdownMenuItem>Delete</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <Button variant="ghost" size="sm" onClick={() => handleUnstar(fav.id)}>
-                <Star className="h-4 w-4 text-yellow-400" />
-              </Button>
-            </div>
-          </li>
+          </Card>
         ))}
-      </ul>
+      </div>
     </ScrollArea>
   )
 }
-

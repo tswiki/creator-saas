@@ -8,6 +8,8 @@ import { FavoritesList } from "./favorites-list"
 import { UploadArea } from "./upload-area"
 import { SearchBar } from "./search-bar"
 import { ExportButton } from "./export-button"
+import { Archive, Star } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 
 export function ViewCollectionsDialog() {
   const [filter, setFilter] = useState("'all'")
@@ -16,11 +18,15 @@ export function ViewCollectionsDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">View Collections</Button>
+        <Button variant="outline">
+          <Archive className="h-4 w-4" />
+        </Button>
       </DialogTrigger>
       <DialogContent className="w-11/12 max-w-6xl h-[90vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>Your Library</DialogTitle>
+          <div className="flex justify-center">
+            {/* <DialogTitle>Archive</DialogTitle> */}
+          </div>
         </DialogHeader>
         <div className="flex-1 overflow-hidden">
           <div className="h-full flex flex-col md:flex-row gap-4">
@@ -31,7 +37,13 @@ export function ViewCollectionsDialog() {
               </div>
               <SearchBar onSearch={setSearchQuery} />
               <div className="flex-1 overflow-hidden">
-                <FavoritesList filter={filter} searchQuery={searchQuery} />
+                <Card className="border-2 border-primary w-full h-full">
+                  <CardHeader className="flex justify-center items-center">
+                  </CardHeader>
+                  <CardContent className="h-[calc(100%-4rem)]">
+                    <FavoritesList filter={filter} searchQuery={searchQuery} />
+                  </CardContent>
+                </Card>
               </div>
             </div>
             <div className="md:w-1/2 overflow-auto">

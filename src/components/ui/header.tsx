@@ -24,7 +24,7 @@ interface HeaderProps {
   brandName?: string;
 }
 
-export default function Header({ logoSrc, brandName = "Concrete Manifest" }: HeaderProps) {
+export default function Header({ logoSrc, brandName = "Artisan's Archive" }: HeaderProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const { theme } = useTheme();
@@ -62,7 +62,7 @@ export default function Header({ logoSrc, brandName = "Concrete Manifest" }: Hea
                 className="object-contain"
               />
             </div>
-            <span className="text-xl font-bold text-indigo-600">{brandName}</span>
+            <span className="text-xl font-bold text-white-600">{brandName}</span>
           </div>
 
           {/* Center - Command Menu */}
