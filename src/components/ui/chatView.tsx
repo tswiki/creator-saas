@@ -58,8 +58,16 @@ const useAuthenticatedUser = () => {
 export function SpacesView() {
   const [spaces] = useState([
     {
+      id: 4,
+      name: "Community Feed",
+      description: "Watch and interact during live YouTube tutorial recordings",
+      members: 12453,
+      messages: 89234,
+      type: "public"
+    },
+    {
       id: 1,
-      name: "Live Streams",
+      name: "Conference Room",
       description: "Join weekly live coding sessions and interactive workshops",
       members: 2341,
       messages: 15678,
@@ -72,38 +80,6 @@ export function SpacesView() {
       members: 8934,
       messages: 234567,
       type: "public" 
-    },
-    {
-      id: 3,
-      name: "Premium Mentorship",
-      description: "Exclusive access to 1-on-1 mentoring and advanced content",
-      members: 156,
-      messages: 4532,
-      type: "private"
-    },
-    {
-      id: 4,
-      name: "YouTube Live",
-      description: "Watch and interact during live YouTube tutorial recordings",
-      members: 12453,
-      messages: 89234,
-      type: "public"
-    },
-    {
-      id: 5,
-      name: "Study Groups",
-      description: "Join focused study groups for different tech topics",
-      members: 342,
-      messages: 7845,
-      type: "private"
-    },
-    {
-      id: 6,
-      name: "Office Hours",
-      description: "Weekly Q&A sessions and code reviews with mentors",
-      members: 567,
-      messages: 3421,
-      type: "public"
     }
   ]);
 
@@ -117,10 +93,14 @@ export function SpacesView() {
     <div className="max-w-7xl mx-auto space-y-6 pt-10">
       {!activeSpace ? (
         <Card>
-          <CardHeader>
-            <CardTitle>Spaces</CardTitle>
-            <CardDescription>Join conversations in topic-focused spaces</CardDescription>
-          </CardHeader>
+          <div className="flex flex-col items-center">
+            <CardHeader>
+              <div className="flex justify-center">
+                <CardTitle>Spaces</CardTitle>
+              </div>
+              <CardDescription>Join conversations in topic-focused spaces</CardDescription>
+            </CardHeader>
+          </div>
           <CardContent>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {spaces.map((space) => (
@@ -164,7 +144,7 @@ export function SpacesView() {
         </Card>
       ) : (
         <>
-          {activeSpace === "Live Streams" && (
+          {activeSpace === "Community Feed" && (
             <div className="h-[calc(100vh-4rem)]">
             <Card className="h-full">
               <VidView/>
@@ -178,23 +158,7 @@ export function SpacesView() {
               </Card>
             </div>
           )}
-          {activeSpace === "Premium Mentorship" && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle>Premium Mentorship</CardTitle>
-                  <CardDescription>1-on-1 mentoring sessions</CardDescription>
-                </div>
-                <Button variant="ghost" size="icon" onClick={() => setActiveSpace(null)}>
-                  <X className="h-4 w-4" />
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <TelegramView />
-              </CardContent>
-            </Card>
-          )}
-          {activeSpace === "YouTube Live" && (
+          {activeSpace === "Conference Room" && (
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
@@ -252,38 +216,6 @@ export function SpacesView() {
                     </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          )}
-          {activeSpace === "Study Groups" && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle>Study Groups</CardTitle>
-                  <CardDescription>Topic-focused study groups</CardDescription>
-                </div>
-                <Button variant="ghost" size="icon" onClick={() => setActiveSpace(null)}>
-                  <X className="h-4 w-4" />
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <UIUXView />
-              </CardContent>
-            </Card>
-          )}
-          {activeSpace === "Office Hours" && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle>Office Hours</CardTitle>
-                  <CardDescription>Q&A and code reviews</CardDescription>
-                </div>
-                <Button variant="ghost" size="icon" onClick={() => setActiveSpace(null)}>
-                  <X className="h-4 w-4" />
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <UIUXView />
               </CardContent>
             </Card>
           )}

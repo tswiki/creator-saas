@@ -156,9 +156,9 @@ const DashboardView = () => {
       description: "Upcoming meetings and deadlines",
       component: (
         <div className="p-4">
-          <Card className="relative">
+          <Card className="relative border-4 border-primary">
             <div className="absolute top-6 right-6">
-              <Card className="p-2">
+              <Card className="p-2 border-2 border-primary">
                 <div className="flex gap-2">
                   <Button variant="ghost" size="icon" onClick={prevSlide}>
                     <ChevronLeft className="h-4 w-4" />
@@ -174,7 +174,7 @@ const DashboardView = () => {
               <CardDescription>Your upcoming events and tasks</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Card className="p-4">
+              <Card className="p-4 border-2 border-primary">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Calendar className="h-5 w-5" />
@@ -186,7 +186,7 @@ const DashboardView = () => {
                   <Badge>Meeting</Badge>
                 </div>
               </Card>
-              <Card className="p-4">
+              <Card className="p-4 border-2 border-primary">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <FileText className="h-5 w-5" />
@@ -208,9 +208,9 @@ const DashboardView = () => {
       description: "Community discussions and mentorship",
       component: (
         <div className="p-4">
-          <Card className="relative">
+          <Card className="relative border-2 border-primary">
             <div className="absolute top-6 right-6">
-              <Card className="p-2">
+              <Card className="p-2 border-2 border-primary">
                 <div className="flex gap-2">
                   <Button variant="ghost" size="icon" onClick={prevSlide}>
                     <ChevronLeft className="h-4 w-4" />
@@ -226,7 +226,7 @@ const DashboardView = () => {
               <CardDescription>Connect with mentors and peers</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Card className="p-4">
+              <Card className="p-4 border-2 border-primary">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Users2 className="h-5 w-5" />
@@ -238,7 +238,7 @@ const DashboardView = () => {
                   <Button size="sm">Join</Button>
                 </div>
               </Card>
-              <Card className="p-4">
+              <Card className="p-4 border-2 border-primary">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <MonitorPlay className="h-5 w-5" />
@@ -260,9 +260,9 @@ const DashboardView = () => {
       description: "Your recent and most accessed content",
       component: (
         <div className="p-4">
-          <Card className="relative">
+          <Card className="relative border-2 border-primary">
             <div className="absolute top-6 right-6">
-              <Card className="p-2">
+              <Card className="p-2 border-2 border-primary">
                 <div className="flex gap-2">
                   <Button variant="ghost" size="icon" onClick={prevSlide}>
                     <ChevronLeft className="h-4 w-4" />
@@ -278,7 +278,7 @@ const DashboardView = () => {
               <CardDescription>Your most accessed resources and actions</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Card className="p-4">
+              <Card className="p-4 border-2 border-primary">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Clock className="h-5 w-5" />
@@ -290,7 +290,7 @@ const DashboardView = () => {
                   <Button size="sm" variant="outline">Resume</Button>
                 </div>
               </Card>
-              <Card className="p-4">
+              <Card className="p-4 border-2 border-primary">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <MessageSquare className="h-5 w-5" />
@@ -302,7 +302,7 @@ const DashboardView = () => {
                   <Button size="sm" variant="outline">Rejoin</Button>
                 </div>
               </Card>
-              <Card className="p-4">
+              <Card className="p-4 border-2 border-primary">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Bookmark className="h-5 w-5" />
@@ -324,9 +324,9 @@ const DashboardView = () => {
       description: "Learning materials and documentation", 
       component: (
         <div className="p-4">
-          <Card className="relative">
+          <Card className="relative border-2 border-primary">
             <div className="absolute top-6 right-6">
-              <Card className="p-2">
+              <Card className="p-2 border-2 border-primary">
                 <div className="flex gap-2">
                   <Button variant="ghost" size="icon" onClick={prevSlide}>
                     <ChevronLeft className="h-4 w-4" />
@@ -342,7 +342,7 @@ const DashboardView = () => {
               <CardDescription>Recently added learning materials</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Card className="p-4">
+              <Card className="p-4 border-2 border-primary">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <FileText className="h-5 w-5" />
@@ -354,7 +354,7 @@ const DashboardView = () => {
                   <Button size="sm" variant="outline">View</Button>
                 </div>
               </Card>
-              <Card className="p-4">
+              <Card className="p-4 border-2 border-primary">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Youtube className="h-5 w-5" />
@@ -377,10 +377,10 @@ const DashboardView = () => {
 
   return (
     <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-hidden">
-      <Card className="h-full w-full">
+      <Card className="h-full w-full border-2 border-primary">
         <div className="relative h-full w-full overflow-hidden">
           <div className="flex items-center justify-center gap-6 p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300">
-            <Card className="flex flex-col items-center p-3">
+            <Card className="flex flex-col items-center p-3 border-2 border-primary">
               <h2 className="text-2xl font-bold">
                 {(() => {
                   const hour = new Date().getHours();
