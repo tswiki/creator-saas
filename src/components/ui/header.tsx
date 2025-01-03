@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { UserCircle, BellRing, Menu, X, Calendar, Users, MessageSquare, Search, Bell } from 'lucide-react';
+import { UserCircle, BellRing, Menu, X, Calendar, Users, MessageSquare, Search, Bell, Mail } from 'lucide-react';
 import { useState } from 'react';
 import Profile from '@/components/ui/profile'
 import { useTheme } from 'next-themes';
@@ -132,6 +132,53 @@ export default function Header({ logoSrc, brandName = "Concrete Manifest" }: Hea
                         <h3 className="font-semibold">{event.title}</h3>
                         <p className="text-sm text-muted-foreground mt-1">{event.date}</p>
                         <p className="text-sm mt-2">{event.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </DialogContent>
+            </Dialog>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Mail className="h-5 w-5" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[600px]">
+                <DialogHeader>
+                  <DialogTitle>Email Inbox</DialogTitle>
+                </DialogHeader>
+                <ScrollArea className="h-[400px] pr-4">
+                  <div className="space-y-4">
+                    {[
+                      {
+                        from: "John Doe",
+                        time: "10:30 AM",
+                        subject: "Project Update",
+                        preview: "Hi, I wanted to share the latest updates on the project..."
+                      },
+                      {
+                        from: "Jane Smith",
+                        time: "Yesterday",
+                        subject: "Meeting Notes",
+                        preview: "Here are the key points from yesterday's meeting..."
+                      },
+                      {
+                        from: "Marketing Team",
+                        time: "2 days ago",
+                        subject: "Campaign Results",
+                        preview: "The Q3 marketing campaign results are now available..."
+                      }
+                    ].map((email, i) => (
+                      <div key={i} className="p-4 rounded-lg border">
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-semibold">{email.from}</h3>
+                          <span className="text-xs text-muted-foreground">{email.time}</span>
+                        </div>
+                        <p className="font-medium text-sm mt-1">{email.subject}</p>
+                        <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                          {email.preview}
+                        </p>
                       </div>
                     ))}
                   </div>
