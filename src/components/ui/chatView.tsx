@@ -90,9 +90,9 @@ export function SpacesView() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 pt-10">
+    <div className="max-w-7xl mx-auto space-y-6 pt-12">
       {!activeSpace ? (
-        <Card>
+        <Card className="border-2 border-primary"> 
           <div className="flex flex-col items-center">
             <CardHeader>
               <div className="flex justify-center">
@@ -104,7 +104,7 @@ export function SpacesView() {
           <CardContent>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {spaces.map((space) => (
-                <Card key={space.id} className="hover:shadow-lg transition-shadow">
+                <Card key={space.id} className="hover:shadow-lg transition-shadow border-2 border-primary">
                   <CardContent className="pt-6">
                     <div className="space-y-4">
                       <div className="flex justify-between items-start">
@@ -153,178 +153,78 @@ export function SpacesView() {
           )}
           {activeSpace === "Discord Community" && (
             <div className="h-[calc(100vh-4rem)]">
-              <Card className="h-full">
+              <Card className="h-full border-2 border-primary ">
                 <DiscordApp/>
               </Card>
             </div>
           )}
           {activeSpace === "Conference Room" && (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle>Activity Feed</CardTitle>
-                  <CardDescription>Recent events and updates</CardDescription>
-                </div>
-                <Button variant="ghost" size="icon" onClick={() => setActiveSpace(null)}>
-                  <X className="h-4 w-4" />
-                </Button>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-4">
-                  <div className="flex items-start space-x-4 p-4 border rounded-lg">
-                    <Avatar>
-                      <AvatarImage src="/avatars/sarah.jpg" />
-                      <AvatarFallback>SJ</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <p className="font-medium">Sarah Johnson</p>
-                      <p className="text-sm text-gray-500">Started a new course: Advanced React Patterns</p>
-                      <div className="flex items-center mt-2 space-x-2">
-                        <Badge variant="secondary">Course</Badge>
-                        <span className="text-xs text-gray-400">2 hours ago</span>
+            <div className="h-[calc(100vh-4rem)]">
+              <Card className="border-2 border-primary">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle>Activity Feed</CardTitle>
+                    <CardDescription>Recent events and updates</CardDescription>
+                  </div>
+                  <Button variant="ghost" size="icon" onClick={() => setActiveSpace(null)}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-4">
+                    <div className="flex items-start space-x-4 p-4 border rounded-lg">
+                      <Avatar>
+                        <AvatarImage src="/avatars/sarah.jpg" />
+                        <AvatarFallback>SJ</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <p className="font-medium">Sarah Johnson</p>
+                        <p className="text-sm text-gray-500">Started a new course: Advanced React Patterns</p>
+                        <div className="flex items-center mt-2 space-x-2">
+                          <Badge variant="secondary">Course</Badge>
+                          <span className="text-xs text-gray-400">2 hours ago</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="flex items-start space-x-4 p-4 border rounded-lg">
-                    <Avatar>
-                      <AvatarImage src="/avatars/mike.jpg" />
-                      <AvatarFallback>MP</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <p className="font-medium">Mike Peters</p>
-                      <p className="text-sm text-gray-500">Completed project milestone: E-commerce Dashboard</p>
-                      <div className="flex items-center mt-2 space-x-2">
-                        <Badge variant="secondary">Project</Badge>
-                        <span className="text-xs text-gray-400">5 hours ago</span>
+                    <div className="flex items-start space-x-4 p-4 border rounded-lg">
+                      <Avatar>
+                        <AvatarImage src="/avatars/mike.jpg" />
+                        <AvatarFallback>MP</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <p className="font-medium">Mike Peters</p>
+                        <p className="text-sm text-gray-500">Completed project milestone: E-commerce Dashboard</p>
+                        <div className="flex items-center mt-2 space-x-2">
+                          <Badge variant="secondary">Project</Badge>
+                          <span className="text-xs text-gray-400">5 hours ago</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="flex items-start space-x-4 p-4 border rounded-lg">
-                    <Avatar>
-                      <AvatarImage src="/avatars/alex.jpg" />
-                      <AvatarFallback>AK</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <p className="font-medium">Alex Kim</p>
-                      <p className="text-sm text-gray-500">Shared a resource: "Ultimate Guide to TypeScript"</p>
-                      <div className="flex items-center mt-2 space-x-2">
-                        <Badge variant="secondary">Resource</Badge>
-                        <span className="text-xs text-gray-400">1 day ago</span>
+                    <div className="flex items-start space-x-4 p-4 border rounded-lg">
+                      <Avatar>
+                        <AvatarImage src="/avatars/alex.jpg" />
+                        <AvatarFallback>AK</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <p className="font-medium">Alex Kim</p>
+                        <p className="text-sm text-gray-500">Shared a resource: "Ultimate Guide to TypeScript"</p>
+                        <div className="flex items-center mt-2 space-x-2">
+                          <Badge variant="secondary">Resource</Badge>
+                          <span className="text-xs text-gray-400">1 day ago</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           )}
         </>
       )}
     </div>
   );
 }
-
-const TelegramView = () => {
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      user: "Emily Brown",
-      avatar: "/avatars/emily.jpg",
-      content: "Welcome to the Telegram group!",
-      timestamp: "3:15 PM"
-    }
-  ]);
-
-  return (
-    <Card className="mt-6">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>Telegram Group</CardTitle>
-          <CardDescription>Instant updates and discussions</CardDescription>
-        </div>
-        <Button variant="ghost" size="icon">
-          <X className="h-4 w-4" />
-        </Button>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {messages.map((message) => (
-            <div key={message.id} className="flex gap-3">
-              <Avatar>
-                <AvatarImage src={message.avatar} />
-                <AvatarFallback>{message.user[0]}</AvatarFallback>
-              </Avatar>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">{message.user}</span>
-                  <span className="text-xs text-muted-foreground">{message.timestamp}</span>
-                </div>
-                <p className="text-sm">{message.content}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-      <CardFooter>
-        <div className="flex w-full gap-2">
-          <Input placeholder="Type a message..." className="flex-1" />
-          <Button>Send</Button>
-        </div>
-      </CardFooter>
-    </Card>
-  );
-};
-
-const UIUXView = () => {
-  const userId  = process.env.USER_ID_STREAMIO;
-  const apiKey = process.env.NEXT_PUBLIC_STREAMIO_API_KEY;
-  const authToken = process.env.JWT_AUTH_TOKEN;
-
-  const filters = { type: 'messaging', members: { $in: [userId] } };
-  const options = { presence: true, state: true, watch: true };
-  const sort = { last_updated: -1 };
-
-  // Move client creation to useMemo to prevent infinite re-renders
-  const client = useMemo(() => {
-    if (!apiKey || !authToken || !userId) return null;
-    
-    return useCreateChatClient({
-      apiKey: apiKey,
-      tokenOrProvider: authToken,
-      userData: { id: userId },
-    });
-  }, [apiKey, authToken, userId]);
-
-  if (!client || !userId) {
-    return <div>Loading...</div>;
-  }
-
-  return (
-    <div className="h-[600px]">
-      <Chat client={client}>
-        <div className="flex h-full">
-          <div className="w-1/4 border-r">
-            <ChannelList 
-              filters={filters}
-              sort={sort}
-              options={options}
-            />
-          </div>
-          <div className="flex-1">
-            <Channel>
-              <Window>
-                <ChannelHeader />
-                <MessageList />
-                <MessageInput focus />
-              </Window>
-              <Thread />
-            </Channel>
-          </div>
-        </div>
-      </Chat>
-    </div>
-  );
-};
 
 export default SpacesView;

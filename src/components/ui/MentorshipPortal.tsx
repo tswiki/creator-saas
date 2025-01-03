@@ -3641,9 +3641,9 @@ export default function MentorshipPortal() {
 
     return (
       <div className="max-w-7xl mx-auto space-y-6 pt-10">
-        <Card>
+        <Card className='border-2 border-primary'>
           <CardHeader>
-            <Card className="p-4">
+            <Card className="p-4 border-2 border-primary">
               <div className="flex flex-col items-center justify-center text-center">
                 <CardTitle>Community Members</CardTitle>
                 <CardDescription>Connect with mentors and fellow developers in our community</CardDescription>
@@ -3653,7 +3653,7 @@ export default function MentorshipPortal() {
           <CardContent>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {communityMembers.map((member) => (
-                <Card key={member.id} className="hover:shadow-lg transition-shadow">
+                <Card key={member.id} className="hover:shadow-lg transition-shadow border-2 border-primary">
                   <CardContent className="pt-6">
                     <div className="flex gap-4">
                       <Avatar className="h-16 w-16">
@@ -3744,7 +3744,7 @@ export default function MentorshipPortal() {
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* About Card */}
-                <Card>
+                <Card className='border-2 border-primary'>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <User className="h-5 w-5" />
@@ -3769,7 +3769,7 @@ export default function MentorshipPortal() {
                 </Card>
 
                 {/* Skills & Expertise Card */}
-                <Card>
+                <Card className='border-2 border-primary'>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Wrench className="h-5 w-5" />
@@ -3796,7 +3796,7 @@ export default function MentorshipPortal() {
                 </Card>
 
                 {/* Objectives & Goals Card */}
-                <Card>
+                <Card className='border-2 border-primary'>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Target className="h-5 w-5" />
