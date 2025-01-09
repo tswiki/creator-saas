@@ -23,7 +23,7 @@ const steps = [
   { title: "Additional Details", description: "Add benefits, price, and contact information" },
 ]
 
-export function ResourceCreationDialog() {
+export function ResourceCreationButton() {
   const [open, setOpen] = useState(false)
   const [step, setStep] = useState(1)
   const methods = useForm<ResourceFormData>({
@@ -45,42 +45,46 @@ export function ResourceCreationDialog() {
   const prevStep = () => setStep(step - 1)
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">Create New Resource</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
-        <FormProvider {...methods}>
-          <form onSubmit={methods.handleSubmit(onSubmit)}>
-            <DialogHeader>
-              <DialogTitle>{steps[step - 1].title}</DialogTitle>
-              <DialogDescription>
-                {steps[step - 1].description} (Step {step} of 3)
-              </DialogDescription>
-            </DialogHeader>
-            <div className="py-4">
-              {step === 1 && <Step1Form />}
-              {step === 2 && <Step2Form />}
-              {step === 3 && <Step3Form />}
-            </div>
-            <DialogFooter>
-              {step > 1 && (
-                <Button type="button" variant="outline" onClick={prevStep}>
-                  Previous
-                </Button>
-              )}
-              {step < 3 ? (
-                <Button type="button" onClick={nextStep}>
-                  Next
-                </Button>
-              ) : (
-                <Button type="submit">Create Resource</Button>
-              )}
-            </DialogFooter>
-          </form>
-        </FormProvider>
-      </DialogContent>
-    </Dialog>
+    <>
+      <Button variant="outline" onClick={() => setOpen(true)}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        New Product
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <FormProvider {...methods}>
+            <form onSubmit={methods.handleSubmit(onSubmit)}>
+              <DialogHeader>
+                <DialogTitle>{steps[step - 1].title}</DialogTitle>
+                <DialogDescription>
+                  {steps[step - 1].description} (Step {step} of 3)
+                </DialogDescription>
+              </DialogHeader>
+              <div className="py-4">
+                {step === 1 && <Step1Form />}
+                {step === 2 && <Step2Form />}
+                {step === 3 && <Step3Form />}
+              </div>
+              <DialogFooter>
+                {step > 1 && (
+                  <Button type="button" variant="outline" onClick={prevStep}>
+                    Previous
+                  </Button>
+                )}
+                {step < 3 ? (
+                  <Button type="button" onClick={nextStep}>
+                    Next
+                  </Button>
+                ) : (
+                  <Button type="submit">Create Resource</Button>
+                )}
+              </DialogFooter>
+            </form>
+          </FormProvider>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
 
+export default ResourceCreationButton;

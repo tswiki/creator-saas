@@ -54,6 +54,34 @@ let resources = [
       { name: "Exercise Files", type: "ZIP", size: "15MB" }
     ],
     progress: 45
+  },
+  {
+    id: 2,
+    title: "Advanced React Patterns",
+    type: "Course",
+    platform: "Udemy", 
+    link: "https://udemy.com/react-patterns",
+    recommended: "Sarah Wilson",
+    description: "Deep dive into advanced React patterns and best practices",
+    attachments: [
+      { name: "Course Slides", type: "PDF", size: "2.4MB" },
+      { name: "Exercise Files", type: "ZIP", size: "15MB" }
+    ],
+    progress: 45
+  },
+  {
+    id: 3,
+    title: "Advanced React Patterns",
+    type: "Course",
+    platform: "Udemy", 
+    link: "https://udemy.com/react-patterns",
+    recommended: "Sarah Wilson",
+    description: "Deep dive into advanced React patterns and best practices",
+    attachments: [
+      { name: "Course Slides", type: "PDF", size: "2.4MB" },
+      { name: "Exercise Files", type: "ZIP", size: "15MB" }
+    ],
+    progress: 45
   }
 ]
 

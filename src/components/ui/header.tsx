@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -18,14 +19,19 @@ import {
   CommandList,
   CommandSeparator,
 } from "./command";
+import EmailInbox from '../email-inbox';
+import { useView } from '@/contexts/viewContext';
+import { Input } from './input';
+import { SearchBar } from '@/components/search-bar';
 
 interface HeaderProps {
   logoSrc?: string;
   brandName?: string;
 }
 
-export default function Header({ logoSrc, brandName = "Artisan's Archive" }: HeaderProps) {
+export default function Header({ logoSrc, brandName = "dejitaru " }: HeaderProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { currentView, setCurrentView } = useView();
   const [open, setOpen] = useState(false);
   const { theme } = useTheme();
 
@@ -47,9 +53,19 @@ export default function Header({ logoSrc, brandName = "Artisan's Archive" }: Hea
     }
   ];
 
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    // Here you can add additional search functionality like:
+    // - Filtering content
+    // - Making API calls
+    // - Updating search results
+  };
+
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 border-b dark:bg-slate-900/75 backdrop-blur-sm transition-colors duration-200">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 dark:bg-slate-900/75 backdrop-blur-sm transition-colors duration-200 pt-1">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Left side - Brand/Logo */}
@@ -66,58 +82,15 @@ export default function Header({ logoSrc, brandName = "Artisan's Archive" }: Hea
           </div>
 
           {/* Center - Command Menu */}
-          <div className="hidden md:flex items-center">
-            <Button
-              variant="outline"
-              className="relative w-full justify-start text-sm text-muted-foreground sm:pr-12 md:w-80 lg:w-96"
-              onClick={() => setOpen(true)}
-            >
-              <span className="hidden lg:inline-flex">Search commands...</span>
-              <span className="inline-flex lg:hidden">Search...</span>
-              <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
-                <span className="text-xs">⌘</span>K
-              </kbd>
-            </Button>
-            <CommandDialog open={open} onOpenChange={setOpen}>
-              <CommandInput placeholder="Type a command or search..." />
-              <CommandList>
-                <CommandEmpty>No results found.</CommandEmpty>
-                <CommandGroup heading="Navigation">
-                  <CommandItem onSelect={() => window.location.href = '/dashboard'}>
-                    Dashboard
-                  </CommandItem>
-                  <CommandItem onSelect={() => window.location.href = '/cohort'}>
-                    Cohort
-                  </CommandItem>
-                  <CommandItem onSelect={() => window.location.href = '/crm'}>
-                    CRM
-                  </CommandItem>
-                  <CommandItem onSelect={() => window.location.href = '/product'}>
-                    Product
-                  </CommandItem>
-                  <CommandItem onSelect={() => window.location.href = '/store'}>
-                    Store
-                  </CommandItem>
-                  <CommandItem onSelect={() => window.location.href = '/chat'}>
-                    Chat
-                  </CommandItem>
-                </CommandGroup>
-                <CommandSeparator />
-                <CommandGroup heading="Quick Actions">
-                  <CommandItem>Create New Post</CommandItem>
-                  <CommandItem>Start Discussion</CommandItem>
-                  <CommandItem>View Calendar</CommandItem>
-                  <CommandItem>Search Members</CommandItem>
-                </CommandGroup>
-              </CommandList>
-            </CommandDialog>
+          <div className="flex items-center justify-center flex-1 max-w-4xl">
+            <SearchBar/>
           </div>
 
           {/* Right side - Features */}
           <div className="flex items-center space-x-4 pr-20">
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="border-2 border-primary rounded-full">
                   <Bell className="h-5 w-5" />
                 </Button>
               </DialogTrigger>
@@ -138,54 +111,15 @@ export default function Header({ logoSrc, brandName = "Artisan's Archive" }: Hea
                 </ScrollArea>
               </DialogContent>
             </Dialog>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Mail className="h-5 w-5" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[600px]">
-                <DialogHeader>
-                  <DialogTitle>Email Inbox</DialogTitle>
-                </DialogHeader>
-                <ScrollArea className="h-[400px] pr-4">
-                  <div className="space-y-4">
-                    {[
-                      {
-                        from: "John Doe",
-                        time: "10:30 AM",
-                        subject: "Project Update",
-                        preview: "Hi, I wanted to share the latest updates on the project..."
-                      },
-                      {
-                        from: "Jane Smith",
-                        time: "Yesterday",
-                        subject: "Meeting Notes",
-                        preview: "Here are the key points from yesterday's meeting..."
-                      },
-                      {
-                        from: "Marketing Team",
-                        time: "2 days ago",
-                        subject: "Campaign Results",
-                        preview: "The Q3 marketing campaign results are now available..."
-                      }
-                    ].map((email, i) => (
-                      <div key={i} className="p-4 rounded-lg border">
-                        <div className="flex items-center justify-between">
-                          <h3 className="font-semibold">{email.from}</h3>
-                          <span className="text-xs text-muted-foreground">{email.time}</span>
-                        </div>
-                        <p className="font-medium text-sm mt-1">{email.subject}</p>
-                        <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
-                          {email.preview}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </DialogContent>
-            </Dialog>
-          </div>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => {setCurrentView('emailInbox')}}
+              className="border-2 border-primary rounded-full"
+            >
+            <Mail className="h-5 w-5" />
+            </Button>
+            </div>
         </div>
       </div>      
     </header>

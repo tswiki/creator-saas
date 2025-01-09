@@ -6,6 +6,8 @@ import { headers } from 'next/headers'; // Add this import
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { ThemeProvider } from '@/components/ui/theme-provider'
+import { ViewProvider } from "@/contexts/viewContext";
+import { AdminProvider} from "@/contexts/adminContext"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -19,9 +21,19 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Concrete Manifest",
+  title: "dejitaru",
   description: "Powered by REVITALISE.IO",
 };
+
+// Key Japanese terms for creator economy concepts:
+// クリエイター経済 (kurieitā keizai) - Creator economy
+// 収益化 (shūekika) - Monetization
+// 発信力 (hasshinryoku) - Influence/reach
+// 価値創造 (kachi sōzō) - Value creation
+// 展開 (tenkai) - Scale/expansion
+// 共創 (kyōsō) - Co-creation
+// 影響力 (eikyōryoku) - Impact
+// 成長 (seichō) - Growth/scaling
 
 export default async function RootLayout({
   children,
@@ -43,14 +55,18 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-      <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AdminProvider>
+            <ViewProvider>
+              {children}
+            </ViewProvider>
+          </AdminProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -119,9 +119,17 @@ import {
   Repeat,
   Share2,
   Bookmark,
-  MoreHorizontal
+  MoreHorizontal,
+  Sparkles,
+  HelpCircle,
+  Folder,
+  FileIcon,
+  FileX,
+  ChevronDown,
+  ExternalLink,
+  Package,
+  Table
 } from "lucide-react";
-import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Label, DropdownMenuSeparator, RadioGroup } from '@radix-ui/react-dropdown-menu';
 import { Switch } from '@/components/ui/switch';
@@ -129,15 +137,15 @@ import { useTheme } from 'next-themes';
 import { toast } from '@/hooks/use-toast';
 import { Textarea } from './textarea';
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarTrigger } from './menubar';
-import { cn } from '@/lib/utils';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@radix-ui/react-tabs';
-import Marquee from './marquee';
 import SpacesView from './chatView';
-import {EmailDialog} from '../email-dialog';
-import {ActivityDialog} from '../activity-dialog'
 import {EventCreationDialog} from '../event-creation-dialog'
 import { ViewCollectionsDialog } from '../view-collections-dialog';
-import { ResourceCreationDialog } from '../resource-creation-dialog';
+import ResourceCreationDialog from '../resource-creation-dialog';
+import EmailInbox from '../email-inbox';
+import { useView } from '@/contexts/viewContext'
+import { useAdmin } from '@/contexts/adminContext';
+import { Carousel, CarouselContent, CarouselItem } from './carousel';
 
 const DashboardView = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -502,7 +510,7 @@ const ScheduleView = () => {
     return tasks
       .filter(task => {
         const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            task.description.toLowerCase().includes(searchQuery.toLowerCase());
+                              task.description.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesType = filterType === 'all' || task.type === filterType;
         const matchesPriority = filterPriority === 'all' || task.priority === filterPriority;
         return matchesSearch && matchesType && matchesPriority;
@@ -830,16 +838,19 @@ const ScheduleView = () => {
     </Card>
   );
 
+
   return (
-    <div className="space-y-6 pt-10">
-      <Card className="h-[80vh] flex flex-col">
+    <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4">
+      <Card className="w-full border-2 border-primary">
         <Card className="rounded-b-none border-b-0">
           <Card>
             <CardHeader className="sticky top-0 bg-background z-10">
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pl-10">
                 <Card className="bg-white dark:bg-gray-800 shadow-sm">
                   <CardHeader className="p-2">
-                    <CardTitle>Timeline</CardTitle>
+                    <div>
+                      <CardTitle>Timeline</CardTitle>
+                    </div>
                   </CardHeader>
                 </Card>
                 <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
@@ -909,111 +920,110 @@ const ScheduleView = () => {
           </Card>
         </Card>
 
-        <Card className="flex-1 rounded-t-none border-t-0">
-          <CardContent className="flex-1 overflow-y-auto pr-4 custom-scrollbar" style={{
-            scrollbarWidth: 'thin',
-            scrollbarColor: 'rgb(203 213 225) transparent'
-          }}>
-            <style jsx global>{`
-              .custom-scrollbar::-webkit-scrollbar {
-                width: 8px;
-              }
-              .custom-scrollbar::-webkit-scrollbar-track {
-                background: transparent;
-              }
-              .custom-scrollbar::-webkit-scrollbar-thumb {
-                background-color: rgb(203 213 225);
-                border-radius: 20px;
-                border: 2px solid transparent;
-              }
-              .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                background-color: rgb(148 163 184);
-              }
-            `}</style>
+        <Card>
+          <CardContent className="flex h-[calc(100vh-12rem)]">
+            <ScrollArea>
+              <style jsx global>{`
+                .custom-scrollbar::-webkit-scrollbar {
+                  width: 8px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                  background: transparent;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                  background-color: rgb(203 213 225);
+                  border-radius: 20px;
+                  border: 2px solid transparent;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                  background-color: rgb(148 163 184);
+                }
+              `}</style>
 
-            <div className="space-y-8">
-              {groupedTasks.overdue.length > 0 && (
-                <div>
-                  <h3 className="text-red-500 font-semibold mb-4">Overdue</h3>
-                  <div className="space-y-4">
-                    {groupedTasks.overdue.map(renderTaskCard)}
+              <div className="space-y-8">
+                {groupedTasks.overdue.length > 0 && (
+                  <div>
+                    <h3 className="text-red-500 font-semibold mb-4">Overdue</h3>
+                    <div className="space-y-4">
+                      {groupedTasks.overdue.map(renderTaskCard)}
+                    </div>
                   </div>
-                </div>
-              )}
-              
-              {groupedTasks.today.length > 0 && (
-                <div className="pt-4">
-                  <Card className="bg-white dark:bg-gray-800 shadow-sm">
-                    <CardContent className="p-2">
-                      <div className="flex items-center justify-center gap-3">
-                        <h3 className="text-blue-500 font-semibold">Today :</h3>
-                        <span className="text-blue-500 font-semibold">
-                          {new Date().toLocaleDateString('en-US', { 
-                            weekday: 'long',
-                            month: 'short', 
-                            day: 'numeric'
-                          })}
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  <div className="space-y-4">
-                    {groupedTasks.today.map(renderTaskCard)}
+                )}
+                
+                {groupedTasks.today.length > 0 && (
+                  <div className="pt-4">
+                    <Card className="bg-white dark:bg-gray-800 shadow-sm">
+                      <CardContent className="p-2">
+                        <div className="flex items-center justify-center gap-3">
+                          <h3 className="text-blue-500 font-semibold">Today :</h3>
+                          <span className="text-blue-500 font-semibold">
+                            {new Date().toLocaleDateString('en-US', { 
+                              weekday: 'long',
+                              month: 'short', 
+                              day: 'numeric'
+                            })}
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    <div className="space-y-4">
+                      {groupedTasks.today.map(renderTaskCard)}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {groupedTasks.tomorrow.length > 0 && (
-                <div>
-                  <h3 className="text-green-500 font-semibold mb-4">Tomorrow</h3>
-                  <div className="space-y-4">
-                    {groupedTasks.tomorrow.map(renderTaskCard)}
+                {groupedTasks.tomorrow.length > 0 && (
+                  <div>
+                    <h3 className="text-green-500 font-semibold mb-4">Tomorrow</h3>
+                    <div className="space-y-4">
+                      {groupedTasks.tomorrow.map(renderTaskCard)}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {groupedTasks.thisWeek.length > 0 && (
-                <div>
-                  <Card className="bg-white dark:bg-gray-800 shadow-sm">
-                    <CardContent className="p-2">
-                      <div className="flex items-center justify-center gap-3">
-                        <h3 className="text-purple-500 font-semibold">This Week :</h3>
-                        <span className="text-purple-500 font-semibold">
-                          {new Date().toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric'
-                          })} - {new Date(Date.now() + 6 * 86400000).toLocaleDateString('en-US', {
-                            month: 'short', 
-                            day: 'numeric'
-                          })}
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  <div className="space-y-4">
-                    {groupedTasks.thisWeek.map(renderTaskCard)}
+                {groupedTasks.thisWeek.length > 0 && (
+                  <div>
+                    <Card className="bg-white dark:bg-gray-800 shadow-sm">
+                      <CardContent className="p-2">
+                        <div className="flex items-center justify-center gap-3">
+                          <h3 className="text-purple-500 font-semibold">This Week :</h3>
+                          <span className="text-purple-500 font-semibold">
+                            {new Date().toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric'
+                            })} - {new Date(Date.now() + 6 * 86400000).toLocaleDateString('en-US', {
+                              month: 'short', 
+                              day: 'numeric'
+                            })}
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    <div className="space-y-4">
+                      {groupedTasks.thisWeek.map(renderTaskCard)}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {groupedTasks.later.length > 0 && (
-                <div>
-                  <h3 className="text-gray-500 font-semibold mb-4">Later</h3>
-                  <div className="space-y-4">
-                    {groupedTasks.later.map(renderTaskCard)}
+                {groupedTasks.later.length > 0 && (
+                  <div>
+                    <h3 className="text-gray-500 font-semibold mb-4">Later</h3>
+                    <div className="space-y-4">
+                      {groupedTasks.later.map(renderTaskCard)}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {groupedTasks.completed.length > 0 && (
-                <div>
-                  <h3 className="text-gray-400 font-semibold mb-4">Completed</h3>
-                  <div className="space-y-4">
-                    {groupedTasks.completed.map(renderTaskCard)}
+                {groupedTasks.completed.length > 0 && (
+                  <div>
+                    <h3 className="text-gray-400 font-semibold mb-4">Completed</h3>
+                    <div className="space-y-4">
+                      {groupedTasks.completed.map(renderTaskCard)}
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            </ScrollArea>
           </CardContent>
         </Card>
       </Card>
@@ -1167,14 +1177,17 @@ async function refreshSession() {
 
 
 export default function MentorshipPortal() {
-
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [currentView, setCurrentView] = useState('dashboard');
+  const { currentView, setCurrentView } = useView();
+  useEffect(() => {
+    setCurrentView('dashboard');
+  }, []);
   const [date, setDate] = useState<Date | undefined>(new Date());
 
   const Sidebar = () => {
     const [showProfileDialog, setShowProfileDialog] = useState(false);
     const [currentProfileView, setCurrentProfileView] = useState('details');
+    const { currentView, setCurrentView } = useView('dashboard');
     const [profileData, setProfileData] = useState({
       username: auth.currentUser?.email || "johndoe@example.com",
       fullName: auth.currentUser?.displayName || "John Doe", 
@@ -1206,33 +1219,43 @@ export default function MentorshipPortal() {
     };
 
     return (
-      <div className="mt-16 fixed top-0 left-0 bottom-0 w-64">
-        <div className="h-full flex flex-col p-4 border-r bg-background">
+      <div className="mt-16 fixed top-0 left-0 bottom-10 w-64">
+        <div className="h-full flex flex-col p-4 bg-background">
           <div className="flex flex-col gap-3 flex-1">
-            <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('dashboard')}>
-              <LayoutDashboard className="mr-2 h-4 w-4" />
-              Dashboard
-            </Button>
-            <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('spaces')}>
-              <Hash className="mr-2 h-4 w-4" />
-              Spaces
-            </Button>
-            <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('connect')}>
-              <Users className="mr-2 h-4 w-4" />
-              Connect
-            </Button>
-            <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('schedule')}>
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              Schedule
-            </Button>
-            <Button variant="ghost" className="justify-start w-full" onClick={() => setCurrentView('resources')}>
-              <BookOpen className="mr-2 h-4 w-4" />
-              Resources
-            </Button>
+            <div className="pl-5">
+              <Button variant="ghost" className="justify-start w-full pl-10" onClick={() => setCurrentView('dashboard')}>
+                <LayoutDashboard className="mr-2 h-4 w-4 pl-" />
+                Dashboard
+              </Button>
+            </div>
+            <div className="pl-5">
+              <Button variant="ghost" className="justify-start w-full pl-10" onClick={() => setCurrentView('spaces')}>
+                <Hash className="mr-2 h-4 w-4" />
+                Spaces
+              </Button>
+            </div>
+            <div className="pl-5">
+              <Button variant="ghost" className="justify-start w-full pl-10" onClick={() => setCurrentView('connect')}>
+                <Users className="mr-2 h-4 w-4" />
+                Connect
+              </Button>
+            </div>
+            <div className="pl-5">
+              <Button variant="ghost" className="justify-start w-full pl-10" onClick={() => setCurrentView('schedule')}>
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                Schedule
+              </Button>
+            </div>
+            <div className="pl-5">
+              <Button variant="ghost" className="justify-start w-full pl-10" onClick={() => setCurrentView('resources')}>
+                <BookOpen className="mr-2 h-4 w-4" />
+                Resources
+              </Button>
+            </div>
           </div>
 
-          <div className="flex items-center justify-center w-full border-t border-b pt-3 pb-3 mb-4">
-            <div className="flex items-center justify-center space-x-2">
+          <div className="flex items-center justify-center w-full pb-3 mb-4">
+            <div className="flex items-center justify-center space-x-2 pb-10">
               <div className="flex items-center justify-center gap-2">
                 <Sun className={`h-4 w-4 transition-opacity ${theme === 'dark' ? 'opacity-50' : 'text-yellow-500'}`} />
               </div>
@@ -1255,7 +1278,7 @@ export default function MentorshipPortal() {
             </div>
           </div>
 
-          <Button variant="ghost" className="justify-between w-full mt-2 mb-2" onClick={async () => {
+          <Button variant="ghost" className="justify-between w-full mt-2 mb-2 pt-10" onClick={async () => {
               try {
                 const response = await fetch('/api/profiles', {
                   method: 'GET',
@@ -1478,17 +1501,655 @@ export default function MentorshipPortal() {
       </div>
     );
   };
+  const FilesView = () => {
+    const [files, setFiles] = useState<any[]>([]);
+    const [showUploadDialog, setShowUploadDialog] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
 
+    useEffect(() => {
+      const fetchFiles = async () => {
+        try {
+          const response = await fetch('/api/files');
+          if (!response.ok) {
+            throw new Error('Failed to fetch files');
+          }
+          const data = await response.json();
+          setFiles(data);
+        } catch (error) {
+          console.error('Error fetching files:', error);
+        }
+      };
+
+      fetchFiles();
+    }, []);
+
+    return (
+      <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-auto">
+        <Card className="h-full w-full border-2 border-primary">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle>Files</CardTitle>
+              <Button 
+                onClick={() => setShowUploadDialog(true)}
+                className="flex items-center gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                Upload File
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {files.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-[60vh] text-muted-foreground">
+                <FileX className="h-16 w-16 mb-4" />
+                <p>No files uploaded yet</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {files.map((file) => (
+                  <Card key={file.id} className="hover:shadow-lg transition-shadow">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <FileIcon className="h-8 w-8 text-blue-500" />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">{file.name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {file.size} • {file.uploadedAt}
+                          </p>
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem>
+                              <Download className="h-4 w-4 mr-2" />
+                              Download
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Share className="h-4 w-4 mr-2" />
+                              Share
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-red-600">
+                              <Trash className="h-4 w-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Upload File</DialogTitle>
+              <DialogDescription>
+                Choose a file to upload to your workspace
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="border-2 border-dashed rounded-lg p-8 text-center">
+                <Input type="file" className="hidden" id="file-upload" />
+                <label 
+                  htmlFor="file-upload"
+                  className="cursor-pointer flex flex-col items-center gap-2"
+                >
+                  <Upload className="h-8 w-8 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">
+                    Click to select a file or drag and drop
+                  </span>
+                </label>
+              </div>
+              {uploadProgress > 0 && (
+                <Progress value={uploadProgress} className="w-full" />
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  };
+
+
+  const SocialsView = () => {
+    const socialChannels = [
+      {
+        platform: "Instagram",
+        handle: "@creator_handle",
+        followers: "10.2K",
+        icon: <Instagram className="h-5 w-5" />,
+        color: "bg-gradient-to-r from-purple-500 to-pink-500"
+      },
+      {
+        platform: "Twitter",
+        handle: "@creator_handle", 
+        followers: "5.8K",
+        icon: <Twitter className="h-5 w-5" />,
+        color: "bg-blue-400"
+      },
+      {
+        platform: "LinkedIn",
+        handle: "@creator_handle",
+        followers: "3.2K",
+        icon: <Linkedin className="h-5 w-5" />,
+        color: "bg-blue-600"
+      },
+      {
+        platform: "TikTok",
+        handle: "@creator_handle",
+        followers: "25.5K", 
+        icon: <Video className="h-5 w-5" />,
+        color: "bg-black"
+      },
+      {
+        platform: "YouTube",
+        handle: "@creator_handle",
+        followers: "12.3K",
+        icon: <Youtube className="h-5 w-5" />,
+        color: "bg-red-600"
+      }
+    ];
+
+    return (
+      <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-auto">
+        <Card className="h-full w-full border-2 border-primary">
+          <CardContent className="max-w-[800px] mx-auto border-none">
+            <div className="flex flex-col md:flex-row gap-8">
+              {/* Left Column */}
+              <div className="pt-2">
+                <div className="w-full mx-auto">
+                  <Card className="border-2 border-primary p-3">
+                    <CardContent className="flex flex-col space-y-2">
+                      <div className="flex justify-center">
+                        <Card className="p-4">
+                          <div className="flex items-center gap-4">
+                            <Avatar className="h-20 w-20">
+                              <AvatarImage src="/avatars/channel-avatar.png" />
+                              <AvatarFallback>CH</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <h2 className="text-2xl font-bold">Code Horizons</h2>
+                              <p className="text-muted-foreground">256K subscribers</p>
+                            </div>
+                          </div>
+                        </Card>
+                      </div>
+
+                      <div className="space-y-2 pt-2">
+                        <Card className="border border-border">
+                          <CardContent className="p-4">
+                            <div className="flex">
+                              <div className="w-[20%]">
+                                <h3 className="mb-2">Vision</h3>
+                              </div>
+                              <div className="pl-8 w-[80%]">
+                                <p className="text-muted-foreground">
+                                  Teaching modern web development through practical projects and in-depth tutorials. 
+                                  Specializing in React, TypeScript, and full-stack development.
+                                </p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        <div className="pt-3">
+                          <Card className="border border-border pt-2">
+                            <CardHeader className="p-4">
+                              <div className="flex">
+                                <div className="w-[20%]">
+                                  <h3 className="">Contact</h3>
+                                </div>
+                                <div className="pl-8 w-[80%]">
+                                  <div className="space-y-1">
+                                    <div className="flex items-center gap-2">
+                                      <Globe className="h-4 w-4 text-muted-foreground" />
+                                      <a href="#" className="text-primary hover:underline">codehorizons.dev</a>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <Mail className="h-4 w-4 text-muted-foreground" />
+                                      <span>contact@codehorizons.dev</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <MapPin className="h-4 w-4 text-muted-foreground" />
+                                      <span>San Francisco, CA</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </CardHeader>
+                          </Card>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+
+              {/* Right Column */}
+              <div className="w-full md:w-2/3 pt-10 pl-8 flex items-center justify-center">
+                <div className="flex flex-col space-y-8">
+                  {socialChannels.map((channel, index) => (
+                    <div key={index} className="w-full">
+                      <Card className="overflow-hidden border-0">
+                        <div className="w-full max-w-[400px] mx-auto">
+                          <Button 
+                            className="w-full hover:scale-105 transition-transform" 
+                            onClick={() => {
+                              window.open(`https://${channel.platform.toLowerCase()}.com/${channel.handle}`, '_blank')
+                            }}
+                          >
+                            <CardContent className="flex items-center p-2">
+                              {/* Icon Column */}
+                              <div className="w-2 flex justify-center">
+                                <div className="p-4">
+                                {channel.platform === "Instagram" && (
+                                  <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                                  </svg>
+                                )}
+                                {channel.platform === "Twitter" && (
+                                  <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                  </svg>
+                                )}
+                                {channel.platform === "LinkedIn" && (
+                                  <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                                  </svg>
+                                )}
+                                {channel.platform === "TikTok" && (
+                                  <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                                  </svg>
+                                )}
+                                {channel.platform === "YouTube" && (
+                                  <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                                  </svg>
+                                )}
+                                </div>
+                              </div>
+                              
+                              {/* Content Column */}
+                              <div className="flex flex items-center justify-between pl-4">
+                                <div className="flex flex-col">
+                                  <span className="text-sm text-muted-foreground">{channel.handle}</span>
+                                </div>
+                                <ArrowRight className="h-5 w-5 text-gray-400" />
+                              </div>
+                            </CardContent>
+                          </Button>
+                        </div>
+                      </Card>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
+  const ProductView = () => {
+    const [products, setProducts] = useState<any[]>([]);
+    const [showAddDialog, setShowAddDialog] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState<any>(null);
+    const [searchQuery, setSearchQuery] = useState('');    
+
+    //used the same resources API request as is being used in Resources View
+    //we needa define a new API request because the displayed in this view is 
+    //different to that in resourcesView's suggested files (1 row 3 columns), 
+    //Product View's catalog is going to be the library that the suggested files
+    //in resources is derived from
+
+    //currently just serves as sample data to ensure that the look and feel is consistent
+
+    useEffect(() => {
+      const fetchResources = async () => {
+        try {
+          const response = await fetch('/api/resources');
+          if (!response.ok) {
+            throw new Error('Failed to fetch resources');
+          }
+          const data = await response.json();
+          setProducts(data);
+        } catch (error) {
+          console.error('Error fetching resources:', error);
+        }
+      };
+
+      fetchResources();
+    }, []);
+
+    return (
+      <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-auto">
+        <Card className="h-full w-full border-2 border-primary">
+          <CardContent>
+            <div className="flex items-center justify-between p-4">
+              <div className="flex items-center gap-2">
+                <h2 className="text-base font-semibold">Products</h2>
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-64"
+                />
+                <ResourceCreationDialog/>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <ScrollArea className="h-[calc(100vh-12rem)]">
+                <div className="grid grid-cols-3 gap-7">
+                  {products.map((product, i) => (
+                    <Button 
+                      key={i}
+                      variant="ghost" 
+                      className="w-full h-full p-0" 
+                      onClick={() => setSelectedProduct(product)}
+                    >
+                      <Card className="hover:bg-accent/50 transition-colors w-full min-h-[250px] flex flex-col">
+                        <CardHeader className="p-4 pb-2 flex-none">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3 min-w-0 pr-2">
+                              <Package className="h-5 w-5 text-blue-500 flex-none" />
+                              <h3 className="font-semibold truncate">{product.title}</h3>
+                            </div>
+                            <div onClick={(e) => e.stopPropagation()} className="flex-none">
+                              <Menubar>
+                                <MenubarMenu>
+                                  <MenubarTrigger asChild>
+                                    <Button variant="ghost" className="pl-1 pr-1">
+                                      <MoreVertical className="h-2 w-2" />
+                                    </Button>
+                                  </MenubarTrigger>
+                                  <MenubarContent>
+                                    <MenubarItem>View Details</MenubarItem>
+                                    <MenubarItem>Edit</MenubarItem>
+                                    <MenubarItem>Share</MenubarItem>
+                                    <MenubarSeparator />
+                                    <MenubarItem className="text-red-600">Delete</MenubarItem>
+                                  </MenubarContent>
+                                </MenubarMenu>
+                              </Menubar>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="px-4 py-2 flex-grow overflow-auto">
+                          <div className="flex flex-col items-center justify-center h-full">
+                            <div className="w-24 h-24 bg-muted/50 rounded-lg flex items-center justify-center">
+                              <Package className="w-12 h-12 text-muted-foreground" />
+                            </div>
+                          </div>
+                        </CardContent>
+                        <CardFooter className="px-4 pt-2 pb-4 flex-none">
+                          <p className="text-xs text-muted-foreground">
+                            Last updated {new Date().toLocaleDateString()}
+                          </p>
+                        </CardFooter>
+                      </Card>
+                    </Button>
+                  ))}
+                </div>
+              </ScrollArea>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
+  const ArchiveView = () => {
+    const [archivedItems, setArchivedItems] = useState<any[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [starredItems, setStarredItems] = useState<any[]>([]);
+
+    useEffect(() => {
+      // Simulated archived items data
+      const mockArchivedItems = [
+        {
+          id: 1,
+          title: "Old Project Documentation",
+          type: "Document", 
+          archivedDate: "2023-10-15",
+          size: "2.4 MB",
+          isStarred: true
+        },
+        {
+          id: 2,
+          title: "Previous Course Materials",
+          type: "Folder",
+          archivedDate: "2023-09-28", 
+          size: "156 MB",
+          isStarred: true
+        },
+        {
+          id: 3,
+          title: "Legacy Code Repository",
+          type: "Code",
+          archivedDate: "2023-11-01",
+          size: "45 MB",
+          isStarred: false
+        },
+        {
+          id: 4,
+          title: "Legacy Code Repository",
+          type: "Code",
+          archivedDate: "2023-11-01",
+          size: "45 MB",
+          isStarred: false
+        },
+        {
+          id: 5,
+          title: "Legacy Code Repository",
+          type: "Code",
+          archivedDate: "2023-11-01",
+          size: "45 MB",
+          isStarred: false
+        },
+        {
+          id: 6,
+          title: "Legacy Code Repository",
+          type: "Code",
+          archivedDate: "2023-11-01",
+          size: "45 MB",
+          isStarred: false
+        }
+      ];
+      setArchivedItems(mockArchivedItems);
+      setStarredItems(mockArchivedItems.filter(item => item.isStarred));
+    }, []);
+
+    const filteredStarredItems = starredItems.filter(item =>
+      item.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    return (
+      <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-auto">
+        <Card className="h-full w-full border-2 border-primary">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Archive</CardTitle>
+              <div className="flex gap-2">
+                <Menubar>
+                  <MenubarMenu>
+                    <MenubarTrigger className="flex items-center gap-2">
+                      <Download className="h-4 w-4" />
+                      Export
+                    </MenubarTrigger>
+                    <MenubarContent>
+                      <MenubarItem>
+                        <FileText className="h-4 w-4 mr-2" />
+                        Export as PDF
+                      </MenubarItem>
+                      <MenubarItem>
+                        <FileText className="h-4 w-4 mr-2" />
+                        Export as DOC
+                      </MenubarItem>
+                      <MenubarItem>
+                        <Table className="h-4 w-4 mr-2" />
+                        Export as CSV
+                      </MenubarItem>
+                    </MenubarContent>
+                  </MenubarMenu>
+                </Menubar>
+                <Button variant="outline" size="sm">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Clear Archive
+                </Button>
+              </div>
+            </div>
+            <CardDescription>Access your archived files and folders</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-6">
+              {/* Left Column - Starred Items */}
+              <div>
+                <div className="mb-4">
+                  <Card className="border-2 border-primary">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-center">
+                        <div className="relative w-full">
+                          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            type="text"
+                            placeholder="Search starred items..."
+                            className="pl-8"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                          />
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="absolute right-2 top-3 h-4 w-6">
+                                <Filter className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem>
+                                <FileText className="h-4 w-4 mr-2 text-blue-500" />
+                                Documents
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>
+                                <Folder className="h-4 w-4 mr-2 text-yellow-500" />
+                                Folders
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>
+                                <FileIcon className="h-4 w-4 mr-2 text-green-500" />
+                                Code Files
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem>
+                                <RefreshCw className="h-4 w-4 mr-2" />
+                                Reset Filters
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <h3 className="text-lg font-semibold mb-4">Starred Items</h3>
+                <div className="space-y-4">
+                  {filteredStarredItems.map((item) => (
+                    <Card key={item.id} className="hover:bg-accent/50 transition-colors">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            {item.type === "Document" && <FileText className="h-5 w-5 text-blue-500" />}
+                            {item.type === "Folder" && <Folder className="h-5 w-5 text-yellow-500" />}
+                            {item.type === "Code" && <FileIcon className="h-5 w-5 text-green-500" />}
+                            <div>
+                              <p className="font-medium">{item.title}</p>
+                              <p className="text-sm text-muted-foreground">Archived on {item.archivedDate}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <span className="text-sm text-muted-foreground">{item.size}</span>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent>
+                                <DropdownMenuItem>
+                                  <Download className="h-4 w-4 mr-2" />
+                                  Download
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <RefreshCw className="h-4 w-4 mr-2" />
+                                  Restore
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="text-red-600">
+                                  <FileX className="h-4 w-4 mr-2" />
+                                  Delete Permanently
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Column - Upload Section */}
+              <div>
+                <div 
+                  className="border-2 border-dashed rounded-lg p-6 text-center hover:bg-accent/50 transition-colors cursor-pointer"
+                  onClick={() => {/* Handle upload click */}}
+                >
+                  <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                  <p className="text-lg font-medium">Drop files here or click to upload</p>
+                  <p className="text-sm text-muted-foreground mt-2">Support for documents, images, and other file types</p>
+                </div>
+                <div className="mt-2">
+                  <h4 className="text-sm font-medium mb-2">Recent Uploads</h4>
+                  <Card className="p-4">
+                    <ScrollArea>
+                    <div className="space-y-2">
+                      {archivedItems.slice(0, 3).map((item) => (
+                        <Card key={item.id}>
+                          <div className="flex items-center justify-between p-2 rounded-md hover:bg-accent/50">
+                            <div className="flex items-center gap-2">
+                              <FileText className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm">{item.title}</span>
+                            </div>
+                            <span className="text-xs text-muted-foreground">{item.size}</span>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                    </ScrollArea>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+  
   const ResourcesView = () => {
     const [resources, setResources] = useState<any[]>([]);
     const [showAddDialog, setShowAddDialog] = useState(false);
-    const [newResource, setNewResource] = useState({
-      title: '',
-      type: '',
-      platform: '',
-      author: '', 
-      description: '',
-    });
+    const { currentView, setCurrentView } = useView('resources');
 
     // Fetch resources on component mount
     useEffect(() => {
@@ -1513,508 +2174,168 @@ export default function MentorshipPortal() {
     }
 
     return (
-    <div className="space-y-6 pt-10">
-        <Card>
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <CardTitle className='pl-10 text-transparent'>sample</CardTitle>
-              <Card>
-          <CardContent className="p-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold pr-5"> {(() => {
-              const { auth } = require('@/firebase/firebaseConfig');
-              const [firstName, setFirstName] = useState('');
-              
-              useEffect(() => {
-                const unsubscribe = auth.onAuthStateChanged(async (user: { displayName: string; }) => {
-                  if (user) {
-                    // Get user's display name and split to get first name
-                    const displayName = user.displayName || '';
-                    const firstName = displayName.split(' ')[0];
-                    setFirstName(firstName);
-                  }
-                });
-                
-                return () => unsubscribe();
-              }, []);
-
-              return `${firstName || 'there'}'s Archive`
-            })()}</h3>
-            <ViewCollectionsDialog />
-            </div>
-          </CardContent>
-        </Card>
-        <ResourceCreationDialog/>
-            </div>
-          </CardHeader>
+      <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-auto">
+        <Card className="h-full w-full border-2 border-primary">
           <CardContent>
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Recommended Resources */}
-              <div>
-                <Card className="p-4">
-                  <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight text-center pt-2 pb-2">Product Hub</h3>
-                </Card>
-                <div className="pt-10 space-y-4">
-                  {resources.map((resource, i) => (
-                    <Card key={i} className="hover:bg-accent transition-colors">
-                      <CardContent className="p-4">
-                        <div className="flex items-start gap-4">
-                          <div className="flex-1">
-                            <h4 className="font-medium text-lg mb-2">{resource.title}</h4>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                              <span>{resource.recommended}</span>
-                              <span>•</span>
-                              <Badge variant="secondary">{resource.type}</Badge>
-                            </div>
-                            <p className="text-sm text-muted-foreground line-clamp-2">{resource.description}</p>
+            <div>
+              <div className="flex items-center gap-2 p-2">
+                <h2 className="text-base font-semibold pt-5">Suggested Folders</h2>
+              </div>
+              <div className="space-y-4">              
+                <div className="grid grid-cols-3 gap-4">
+                  <Card className="hover:bg-accent/50 transition-colors cursor-pointer w-full" onClick={() => setCurrentView('products')}>
+                    <CardContent className="p-4 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Folder className="h-5 w-5 text-blue-500" />
+                        <div>
+                          <h3 className="font-semibold pl-12">Products</h3>
+                          <div className="flex justify-center pl-2">
+                            <p className="text-sm text-muted-foreground">Product resources and guides</p>
                           </div>
-                          
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant="ghost" size="sm" className="mt-1">
-                                <BookOpen className="h-4 w-4 mr-2" />
-                                View Details
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-[500px]">
-                              <Card className="mb-6 pt-5">
-                                <CardContent>
-                                  <DialogHeader>
-                                    <DialogTitle>Join Our Mentorship Program</DialogTitle>
-                                    <DialogDescription>
-                                      Get personalized guidance and unlock premium resources
-                                    </DialogDescription>
-                                  </DialogHeader>
-                                </CardContent>
-                              </Card>
-                              <Card>
-                                <CardContent className="space-y-6">
-                                  <div className="text-center">
-                                    <h4 className="font-medium mb-4">Premium Mentorship Benefits</h4>
-                                    <ul className="text-sm space-y-3">
-                                      <li className="flex items-center gap-2">
-                                        <CheckCircle2 className="h-4 w-4 text-primary" />
-                                        <span>1-on-1 sessions with expert mentors</span>
-                                      </li>
-                                      <li className="flex items-center gap-2">
-                                        <CheckCircle2 className="h-4 w-4 text-primary" />
-                                        <span>Access to all premium resources</span>
-                                      </li>
-                                      <li className="flex items-center gap-2">
-                                        <CheckCircle2 className="h-4 w-4 text-primary" />
-                                        <span>Personalized learning path</span>
-                                      </li>
-                                      <li className="flex items-center gap-2">
-                                        <CheckCircle2 className="h-4 w-4 text-primary" />
-                                        <span>Project reviews and feedback</span>
-                                      </li>
-                                    </ul>
-                                  </div>
-
-                                  <div className="text-center space-y-4 p-6 border rounded-lg">
-                                    <div>
-                                      <span className="text-3xl font-bold">$199</span>
-                                      <span className="text-sm text-muted-foreground">/month</span>
-                                    </div>
-                                    <p className="text-sm text-muted-foreground">
-                                      Cancel anytime. 100% satisfaction guaranteed.
-                                    </p>
-                                  </div>
-
-                                  <div className="flex flex-col gap-3">
-                                    <Button size="lg" onClick={() => setCurrentView('course')}>
-                                      Start Your Mentorship Journey
-                                    </Button>
-                                  </div>
-
-                                  <div className="text-center text-sm text-muted-foreground">
-                                    <p>Have questions? <span className="text-primary cursor-pointer hover:underline">Contact us</span></p>
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            </DialogContent>
-                          </Dialog>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <Menubar>
+                          <MenubarMenu>
+                            <MenubarTrigger asChild>
+                              <Button variant="ghost" className="pl-1 pr-1">
+                                <MoreVertical className="h-3 w-3" />
+                              </Button>
+                            </MenubarTrigger>
+                            <MenubarContent>
+                              <MenubarItem>Open</MenubarItem>
+                              <MenubarItem>Share</MenubarItem>
+                              <MenubarItem>Move</MenubarItem>
+                              <MenubarSeparator />
+                              <MenubarItem className="text-red-600">Delete</MenubarItem>
+                            </MenubarContent>
+                          </MenubarMenu>
+                        </Menubar>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="hover:bg-accent/50 transition-colors cursor-pointer w-full" onClick={() => setCurrentView('socials')}>
+                    <CardContent className="p-4 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Folder className="h-5 w-5 text-blue-500" />
+                        <div>
+                          <h3 className="font-semibold pl-12">Socials</h3>
+                          <div className="flex justify-center pl-2">
+                            <p className="text-sm text-muted-foreground">Social media content</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <Menubar>
+                          <MenubarMenu>
+                            <MenubarTrigger asChild>
+                              <Button variant="ghost" className="pl-1 pr-1">
+                                <MoreVertical className="h-3 w-3" />
+                              </Button>
+                            </MenubarTrigger>
+                            <MenubarContent>
+                              <MenubarItem>Open</MenubarItem>
+                              <MenubarItem>Share</MenubarItem>
+                              <MenubarItem>Move</MenubarItem>
+                              <MenubarSeparator />
+                              <MenubarItem className="text-red-600">Delete</MenubarItem>
+                            </MenubarContent>
+                          </MenubarMenu>
+                        </Menubar>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="hover:bg-accent/50 transition-colors cursor-pointer w-full" onClick={() => setCurrentView('archives')}>
+                    <CardContent className="p-4 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Folder className="h-5 w-5 text-blue-500" />
+                        <div>
+                          <h3 className="font-semibold pl-12">Archive</h3>
+                          <div className="flex justify-center pl-3">
+                            <p className="text-xs text-muted-foreground">Past resources and materials</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <Menubar>
+                          <MenubarMenu>
+                            <MenubarTrigger asChild>
+                              <Button variant="ghost" className="pl-1 pr-1">
+                                <MoreVertical className="h-3 w-3" />
+                              </Button>
+                            </MenubarTrigger>
+                            <MenubarContent>
+                              <MenubarItem>Open</MenubarItem>
+                              <MenubarItem>Share</MenubarItem>
+                              <MenubarItem>Move</MenubarItem>
+                              <MenubarSeparator />
+                              <MenubarItem className="text-red-600">Delete</MenubarItem>
+                            </MenubarContent>
+                          </MenubarMenu>
+                        </Menubar>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div className="flex items-center gap-2 p-2">
+                <h2 className="text-base font-semibold">Suggested Files</h2>
+              </div>
+              <div className="space-y-4">
+                <div className="grid grid-cols-3 gap-7">
+                  {resources.map((resource, i) => (
+                    <Button variant="ghost" className="w-full h-full p-0" onClick={() => setCurrentView('course')}>
+                      <Card key={i} className="hover:bg-accent/50 transition-colors w-full min-h-[250px] flex flex-col">
+                        <CardHeader className="p-4 pb-2 flex-none">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3 min-w-0 pr-2">
+                              <FileText className="h-5 w-5 text-blue-500 flex-none" />
+                              <h3 className="font-semibold truncate">{resource.title}</h3>
+                            </div>
+                            <div onClick={(e) => e.stopPropagation()} className="flex-none">
+                              <Menubar>
+                                <MenubarMenu>
+                                  <MenubarTrigger asChild>
+                                    <Button variant="ghost" className="pl-1 pr-1">
+                                      <MoreVertical className="h-2 w-2" />
+                                    </Button>
+                                  </MenubarTrigger>
+                                  <MenubarContent>
+                                    <MenubarItem>Open</MenubarItem>
+                                    <MenubarItem>Share</MenubarItem>
+                                    <MenubarItem>Move</MenubarItem>
+                                    <MenubarSeparator />
+                                    <MenubarItem className="text-red-600">Delete</MenubarItem>
+                                  </MenubarContent>
+                                </MenubarMenu>
+                              </Menubar>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="px-4 py-2 flex-grow overflow-auto">
+                          <div className="flex flex-col items-center justify-center h-full">
+                            <div className="w-24 h-24 bg-muted/50 rounded-lg flex items-center justify-center">
+                              <FileText className="w-12 h-12 text-muted-foreground" />
+                            </div>
+                          </div>
+                        </CardContent>
+                        <CardFooter className="px-4 pt-2 pb-4 flex-none">
+                          <p className="text-xs text-muted-foreground">
+                            Last accessed {new Date().toLocaleDateString()}
+                          </p>
+                        </CardFooter>
+                      </Card>
+                    </Button>
                   ))}
                 </div>
               </div>
-
-              {/* Learning Path */}
-              <div>
-                <Card className="p-4">
-                  <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight text-center pt-2 pb-2">Content Hub</h3>
-                </Card>
-                <div className='pt-10'></div>
-                {currentView === "youtube" ? (
-                  <YoutubeView />
-                ) : currentView === "tiktok" ? (
-                  <TikTokView />
-                ) : currentView === "twitter" ? (
-                  <TwitterView />
-                ) : currentView === "instagram" ? (
-                  <InstagramView />
-                ) : (
-                  <div className="space-y-4">
-                    {[
-                      {
-                        platform: "YouTube",
-                        status: "Latest Content", 
-                        content: [
-                          {
-                            title: "Frontend Development Tips",
-                            views: "15K views",
-                            date: "2 days ago",
-                            thumbnail: "/youtube-thumb-1.jpg"
-                          },
-                          {
-                            title: "React Best Practices",
-                            views: "32K views",
-                            date: "1 week ago", 
-                            thumbnail: "/youtube-thumb-2.jpg"
-                          }
-                        ],
-                        channelInfo: {
-                          subscribers: "50K",
-                          totalVideos: "125"
-                        }
-                      },
-                      {
-                        platform: "Instagram",
-                        status: "Recent Posts",
-                        content: [
-                          {
-                            caption: "Sharing some web development tips! 💻 #webdev #coding",
-                            likes: "2.5K",
-                            comments: "156",
-                            thumbnail: "/instagram-post-1.jpg"
-                          },
-                          {
-                            caption: "Check out this cool React project! 🚀 #reactjs #javascript",
-                            likes: "3.2K", 
-                            comments: "234",
-                            thumbnail: "/instagram-post-2.jpg"
-                          }
-                        ],
-                        profileInfo: {
-                          followers: "25K",
-                          posts: "342",
-                          following: "1.2K"
-                        }
-                      },
-                      {
-                        platform: "TikTok",
-                        status: "Trending",
-                        content: [
-                          {
-                            title: "Quick CSS Tips",
-                            likes: "45K",
-                            comments: "1.2K",
-                            thumbnail: "/tiktok-thumb-1.jpg"
-                          },
-                          {
-                            title: "JavaScript Shorts",
-                            likes: "32K",
-                            comments: "890",
-                            thumbnail: "/tiktok-thumb-2.jpg"
-                          }
-                        ],
-                        profileInfo: {
-                          followers: "100K",
-                          likes: "1.2M"
-                        }
-                      },
-                      {
-                        platform: "Twitter",
-                        status: "Recent Threads",
-                        content: [
-                          {
-                            text: "🧵 Essential Web Development Tools in 2024",
-                            retweets: "2.5K",
-                            likes: "12K",
-                            time: "3h ago"
-                          },
-                          {
-                            text: "Breaking down complex React concepts 👇",
-                            retweets: "1.8K",
-                            likes: "8K",
-                            time: "1d ago"
-                          }
-                        ],
-                        profileInfo: {
-                          followers: "75K",
-                          tweets: "3.2K"
-                        }
-                      }
-                    ].map((platform, i) => (
-                      <Card 
-                        key={i} 
-                        className="hover:shadow-md transition-shadow"
-                      >
-                        <CardContent className="p-4">
-                          <div className="space-y-3">
-                            <Card className="p-3">
-                              <div className="flex justify-between items-center">
-                                <h4 className="font-medium flex items-center gap-2">
-                                  {platform.platform === "YouTube" && (
-                                    <Button 
-                                      variant="ghost" 
-                                      size="icon"
-                                      className="p-0"
-                                    >
-                                      <svg className="h-5 w-5 dark:text-red-500 text-red-600" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                                      </svg>
-                                    </Button>
-                                  )}
-                                  {platform.platform === "TikTok" && (
-                                    <Button 
-                                      variant="ghost" 
-                                      size="icon"
-                                      className="p-0"
-                                    >
-                                      <svg className="h-5 w-5 dark:text-white text-black" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
-                                      </svg>
-                                    </Button>
-                                  )}
-                                  {platform.platform === "Twitter" && (
-                                    <Button 
-                                      variant="ghost" 
-                                      size="icon"
-                                      className="p-0"
-                                    >
-                                      <svg className="h-5 w-5 dark:text-white text-black" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                                      </svg>
-                                    </Button>
-                                  )}
-                                  {platform.platform === "Instagram" && (
-                                    <Button 
-                                      variant="ghost" 
-                                      size="icon"
-                                      className="p-0"
-                                    >
-                                      <svg className="h-5 w-5 dark:text-white text-black" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                                      </svg>
-                                    </Button>
-                                  )}
-                                  {platform.platform}
-                                </h4>
-                                <Badge variant="secondary">{platform.status}</Badge>
-                              </div>
-                            </Card>
-
-                            <div className="grid gap-3">
-                              {platform.content.map((item, j) => (
-                                <Card key={j} className="p-2">
-                                  <div className="flex items-center gap-3 hover:bg-accent rounded-lg">
-                                    {item.thumbnail && (
-                                      <div className="w-24 h-16 bg-muted rounded overflow-hidden">
-                                        <div className="w-full h-full bg-center bg-cover" style={{backgroundImage: `url(${item.thumbnail})`}} />
-                                      </div>
-                                    )}
-                                    <div className="flex-1">
-                                      <p className="font-medium text-sm">{item.title || item.text}</p>
-                                      <div className="flex gap-2 text-xs text-muted-foreground mt-1">
-                                        {item.views && <span>{item.views}</span>}
-                                        {item.likes && <span>{item.likes} likes</span>}
-                                        {item.retweets && <span>{item.retweets} retweets</span>}
-                                        {item.date || item.time && <span>• {item.date || item.time}</span>}
-                                      </div>
-                                    </div>
-                                  </div>
-                                </Card>
-                              ))}
-                            </div>
-
-                            <Card className="p-3">
-                              <div className="flex justify-between items-center">
-                                <div className="flex gap-4 text-sm text-muted-foreground">
-                                  {platform.channelInfo && (
-                                    <>
-                                      <span>{platform.channelInfo.subscribers} subscribers</span>
-                                      <span>{platform.channelInfo.totalVideos} videos</span>
-                                    </>
-                                  )}
-                                  {platform.profileInfo && (
-                                    <>
-                                      <span>{platform.profileInfo.followers} followers</span>
-                                      {platform.profileInfo.likes && <span>{platform.profileInfo.likes} likes</span>}
-                                      {platform.profileInfo.tweets && <span>{platform.profileInfo.tweets} tweets</span>}
-                                    </>
-                                  )}
-                                </div>
-                                <Button 
-                                  variant="outline"
-                                  onClick={() => setCurrentView(platform.platform.toLowerCase())}
-                                >
-                                  Open
-                                </Button>
-                              </div>
-                            </Card>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </div>
             </div>
           </CardContent>
         </Card>
-
-        <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-          <DialogContent>
-            {/* Step 1: Resource Details */}
-            {!setShowSecondStep ? (
-              <>
-                <div className="flex justify-center">
-                  <Card className="w-full">
-                    <CardContent className="flex flex-col items-center py-4">
-                      <DialogHeader className="text-center">
-                        <DialogTitle>Add New Resource - Details</DialogTitle>
-                        <DialogDescription>
-                          First, let's add the resource details and metadata
-                        </DialogDescription>
-                      </DialogHeader>
-                    </CardContent>
-                  </Card>
-                </div>
-                <div className="grid gap-4 py-4">
-                  <div className="grid gap-2">
-                    <label htmlFor="recommended">Recommended For</label>
-                    <input
-                      id="recommended"
-                      value={newResource.recommended}
-                      onChange={(e) => setNewResource({...newResource, recommended: e.target.value})}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                      placeholder="e.g. Beginners, Advanced Developers"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <label htmlFor="url">Resource URL</label>
-                    <input
-                      id="url"
-                      value={newResource.url}
-                      onChange={(e) => setNewResource({...newResource, url: e.target.value})}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                      placeholder="https://"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <label htmlFor="tags">Tags</label>
-                    <input
-                      id="tags"
-                      value={newResource.tags}
-                      onChange={(e) => setNewResource({...newResource, tags: e.target.value})}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                      placeholder="Enter comma-separated tags"
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button 
-                    onClick={() => setShowSecondStep(true)}
-                    disabled={!newResource.recommended || !newResource.url || !newResource.tags}
-                  >
-                    Continue to Course Details
-                  </Button>
-                </DialogFooter>
-              </>
-            ) : (
-              <>
-                {/* Step 2: Course Information */}
-                <div className="flex justify-center">
-                  <Card className="w-full">
-                    <CardContent className="flex flex-col items-center py-4">
-                      <DialogHeader className="text-center">
-                        <DialogTitle>Course Information</DialogTitle>
-                        <DialogDescription>
-                          Now, let's add the core details about your course
-                        </DialogDescription>
-                      </DialogHeader>
-                    </CardContent>
-                  </Card>
-                </div>
-                <div className="grid gap-4 py-4">
-                  <div className="grid gap-2">
-                    <label htmlFor="title">Course Title</label>
-                    <input
-                      id="title"
-                      value={newResource.title}
-                      onChange={(e) => setNewResource({...newResource, title: e.target.value})}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <label htmlFor="type">Course Type</label>
-                    <Select onValueChange={(value) => setNewResource({...newResource, type: value})}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Video Course">Video Course</SelectItem>
-                        <SelectItem value="Interactive Course">Interactive Course</SelectItem>
-                        <SelectItem value="Workshop">Workshop</SelectItem>
-                        <SelectItem value="Tutorial Series">Tutorial Series</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid gap-2">
-                    <label htmlFor="description">Course Description</label>
-                    <textarea
-                      id="description"
-                      value={newResource.description}
-                      onChange={(e) => setNewResource({...newResource, description: e.target.value})}
-                      className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                      placeholder="Provide a detailed overview of the course content and learning outcomes"
-                    />
-                  </div>
-                </div>
-                <DialogFooter className="flex justify-between">
-                  <Button variant="outline" onClick={() => setShowSecondStep(false)}>
-                    Back to Resource Details
-                  </Button>
-                  <Button onClick={async () => {
-                    try {
-                      const response = await fetch('/api/resources', {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(newResource)
-                      });
-
-                      if (!response.ok) {
-                        throw new Error('Failed to add resource');
-                      }
-
-                      const updatedResponse = await fetch('/api/resources');
-                      const updatedData = await updatedResponse.json();
-                      setResources(updatedData);
-
-                      setNewResource({
-                        title: '',
-                        type: '',
-                        platform: '',
-                        author: '',
-                        description: '',
-                      });
-                      
-                      setShowSecondStep(false);
-                      setShowAddDialog(false);
-                    } catch (error) {
-                      console.error('Error adding resource:', error);
-                    }
-                  }}>Create Course</Button>
-                </DialogFooter>
-              </>
-            )}
-          </DialogContent>
-        </Dialog>
       </div>
     );
   };
@@ -2737,49 +3058,16 @@ export default function MentorshipPortal() {
   
   const CourseView = () => {
     const [courses, setCourses] = useState<any[]>([]);
-    const [isAdminView, setIsAdminView] = useState(false);
+    const { isAdmin, setIsAdmin } = useAdmin();
 
+    // Set initial admin view
     useEffect(() => {
-      const fetchCourses = async () => {
-        try {
-          const response = await fetch('/api/course', {
-            credentials: 'include'
-          });
-          if (!response.ok) {
-            throw new Error('Failed to fetch courses');
-          }
-          const data = await response.json();
-          setCourses(data.courses);
-        } catch (error) {
-          console.error('Error fetching courses:', error);
-        }
-      };
-
-      fetchCourses();
-    }, []);
+      setIsAdmin(true);
+    }, [setIsAdmin]);
 
     return (
       <div className="space-y-6 pt-16">
-        <div className="flex justify-end mb-4">
-          <Button
-            variant="outline"
-            onClick={() => setIsAdminView(!isAdminView)}
-          >
-            {isAdminView ? (
-              <>
-                <Eye className="h-4 w-4 mr-2" />
-                View Course
-              </>
-            ) : (
-              <>
-                <Pencil className="h-4 w-4 mr-2" />
-                Edit Course
-              </>
-            )}
-          </Button>
-        </div>
-
-        {isAdminView ? (
+        {isAdmin ? (
           <AdminCourseView courses={courses} />
         ) : (
           <MemberCourseView courses={courses} />
@@ -2795,8 +3083,12 @@ export default function MentorshipPortal() {
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle>Course: Advanced JavaScript Concepts</CardTitle>
-            <Badge variant="secondary">Progress: 45%</Badge>
+            <div className="flex items-center space-x-2">
+              <Switch/>
+              <Label>Edit</Label>
+            </div>
           </div>
+          
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-3 gap-6">
@@ -3101,7 +3393,10 @@ export default function MentorshipPortal() {
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle>Course: Advanced JavaScript Concepts</CardTitle>
-            <Badge variant="secondary">Progress: 45%</Badge>
+            <div className="flex items-center space-x-2">
+              <Switch/>
+              <Label>Edit</Label>
+            </div>
           </div>
         </CardHeader>
         
@@ -3545,6 +3840,7 @@ export default function MentorshipPortal() {
       yearsOfExperience: number;
       interests: string[];
       socials: {
+        instagram: any;
         linkedin?: string;
         twitter?: string;
         github?: string;
@@ -3636,12 +3932,13 @@ export default function MentorshipPortal() {
         timezone: "GMT",
         rating: 4.7,
         email: undefined
-      }
+      },
     ];
 
+
     return (
-      <div className="max-w-7xl mx-auto space-y-6 pt-10">
-        <Card className='border-2 border-primary'>
+      <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-hidden">
+        <Card className="h-full w-full border-2 border-primary">
           <CardHeader>
             <Card className="p-4 border-2 border-primary">
               <div className="flex flex-col items-center justify-center text-center">
@@ -3651,277 +3948,172 @@ export default function MentorshipPortal() {
             </Card>
           </CardHeader>
           <CardContent>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {communityMembers.map((member) => (
-                <Card key={member.id} className="hover:shadow-lg transition-shadow border-2 border-primary">
-                  <CardContent className="pt-6">
-                    <div className="flex gap-4">
-                      <Avatar className="h-16 w-16">
-                        <AvatarFallback className="text-xl">
-                          {member.name.split(' ').map(n => n[0]).join('')}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="space-y-1">
-                        <h3 className="font-semibold text-lg">{member.name}</h3>
-                        <p className="text-sm text-muted-foreground">{member.role}</p>
-                        {member.company && (
-                          <p className="text-sm text-muted-foreground">at {member.company}</p>
-                        )}
-                        <div className="flex gap-2 items-center">
-                          <Badge variant={member.type === 'mentor' ? 'default' : 'secondary'}>
-                            {member.type === 'mentor' ? 'Mentor' : 'Member'}
-                          </Badge>
-                          {member.rating && (
-                            <Badge variant="outline">
-                              ⭐ {member.rating}
-                            </Badge>
+            <ScrollArea className="h-[calc(100vh-16rem)]">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {communityMembers.map((member) => (
+                  <Card key={member.id} className="hover:shadow-lg transition-shadow border-2 border-primary">
+                    <CardContent className="pt-6">
+                      <div className="flex gap-4">
+                        <Avatar className="h-16 w-16">
+                          <AvatarFallback className="text-xl">
+                            {member.name.split(' ').map(n => n[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="space-y-1">
+                          <h3 className="font-semibold text-lg">{member.name}</h3>
+                          <p className="text-sm text-muted-foreground">{member.role}</p>
+                          {member.company && (
+                            <p className="text-sm text-muted-foreground">at {member.company}</p>
                           )}
+                          <div className="flex gap-2 items-center">
+                            <Badge variant={member.type === 'mentor' ? 'default' : 'secondary'}>
+                              {member.type === 'mentor' ? 'Mentor' : 'Member'}
+                            </Badge>
+                            {member.rating && (
+                              <Badge variant="outline">
+                                ⭐ {member.rating}
+                              </Badge>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="mt-4 h-[80px]">
-                      <h4 className="font-medium mb-2">Expertise</h4>
-                      <div className="flex flex-wrap gap-2 h-[48px] overflow-hidden">
-                        {member.expertise.slice(0, 3).map((skill, i) => (
-                          <Badge key={i} variant="outline">{skill}</Badge>
-                        ))}
-                      </div>
-                    </div>
-
-                    {member.location && (
-                      <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-                        <MapPin className="h-4 w-4" />
-                        <span>{member.location}</span>
-                      </div>
-                    )}
-
-                    <Button 
-                      className="w-full mt-4" 
-                      onClick={() => {
-                        setSelectedMember(member);
-                        setShowProfileDialog(true);
-                      }}
-                    >
-                      View Profile
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Dialog open={showProfileDialog} onOpenChange={setShowProfileDialog}>
-          <DialogContent className="w-[95vw] max-w-7xl">
-            <DialogHeader className="p-6 border-b">
-              <DialogTitle className="text-2xl font-bold flex items-center gap-3">
-                {selectedMember?.name}
-                {selectedMember?.type === 'mentor' && (
-                  <Badge variant="secondary">Mentor</Badge>
-                )}
-              </DialogTitle>
-              <DialogDescription className="text-lg flex items-center gap-2">
-                <span>{selectedMember?.role}</span>
-                {selectedMember?.company && (
-                  <>
-                    <span>•</span>
-                    <span>{selectedMember.company}</span>
-                  </>
-                )}
-                {selectedMember?.location && (
-                  <>
-                    <span>•</span>
-                    <span className="flex items-center gap-1">
-                      <MapPin className="h-4 w-4" />
-                      {selectedMember.location}
-                    </span>
-                  </>
-                )}
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* About Card */}
-                <Card className='border-2 border-primary'>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <User className="h-5 w-5" />
-                      About
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <p className="text-muted-foreground leading-relaxed">{selectedMember?.bio}</p>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        {selectedMember?.yearsOfExperience} years experience
-                      </div>
-                      {selectedMember?.timezone && (
-                        <div className="flex items-center gap-1">
-                          <Globe className="h-4 w-4" />
-                          {selectedMember.timezone}
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Skills & Expertise Card */}
-                <Card className='border-2 border-primary'>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Wrench className="h-5 w-5" />
-                      Skills & Expertise
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex flex-wrap gap-2">
-                      {selectedMember?.expertise.map((skill, i) => (
-                        <Badge key={i} variant="secondary">{skill}</Badge>
-                      ))}
-                    </div>
-                    {selectedMember?.languages && (
-                      <div>
-                        <h4 className="text-sm font-medium mb-2">Languages</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {selectedMember.languages.map((language, i) => (
-                            <Badge key={i} variant="outline">{language}</Badge>
+                      <div className="mt-4 h-[40]">
+                        <div className="flex flex-wrap gap-2 h-[48px] overflow-hidden">
+                          {member.expertise.slice(0, 3).map((skill, i) => (
+                            <Badge key={i} variant="outline">{skill}</Badge>
                           ))}
                         </div>
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
 
-                {/* Objectives & Goals Card */}
-                <Card className='border-2 border-primary'>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Target className="h-5 w-5" />
-                      Objectives & Goals
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex flex-wrap gap-2">
-                      {selectedMember?.interests.map((interest, i) => (
-                        <Badge key={i} variant="secondary">{interest}</Badge>
-                      ))}
-                    </div>
-                    {selectedMember?.achievements && (
-                      <div className="space-y-2">
-                        <h4 className="text-sm font-medium">Key Achievements</h4>
-                        {selectedMember.achievements.map((achievement, i) => (
-                          <div key={i} className="flex items-center gap-2 text-sm">
-                            <Trophy className="h-4 w-4 text-yellow-500" />
-                            <span>{achievement}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-              
-              <div className="mt-6 flex justify-end gap-4">
-                <Menubar className="border-none bg-transparent p-0">
-                  <MenubarMenu>
-                    <MenubarTrigger className="flex cursor-default select-none items-center rounded-sm px-3 py-2 text-sm font-medium outline-none focus:bg-neutral-100 focus:text-neutral-900 data-[state=open]:bg-neutral-100 data-[state=open]:text-neutral-900 dark:focus:bg-neutral-800 dark:focus:text-neutral-50 dark:data-[state=open]:bg-neutral-800 dark:data-[state=open]:text-neutral-50">
-                      Actions
-                    </MenubarTrigger>
-                    <MenubarContent className="min-w-[12rem] overflow-hidden rounded-md border border-neutral-200 bg-white p-1 text-neutral-950 shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-50">
-                      {Object.entries(selectedMember?.socials || {}).map(([platform, url]) => (
-                        url && (
-                          <MenubarItem 
-                            key={platform} 
-                            className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-neutral-100 focus:text-neutral-900 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 dark:focus:bg-neutral-800 dark:focus:text-neutral-50"
-                            onClick={() => window.open(url, '_blank')}
-                          >
-                            <div className="flex items-center gap-2">
-                              {platform === 'github' && <Github className="h-4 w-4" />}
-                              {platform === 'twitter' && <Twitter className="h-4 w-4" />}
-                              {platform === 'linkedin' && <Linkedin className="h-4 w-4" />}
-                              {platform === 'website' && <Globe className="h-4 w-4" />}
-                              {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button className="w-full mt-4">
+                            View Profile
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-4xl">                        
+                          <div className="grid grid-cols-3 gap-6">
+                            {/* Left Column */}
+                            <div className="col-span-1">
+                              <Card className="border-2 border-primary">
+                                <CardContent className="p-6">
+                                  <div className="flex flex-col items-center gap-4">
+                                    <Avatar className="h-24 w-24">
+                                      <AvatarFallback className="text-2xl">
+                                        {member.name.split(' ').map(n => n[0]).join('')}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <div className="text-center space-y-2">
+                                      <h3 className="font-semibold text-xl">{member.name}</h3>
+                                      <p className="text-muted-foreground">{member.role}</p>
+                                      {member.company && (
+                                        <p className="text-muted-foreground">at {member.company}</p>
+                                      )}
+                                      <div className="flex justify-center gap-2">
+                                        <Badge variant={member.type === 'mentor' ? 'default' : 'secondary'}>
+                                          {member.type === 'mentor' ? 'Mentor' : 'Member'}
+                                        </Badge>
+                                        {member.rating && (
+                                          <Badge variant="outline">⭐ {member.rating}</Badge>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                              <Card className="border-2 border-primary mt-2">
+                                <CardHeader className="">
+                                  <CardTitle className="text-center text-lg font-medium text-muted-foreground">
+                                    Match Score:
+                                  </CardTitle>
+                                </CardHeader>
+                                <CardContent className="flex flex-col items-center">
+                                  <div className="relative flex items-center justify-center">
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                      <div className="text-xl font-bold text-primary">
+                                        {Math.floor(Math.random() * 30 + 70)}%
+                                      </div>
+                                    </div>
+                                    {/* <Sparkles className="absolute h-full w-full text-primary/20 animate-pulse" /> */}
+                                  </div>
+                                  <div className="flex items-center gap-2 text-sm text-muted-foreground pt-4">
+                                    <span>Skills & Interests Match</span>
+                                    <HelpCircle className="h-4 w-4 opacity-50" />
+                                  </div>
+                                </CardContent>
+                              </Card>
                             </div>
-                          </MenubarItem>
-                        )
-                      ))}
-                      <MenubarSeparator className="-mx-1 my-1 h-px bg-neutral-100 dark:bg-neutral-800"/>
-                      <MenubarSub>
-                        <MenubarSubTrigger>
-                          <MessageSquare className="h-4 w-4 mr-2" />
-                          Contact Options
-                        </MenubarSubTrigger>
-                        <MenubarSubContent>
-                          <MenubarItem 
-                            onClick={() => {
-                              // Handle direct message
-                              if (selectedMember) {
-                                toast({
-                                  title: "Message Started",
-                                  description: `Starting chat with ${selectedMember.name}`,
-                                  duration: 3000,
-                                })
-                              }
-                            }}
-                          >
-                            Direct Message
-                          </MenubarItem>
-                          <MenubarItem
-                            onClick={() => {
-                              // Handle email
-                              if (selectedMember?.email) {
-                                window.location.href = `mailto:${selectedMember.email}`
-                              }
-                            }}
-                          >
-                            Send Email
-                          </MenubarItem>
-                        </MenubarSubContent>
-                      </MenubarSub>
-                      <MenubarSub>
-                        <MenubarSubTrigger>
-                          <UserPlus className="h-4 w-4 mr-2" />
-                          Mentorship
-                        </MenubarSubTrigger>
-                        <MenubarSubContent>
-                          <MenubarItem 
-                            onClick={() => {
-                              if (selectedMember) {
-                                toast({
-                                  title: "Mentorship Request Sent",
-                                  description: `Your request has been sent to ${selectedMember.name}`,
-                                  duration: 3000,
-                                })
-                              }
-                            }}
-                          >
-                            Request Mentorship
-                          </MenubarItem>
-                          <MenubarItem
-                            onClick={() => {
-                              if (selectedMember) {
-                                toast({
-                                  title: "Schedule Meeting",
-                                  description: "Opening calendar to schedule a meeting",
-                                  duration: 3000,
-                                })
-                              }
-                            }}
-                          >
-                            Schedule Meeting
-                          </MenubarItem>
-                        </MenubarSubContent>
-                      </MenubarSub>
-                    </MenubarContent>
-                  </MenubarMenu>
-                </Menubar>
+
+                            {/* Right Column */}
+                            <div className="col-span-2 space-y-6">
+                              <Card className="border-2 border-primary">
+                                <CardHeader>
+                                  <CardTitle className="flex items-center gap-2">
+                                    <User className="h-5 w-5" />
+                                    About
+                                  </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                  <p className="text-muted-foreground">{member.bio}</p>
+                                </CardContent>
+                              </Card>
+
+                              <Card className="border-2 border-primary">
+                                <CardHeader>
+                                  <CardTitle className="flex items-center gap-2">
+                                    <Wrench className="h-5 w-5" />
+                                    Expertise
+                                  </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                  <div className="flex flex-wrap gap-2">
+                                    {member.expertise.map((skill, i) => (
+                                      <Badge key={i} variant="secondary">{skill}</Badge>
+                                    ))}
+                                  </div>
+                                </CardContent>
+                              </Card>
+
+                              <div className="flex flex-col justify-center items-center">
+                                <Card className="border-2 border-primary">
+                                  <CardContent className="flex flex-col gap-4 p-6">
+                                    <div className="flex justify-center gap-4">
+                                      <Button variant="ghost" size="icon" onClick={() => window.open('https://linkedin.com', '_blank')}>
+                                        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                                          <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                                        </svg>
+                                      </Button>
+                                      <Button variant="ghost" size="icon" onClick={() => window.open('https://twitter.com', '_blank')}>
+                                        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                                          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                        </svg>
+                                      </Button>
+                                      <Button variant="ghost" size="icon" onClick={() => window.open('https://instagram.com', '_blank')}>
+                                        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                                          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                                        </svg>
+                                      </Button>
+                                      <Button variant="ghost" size="icon" onClick={() => window.open('https://github.com', '_blank')}>
+                                        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                                          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                        </svg>
+                                      </Button>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              </div>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </ScrollArea>
+          </CardContent>
+        </Card>
       </div>
     );
   };
@@ -3929,8 +4121,9 @@ export default function MentorshipPortal() {
 
   return (
     <div className="min-h-screen flex">
-      <div className="hidden md:block w-64 border-r">
+      <div className="hidden md:block w-64">
         <Sidebar />
+        {/* <Sidebar /> */}
       </div>
 
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
@@ -3955,6 +4148,11 @@ export default function MentorshipPortal() {
         {currentView === 'tiktok' && <TikTokView/>}
         {currentView === 'twitter' && <TwitterView/>}
         {currentView === 'instagram' && <InstagramView/>}
+        {currentView === 'emailInbox' && <EmailInbox/>}
+        {currentView === 'files' && <FilesView/>}
+        {currentView === 'socials' && <SocialsView/>}
+        {currentView === 'products' && <ProductView/>}
+        {currentView === 'archives' && <ArchiveView/>}
       </div>
     </div>
   );

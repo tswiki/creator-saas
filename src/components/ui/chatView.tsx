@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { Badge } from "./badge";
 import { Button } from "./button";
-import { MessageCircle, Users2, X } from "lucide-react";
+import { Calendar, Clock, Globe, MessageCircle, MessageSquare, Share2, Users, Users2, Video, X } from "lucide-react";
 import { Input } from "./input";
 import DiscordApp from '../spaces/discordView';
 import VidView from '../spaces/videoView';
@@ -68,7 +68,7 @@ export function SpacesView() {
     {
       id: 1,
       name: "Conference Room",
-      description: "Join weekly live coding sessions and interactive workshops",
+      description: "Join weekly live coding sessions and workshops",
       members: 2341,
       messages: 15678,
       type: "public"
@@ -76,7 +76,7 @@ export function SpacesView() {
     {
       id: 2,
       name: "Discord Community",
-      description: "Connect with other developers, share resources and get help",
+      description: "Connect with other developers",
       members: 8934,
       messages: 234567,
       type: "public" 
@@ -89,10 +89,10 @@ export function SpacesView() {
     setActiveSpace(space.name);
   };
 
+
   return (
-    <div className="max-w-7xl mx-auto space-y-6 pt-12">
-      {!activeSpace ? (
-        <Card className="border-2 border-primary"> 
+      <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-hidden">      {!activeSpace ? (
+        <Card className="h-full w-full border-2 border-primary"> 
           <div className="flex flex-col items-center">
             <CardHeader>
               <div className="flex justify-center">
@@ -106,7 +106,7 @@ export function SpacesView() {
               {spaces.map((space) => (
                 <Card key={space.id} className="hover:shadow-lg transition-shadow border-2 border-primary">
                   <CardContent className="pt-6">
-                    <div className="space-y-4">
+                    <div>
                       <div className="flex justify-between items-start">
                         <div>
                           <h3 className="font-semibold text-lg">{space.name}</h3>
@@ -141,6 +141,67 @@ export function SpacesView() {
               ))}
             </div>
           </CardContent>
+          <div className="px-6">
+            <Card className="w-full p-1 border-0">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                <Card className="w-full border-2 border-primary p-6">
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-lg border-b pb-2">Community Stats</h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Users2 className="h-5 w-5 text-muted-foreground" />
+                        <span className="text-sm">23,728 Total Members</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MessageCircle className="h-5 w-5 text-muted-foreground" />
+                        <span className="text-sm">339,479 Messages Sent</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Globe className="h-5 w-5 text-muted-foreground" />
+                        <span className="text-sm">3 Active Spaces</span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="w-full border-2 border-primary p-6">
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-lg border-b pb-2">Space Purposes</h4>
+                    <div className="text-sm space-y-2">
+                      <p className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-muted-foreground" />
+                        Conference Room - Weekly coding sessions and workshops
+                      </p>
+                      <p className="flex items-center gap-2">
+                        <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                        Discord Community - Developer networking and support
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="w-full border-2 border-primary p-6">
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-lg border-b pb-2">Quick Facts</h4>
+                    <div className="text-sm space-y-2">
+                      <p className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        24/7 Community Support
+                      </p>
+                      <p className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        Weekly Live Events
+                      </p>
+                      <p className="flex items-center gap-2">
+                        <Users2 className="h-4 w-4 text-muted-foreground" />
+                        Project Collaboration
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            </Card>
+          </div>
         </Card>
       ) : (
         <>
@@ -223,8 +284,8 @@ export function SpacesView() {
           )}
         </>
       )}
+      
     </div>
   );
 }
-
 export default SpacesView;
