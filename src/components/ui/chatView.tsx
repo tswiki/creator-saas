@@ -60,7 +60,7 @@ export function SpacesView() {
   const [spaces] = useState([
     {
       id: 4,
-      name: "Community Feed",
+      name: "Community Feed", 
       description: "Watch and interact during live YouTube tutorial recordings",
       members: 12453,
       messages: 89234,
@@ -69,7 +69,7 @@ export function SpacesView() {
     {
       id: 1,
       name: "Conference Room",
-      description: "Join weekly live coding sessions and workshops",
+      description: "Join weekly live coding sessions and workshops", 
       members: 2341,
       messages: 15678,
       type: "public"
@@ -80,7 +80,7 @@ export function SpacesView() {
       description: "Connect with other developers",
       members: 8934,
       messages: 234567,
-      type: "public" 
+      type: "public"
     }
   ]);
 
@@ -89,7 +89,6 @@ export function SpacesView() {
   const handleJoinSpace = (space: { id?: number; name: any; description?: string; members?: number; messages?: number; type?: string; }) => {
     setActiveSpace(space.name);
   };
-
 
   return (
       <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-hidden">      {!activeSpace ? (
@@ -142,188 +141,60 @@ export function SpacesView() {
               ))}
             </div>
           </CardContent>
-          <div className="px-6 ">
+          <div className="px-6">
             <Card className="w-full p-1 border-0">
-
               <div className="relative w-full">
-                <Carousel 
-                  className="w-full"
-                  opts={{
-                    align: "center",
-                    loop: true,
-                    startIndex: 1
-                  }}
-                >
-                  <div className="relative px-12">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="absolute left-0 top-1/2 -translate-y-1/2 z-10"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const carousel = e.currentTarget.closest('.carousel');
-                        if (carousel) {
-                          const api = (carousel as any).Carousel;
-                          if (api) {
-                            api.scrollPrev();
-                          }
-                        }
-                      }}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline" 
-                      size="icon"
-                      className="absolute right-0 top-1/2 -translate-y-1/2 z-10"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const carousel = e.currentTarget.closest('.carousel');
-                        if (carousel) {
-                          const api = (carousel as any).Carousel;
-                          if (api) {
-                            api.scrollNext();
-                          }
-                        }
-                      }}
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                    
-                    <CarouselContent className="overflow-visible">
-                      <CarouselItem className="md:basis-1/5 lg:basis-1/4 transition-all duration-300 data-[inactive]:scale-80 data-[inactive]:-translate-x-4 data-[inactive]:opacity-30 data-[inactive]:blur-sm">
-                        <Card className="w-full border-2 border-primary p-6">
-                          <div className="space-y-3">
-                            <h4 className="font-semibold text-lg border-b pb-2">Community Stats</h4>
+                <Carousel className="w-full">
+                  <CarouselContent>
+                    {Array.from({ length: 6 }).map((_, index) => (
+                      <CarouselItem key={index} className="md:basis-1/3 lg:basis-1/4">
+                        <div className="p-1">
+                          <Card className="w-full border-2 border-primary p-4">
                             <div className="space-y-2">
-                              <div className="flex items-center gap-2">
-                                <Users2 className="h-5 w-5 text-muted-foreground" />
-                                <span className="text-sm">23,728 Total Members</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <MessageCircle className="h-5 w-5 text-muted-foreground" />
-                                <span className="text-sm">339,479 Messages Sent</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Globe className="h-5 w-5 text-muted-foreground" />
-                                <span className="text-sm">3 Active Spaces</span>
-                              </div>
-                            </div>
-                          </div>
-                        </Card>
-                      </CarouselItem>
-
-                      <CarouselItem className="md:basis-1/5 lg:basis-1/4 transition-all duration-300 data-[inactive]:scale-80 data-[inactive]:-translate-x-4 data-[inactive]:opacity-30 data-[inactive]:blur-sm">
-                        <Card className="w-full border-2 border-primary p-6">
-                          <div className="space-y-3">
-                            <h4 className="font-semibold text-lg border-b pb-2">Space Purposes</h4>
-                            <div className="text-sm space-y-2">
-                              <p className="flex items-center gap-2">
-                                <Users className="h-4 w-4 text-muted-foreground" />
-                                Weekly coding sessions and workshops
-                              </p>
-                              <p className="flex items-center gap-2">
-                                <MessageSquare className="h-4 w-4 text-muted-foreground" />
-                                Developer networking and support
-                              </p>
-                            </div>
-                          </div>
-                        </Card>
-                      </CarouselItem>
-
-                      <CarouselItem className="md:basis-1/5 lg:basis-1/4 transition-all duration-300 data-[inactive]:scale-80 data-[inactive]:-translate-x-4 data-[inactive]:opacity-30 data-[inactive]:blur-sm">
-                        <Card className="w-full border-2 border-primary p-6">
-                          <div className="space-y-3">
-                            <h4 className="font-semibold text-lg border-b pb-2">Quick Facts</h4>
-                            <div className="text-sm space-y-2">
-                              <p className="flex items-center gap-2">
-                                <Clock className="h-4 w-4 text-muted-foreground" />
-                                24/7 Community Support
-                              </p>
-                              <p className="flex items-center gap-2">
-                                <Calendar className="h-4 w-4 text-muted-foreground" />
-                                Weekly Live Events
-                              </p>
-                              <p className="flex items-center gap-2">
-                                <Users2 className="h-4 w-4 text-muted-foreground" />
-                                Project Collaboration
-                              </p>
-                            </div>
-                          </div>
-                        </Card>
-                      </CarouselItem>
-
-                      <CarouselItem className="md:basis-1/5 lg:basis-1/4 transition-all duration-300 data-[inactive]:scale-80 data-[inactive]:-translate-x-4 data-[inactive]:opacity-30 data-[inactive]:blur-sm">
-                        <Card className="w-full border-2 border-primary p-6">
-                          <div className="space-y-3">
-                            <h4 className="font-semibold text-lg border-b pb-2">More Stats</h4>
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2">
-                                <Users2 className="h-5 w-5 text-muted-foreground" />
-                                <span className="text-sm">23,728 Total Members</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <MessageCircle className="h-5 w-5 text-muted-foreground" />
-                                <span className="text-sm">339,479 Messages Sent</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Globe className="h-5 w-5 text-muted-foreground" />
-                                <span className="text-sm">3 Active Spaces</span>
+                              <h4 className="font-semibold text-base border-b pb-2">
+                                {index === 0 && "Community Stats"}
+                                {index === 1 && "Space Purposes"}
+                                {index === 2 && "Quick Facts"}
+                                {index === 3 && "More Stats"}
+                                {index === 4 && "Other Stats"}
+                                {index === 5 && "Misc Stats"}
+                              </h4>
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <Users2 className="h-4 w-4 text-muted-foreground" />
+                                  <span className="text-sm">23,728 Members</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <MessageCircle className="h-4 w-4 text-muted-foreground" />
+                                  <span className="text-sm">339,479 Messages</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Globe className="h-4 w-4 text-muted-foreground" />
+                                  <span className="text-sm">3 Active Spaces</span>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </Card>
+                          </Card>
+                        </div>
                       </CarouselItem>
-
-                      <CarouselItem className="md:basis-1/5 lg:basis-1/4 transition-all duration-300 data-[inactive]:scale-80 data-[inactive]:-translate-x-4 data-[inactive]:opacity-30 data-[inactive]:blur-sm">
-                        <Card className="w-full border-2 border-primary p-6">
-                          <div className="space-y-3">
-                            <h4 className="font-semibold text-lg border-b pb-2">Other Stats</h4>
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2">
-                                <Users2 className="h-5 w-5 text-muted-foreground" />
-                                <span className="text-sm">23,728 Total Members</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <MessageCircle className="h-5 w-5 text-muted-foreground" />
-                                <span className="text-sm">339,479 Messages Sent</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Globe className="h-5 w-5 text-muted-foreground" />
-                                <span className="text-sm">3 Active Spaces</span>
-                              </div>
-                            </div>
-                          </div>
-                        </Card>
-                      </CarouselItem>
-
-                      <CarouselItem className="md:basis-1/5 lg:basis-1/4 transition-all duration-300 data-[inactive]:scale-80 data-[inactive]:-translate-x-4 data-[inactive]:opacity-30 data-[inactive]:blur-sm">
-                        <Card className="w-full border-2 border-primary p-6">
-                          <div className="space-y-3">
-                            <h4 className="font-semibold text-lg border-b pb-2">Misc Stats</h4>
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2">
-                                <Users2 className="h-5 w-5 text-muted-foreground" />
-                                <span className="text-sm">23,728 Total Members</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <MessageCircle className="h-5 w-5 text-muted-foreground" />
-                                <span className="text-sm">339,479 Messages Sent</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Globe className="h-5 w-5 text-muted-foreground" />
-                                <span className="text-sm">3 Active Spaces</span>
-                              </div>
-                            </div>
-                          </div>
-                        </Card>
-                      </CarouselItem>
-
-                    </CarouselContent>
-                  </div>
+                    ))}
+                  </CarouselContent>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="absolute -left-12 top-1/2 -translate-y-1/2 z-10"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="absolute -right-12 top-1/2 -translate-y-1/2 z-10"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
                 </Carousel>
               </div>
-              
             </Card>
           </div>
         </Card>
