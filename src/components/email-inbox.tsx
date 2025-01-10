@@ -314,7 +314,7 @@ const dummyAgentMessages: AgentMessage[] = [
 
 export default function EmailInbox() {
   const [emails, setEmails] = useState<Email[]>(dummyEmails)
-  const [selectedView, setSelectedView] = useState<string>('inbox')
+  const [selectedView, setSelectedView] = useState<string>('overview')
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null)
   const [overview, setOverview] = useState<UserOverview>(dummyOverview)
   const [ratings, setRatings] = useState<Rating[]>(dummyRatings)
@@ -336,7 +336,7 @@ export default function EmailInbox() {
       case 'heji-shindo':
         return agentMessages
       default:
-        return emails
+        return [overview]
     }
   }
 
