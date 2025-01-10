@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { UserCircle, BellRing, Menu, X, Calendar, Users, MessageSquare, Search, Bell, Mail } from 'lucide-react';
+import { UserCircle, BellRing, Menu, X, Calendar, Users, MessageSquare, Search, Bell, Mail, User } from 'lucide-react';
 import { useState } from 'react';
 import Profile from '@/components/ui/profile'
 import { useTheme } from 'next-themes';
@@ -10,18 +10,8 @@ import Image from 'next/image';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './dialog';
 import { Button } from './button';
 import { ScrollArea } from './scroll-area';
-import {
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-} from "./command";
-import EmailInbox from '../email-inbox';
+;
 import { useView } from '@/contexts/viewContext';
-import { Input } from './input';
 import { SearchBar } from '@/components/search-bar';
 
 interface HeaderProps {
@@ -65,7 +55,7 @@ export default function Header({ logoSrc, brandName = "dejitaru " }: HeaderProps
 
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 dark:bg-slate-900/75 backdrop-blur-sm transition-colors duration-200 pt-1">
+    <header className="fixed top-0 left-12 right-0 z-50 bg-background backdrop-blur-sm transition-colors duration-200 pt-1">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Left side - Brand/Logo */}
@@ -118,6 +108,14 @@ export default function Header({ logoSrc, brandName = "dejitaru " }: HeaderProps
               className="border-2 border-primary rounded-full"
             >
             <Mail className="h-5 w-5" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => {setCurrentView('profile')}}
+              className="border-2 border-primary rounded-full"
+            >
+              <User className="h-5 w-5" />
             </Button>
             </div>
         </div>

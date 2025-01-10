@@ -128,7 +128,9 @@ import {
   ChevronDown,
   ExternalLink,
   Package,
-  Table
+  Table,
+  PlayCircle,
+  Link2
 } from "lucide-react";
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Label, DropdownMenuSeparator, RadioGroup } from '@radix-ui/react-dropdown-menu';
@@ -140,7 +142,6 @@ import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, Me
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@radix-ui/react-tabs';
 import SpacesView from './chatView';
 import {EventCreationDialog} from '../event-creation-dialog'
-import { ViewCollectionsDialog } from '../view-collections-dialog';
 import ResourceCreationDialog from '../resource-creation-dialog';
 import EmailInbox from '../email-inbox';
 import { useView } from '@/contexts/viewContext'
@@ -204,6 +205,203 @@ const DashboardView = () => {
                     </div>
                   </div>
                   <Badge variant="destructive">High Priority</Badge>
+                </div>
+              </Card>
+            </CardContent>
+          </Card>
+        </div>
+      )
+    },
+    {
+      title: "Community Feed",
+      description: "Latest community updates and activities", 
+      component: (
+        <div className="p-4">
+          <Card className="relative border-4 border-primary">
+            <div className="absolute top-6 right-6">
+              <Card className="p-2 border-2 border-primary">
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="icon" onClick={prevSlide}>
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={nextSlide}>
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </Card>
+            </div>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Community Stream</CardTitle>
+                  <CardDescription>Recent activities and updates</CardDescription>
+                </div>
+                <Button variant="outline" size="sm">
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Refresh
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-[calc(100vh-20rem)] pr-4">
+                <div className="space-y-4">
+                  <Card className="p-4 border-2 border-primary">
+                    <div className="flex gap-4">
+                      <Avatar>
+                        <AvatarImage src="/avatars/sarah.jpg" />
+                        <AvatarFallback>SC</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <span className="font-medium">Sarah Chen</span>
+                            <span className="text-muted-foreground"> started a live stream</span>
+                          </div>
+                          <span className="text-sm text-muted-foreground">2m ago</span>
+                        </div>
+                        <p className="mt-2">🎥 Building a Full-Stack App with Next.js - Join now!</p>
+                        <div className="mt-3 flex gap-2">
+                          <Button size="sm">
+                            <MonitorPlay className="h-4 w-4 mr-2" />
+                            Join Stream
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <MessageSquare className="h-4 w-4 mr-2" />
+                            Comment
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+
+                  <Card className="p-4 border-2 border-primary">
+                    <div className="flex gap-4">
+                      <Avatar>
+                        <AvatarImage src="/avatars/alex.jpg" />
+                        <AvatarFallback>AR</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <span className="font-medium">Alex Rivera</span>
+                            <span className="text-muted-foreground"> shared a resource</span>
+                          </div>
+                          <span className="text-sm text-muted-foreground">15m ago</span>
+                        </div>
+                        <p className="mt-2">📚 Great article on React performance optimization</p>
+                        <Card className="mt-3 p-3 bg-muted">
+                          <div className="flex items-center gap-2">
+                            <Link2 className="h-4 w-4" />
+                            <span className="text-sm">React Performance: A Deep Dive</span>
+                          </div>
+                        </Card>
+                        <div className="mt-3 flex gap-2">
+                          <Button variant="ghost" size="sm">
+                            <Heart className="h-4 w-4 mr-2" />
+                            Like
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <MessageSquare className="h-4 w-4 mr-2" />
+                            Comment
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <Share2 className="h-4 w-4 mr-2" />
+                            Share
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+
+                  <Card className="p-4 border-2 border-primary">
+                    <div className="flex gap-4">
+                      <Avatar>
+                        <AvatarImage src="/avatars/maria.jpg" />
+                        <AvatarFallback>MK</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <span className="font-medium">Maria Kim</span>
+                            <span className="text-muted-foreground"> posted an announcement</span>
+                          </div>
+                          <span className="text-sm text-muted-foreground">1h ago</span>
+                        </div>
+                        <p className="mt-2">🎉 New workshop series starting next week! Topics include Docker, K8s, and Cloud Native development.</p>
+                        <div className="mt-3 flex gap-2">
+                          <Button size="sm">Register Now</Button>
+                          <Button variant="ghost" size="sm">
+                            <MessageSquare className="h-4 w-4 mr-2" />
+                            Comment
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </div>
+      )
+    },
+    {
+      title: "Community Chat",
+      description: "Connect with your peers and mentors",
+      component: (
+        <div className="p-4">
+          <Card className="relative border-4 border-primary">
+            <div className="absolute top-6 right-6">
+              <Card className="p-2 border-2 border-primary">
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="icon" onClick={prevSlide}>
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={nextSlide}>
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </Card>
+            </div>
+            <CardHeader>
+              <CardTitle>Community Discussions</CardTitle>
+              <CardDescription>Recent conversations and topics</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Card className="p-4 border-2 border-primary">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <MessageCircle className="h-5 w-5" />
+                    <div>
+                      <p className="font-medium">Technical Discussion</p>
+                      <p className="text-sm text-muted-foreground">15 new messages</p>
+                    </div>
+                  </div>
+                  <Badge>Active</Badge>
+                </div>
+              </Card>
+              <Card className="p-4 border-2 border-primary">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Users className="h-5 w-5" />
+                    <div>
+                      <p className="font-medium">Mentorship Group</p>
+                      <p className="text-sm text-muted-foreground">5 mentors online</p>
+                    </div>
+                  </div>
+                  <Button size="sm">Join Chat</Button>
+                </div>
+              </Card>
+              <Card className="p-4 border-2 border-primary">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <HelpCircle className="h-5 w-5" />
+                    <div>
+                      <p className="font-medium">Q&A Forum</p>
+                      <p className="text-sm text-muted-foreground">3 unanswered questions</p>
+                    </div>
+                  </div>
+                  <Button size="sm" variant="outline">View All</Button>
                 </div>
               </Card>
             </CardContent>
@@ -381,8 +579,6 @@ const DashboardView = () => {
     }
   ];
 
-  
-
   return (
     <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-hidden">
       <Card className="h-full w-full border-2 border-primary">
@@ -423,7 +619,7 @@ const DashboardView = () => {
                   key={index}
                   className="absolute transition-all duration-500 h-auto min-h-[60%] max-h-[90%] w-[70%] max-w-2xl"
                   style={{
-                    transform: `translateX(${overlap}%) scale(${isCenter ? 1.05 : 0.9})`,
+                    transform: `translateX(${overlap}%) scale(${isCenter ? 0.945 : 0.81})`,
                     opacity: isCenter ? 1 : 0.5,
                     zIndex: isCenter ? 20 : position === -1 ? 5 : 1,
                     pointerEvents: isCenter ? 'auto' : 'none',
@@ -448,6 +644,166 @@ const DashboardView = () => {
                 onClick={() => setCurrentSlide(index)}
               />
             ))}
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+};
+
+
+const ProfileView = () => {
+  const [profileData, setProfileData] = useState({
+    username: "johndoe@example.com",
+    fullName: "John Doe",
+    email: "johndoe@example.com",
+    photoURL: "/default-avatar.png", 
+    bio: "Software Developer & Mentor",
+    skills: ["React", "TypeScript", "Node.js"],
+    achievements: ["Top Contributor 2023", "Mentor of the Month"],
+    niche: "Full Stack Development",
+    goal: "Help others learn and grow in tech"
+  });
+
+  return (
+    <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-hidden">
+      <Card className="h-full w-full border-2 border-primary">
+        <div className="relative h-full w-full overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
+            <div className="flex flex-col">
+              <Card className="md:col-span-1 border-2 border-primary h-fit">
+                <CardContent className="pt-12">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="relative w-24 h-24 md:w-32 md:h-32">
+                      <div className="absolute inset-0 rounded-full overflow-hidden border-2 border-primary">
+                        <img
+                          src={profileData.photoURL}
+                          alt={profileData.fullName}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <h3 className="font-semibold text-lg md:text-xl">{profileData.fullName}</h3>
+                      <p className="text-xs md:text-sm text-muted-foreground">{profileData.email}</p>
+                    </div>
+                    <div className="w-full pt-2">
+                      <div className="flex justify-center gap-2">
+                        <Button variant="ghost" size="sm">
+                          <Mail className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          <Calendar className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          <MessageSquare className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="border-2 border-primary mt-5">
+                <CardContent className="flex flex-col gap-4 p-6">
+                  <div className="flex justify-center gap-4">
+                    <Button variant="ghost" size="icon" onClick={() => window.open('https://linkedin.com', '_blank')}>
+                      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                      </svg>
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => window.open('https://twitter.com', '_blank')}>
+                      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                      </svg>
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => window.open('https://instagram.com', '_blank')}>
+                      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                      </svg>
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => window.open('https://github.com', '_blank')}>
+                      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                      </svg>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+                       
+
+            <div className="md:col-span-2 space-y-4 overflow-y-auto max-h-[calc(100vh-10rem)]">
+              <Card className="border-2 border-primary">
+                <CardHeader className="py-3">
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <FileText className="h-4 w-4" />
+                    About
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-xs md:text-sm text-muted-foreground">{profileData.bio}</p>
+                </CardContent>
+              </Card>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card className="border-2 border-primary">
+                  <CardHeader className="py-3">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <Sparkles className="h-4 w-4" />
+                      Skills & Expertise
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-1">
+                      {profileData.skills.map((skill, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {skill}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-2 border-primary">
+                  <CardHeader className="py-3">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <Trophy className="h-4 w-4" />
+                      Achievements
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-1">
+                      {profileData.achievements.map((achievement, index) => (
+                        <div key={index} className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground">
+                          <CheckCircle className="h-3 w-3 text-primary" />
+                          {achievement}
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <Card className="border-2 border-primary">
+                <CardHeader className="py-3">
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Target className="h-4 w-4" />
+                    Goals & Focus
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div>
+                    <h4 className="font-medium text-sm mb-1">Niche</h4>
+                    <p className="text-xs md:text-sm text-muted-foreground">{profileData.niche}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm mb-1">Current Goal</h4>
+                    <p className="text-xs md:text-sm text-muted-foreground">{profileData.goal}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </Card>
@@ -1254,8 +1610,8 @@ export default function MentorshipPortal() {
             </div>
           </div>
 
-          <div className="flex items-center justify-center w-full pb-3 mb-4">
-            <div className="flex items-center justify-center space-x-2 pb-10">
+          <div className="flex items-center justify-center w-full pt-3">
+            <div className="flex items-center justify-center space-x-2 pb-5">
               <div className="flex items-center justify-center gap-2">
                 <Sun className={`h-4 w-4 transition-opacity ${theme === 'dark' ? 'opacity-50' : 'text-yellow-500'}`} />
               </div>
@@ -1278,225 +1634,45 @@ export default function MentorshipPortal() {
             </div>
           </div>
 
-          <Button variant="ghost" className="justify-between w-full mt-2 mb-2 pt-10" onClick={async () => {
-              try {
-                const response = await fetch('/api/profiles', {
-                  method: 'GET',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  }
-                });
-
-                if (!response.ok) {
-                  throw new Error('Failed to fetch profile');
-                }
-
-                const data = await response.json();
-                setProfileData(data.profile);
-                setShowProfileDialog(true);
-                setCurrentProfileView('details');
-              } catch (error) {
-                console.error('Error fetching profile:', error);
-                toast({
-                  title: "Error",
-                  description: "Failed to load profile data",
-                  variant: "destructive",
-                  duration: 3000
-                });
-              }
-          }}>
-            <div className="flex items-center gap-2">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={profileData.photoURL} alt={profileData.fullName} />
-                <AvatarFallback>{profileData.fullName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col items-start">
-                <span className="text-sm font-medium">{profileData.fullName}</span>
-                <span className="text-xs text-muted-foreground">{profileData.email}</span>
-              </div>
-            </div>
-            <Settings className="h-4 w-4" />
-          </Button>
-
-          <Dialog open={showProfileDialog} onOpenChange={setShowProfileDialog}>
-            <DialogContent className="w-[70vw] max-w-[1000px] h-[80vh] max-h-[800px]">
-              <div className="space-y-6 mt-6 overflow-y-auto pr-4 custom-scrollbar" style={{
-                scrollbarWidth: 'thin',
-                scrollbarColor: 'rgb(203 213 225) transparent'
-              }}>
-                <style jsx global>{`
-                  .custom-scrollbar::-webkit-scrollbar {
-                    width: 8px;
-                  }
-                  .custom-scrollbar::-webkit-scrollbar-track {
-                    background: transparent;
-                  }
-                  .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background-color: rgb(203 213 225);
-                    border-radius: 20px;
-                    border: 2px solid transparent;
-                  }
-                  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                    background-color: rgb(148 163 184);
-                  }
-                `}</style>
-                <Card>
-                  <CardHeader className="pb-4">
-                    <div className="flex flex-col items-center gap-4">
-                      <div className="relative">
-                        <Avatar className="h-24 w-24">
-                          <AvatarImage src={profileData.photoURL} alt={profileData.fullName} />
-                          <AvatarFallback>{profileData.fullName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                        </Avatar>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="absolute bottom-0 right-0 rounded-full bg-background shadow-sm"
-                        >
-                          <Pencil className="h-4 w-4" />
-                          <span className="sr-only">Change photo</span>
-                        </Button>
-                      </div>
-                      <Button variant="outline" size="sm">
-                        <Link className="h-4 w-4 mr-1" />
-                        Copy Link
-                      </Button>
+          <div className="px-4">
+            <Card className="border-2 border-primary">
+              <CardContent className="p-4">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="text-sm font-medium text-muted-foreground">Engagement Score</div>
+                  <div className="relative w-20 h-20">
+                    <svg className="w-20 h-20 transform -rotate-90">
+                      <circle
+                        cx="40"
+                        cy="40"
+                        r="36"
+                        stroke="currentColor"
+                        strokeWidth="8"
+                        fill="none"
+                        className="text-muted/20"
+                      />
+                      <circle
+                        cx="40"
+                        cy="40"
+                        r="36"
+                        stroke="currentColor"
+                        strokeWidth="8"
+                        fill="none"
+                        strokeDasharray={`${2 * Math.PI * 36}`}
+                        strokeDashoffset={`${2 * Math.PI * 36 * (1 - 0.87)}`}
+                        className="text-primary"
+                      />
+                    </svg>
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-lg font-bold">
+                      87%
                     </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-4 divide-y divide-border">
-                      <div>
-                        <h3 className="text-sm font-medium mb-2">Name</h3>
-                        <input
-                          id="fullName"
-                          value={profileData.fullName}
-                          onChange={(e) => setProfileData({...profileData, fullName: e.target.value})}
-                          className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
-                        />
-                      </div>
-
-                      <div className="pt-4">
-                        <h3 className="text-sm font-medium mb-2">Username</h3>
-                        <input
-                          id="username"
-                          value={profileData.username}
-                          onChange={(e) => setProfileData({...profileData, username: e.target.value})}
-                          className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
-                        />
-                      </div>
-
-                      <div className="pt-4">
-                        <h3 className="text-sm font-medium mb-2">Email Address</h3>
-                        <input
-                          id="email"
-                          value={profileData.email}
-                          onChange={(e) => setProfileData({...profileData, email: e.target.value})}
-                          className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
-                        />
-                      </div>
-
-                      <div className="pt-4">
-                        <h3 className="text-sm font-medium mb-2">Phone Number</h3>
-                        <div className="flex gap-2">
-                          <Select
-                            onValueChange={(value) => setProfileData(prev => ({
-                              ...prev,
-                              countryCode: value
-                            }))}
-                          >
-                            <SelectTrigger className="w-[140px]">
-                              <SelectValue placeholder="Code" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="+1">+1 (US/CA)</SelectItem>
-                              <SelectItem value="+44">+44 (UK)</SelectItem>
-                              <SelectItem value="+61">+61 (AU)</SelectItem>
-                              <SelectItem value="+91">+91 (IN)</SelectItem>
-                              <SelectItem value="+86">+86 (CN)</SelectItem>
-                              <SelectItem value="+81">+81 (JP)</SelectItem>
-                              <SelectItem value="+49">+49 (DE)</SelectItem>
-                              <SelectItem value="+33">+33 (FR)</SelectItem>
-                              <SelectItem value="+55">+55 (BR)</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <input
-                            id="phone"
-                            type="tel"
-                            value={profileData.phoneNumber}
-                            onChange={(e) => setProfileData({...profileData, phoneNumber: e.target.value})}
-                            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
-                            placeholder="Enter phone number"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="pt-4">
-                        <h3 className="text-sm font-medium mb-2">About</h3>
-                        <textarea
-                          id="bio"
-                          value={profileData.bio}
-                          onChange={(e) => setProfileData({...profileData, bio: e.target.value})}
-                          className="flex h-20 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
-                          placeholder="Tell us about yourself..."
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <div className="flex justify-center gap-4 mt-6">
-                <Button 
-                  variant="destructive"
-                  onClick={() => {
-                    localStorage.clear();
-                    window.location.href = '/login';
-                  }}
-                  className="flex items-center gap-2 bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
-                >
-                  <LogOut className="h-4 w-4" />
-                  Logout
-                </Button>
-                <Button 
-                  className="flex items-center gap-2 bg-slate-800 hover:bg-slate-900 dark:bg-white dark:hover:bg-gray-100"
-                  onClick={async () => {
-                    try {
-                      const response = await fetch('/api/profiles', {
-                        method: 'PUT',
-                        headers: {
-                          'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(profileData)
-                      });
-                      
-                      if (!response.ok) {
-                        throw new Error('Failed to save changes');
-                      }
-                      
-                      const data = await response.json();
-                      toast({
-                        title: "Success",
-                        description: "Profile updated successfully",
-                        duration: 3000
-                      });
-                      setShowProfileDialog(false);
-                    } catch (error) {
-                      console.error('Error saving changes:', error);
-                      toast({
-                        title: "Error",
-                        description: "Failed to save changes",
-                        variant: "destructive",
-                        duration: 3000
-                      });
-                    }
-                  }}
-                >
-                  <Save className="h-4 w-4" />
-                  Save
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+                  </div>
+                  <div className="text-xs text-muted-foreground text-center mt-1">
+                    Great engagement this week!
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     );
@@ -3933,6 +4109,58 @@ export default function MentorshipPortal() {
         rating: 4.7,
         email: undefined
       },
+      {
+        id: 4,
+        name: "Marcus Johnson",
+        role: "DevOps Engineer",
+        type: "mentor",
+        company: "Amazon",
+        expertise: ["Kubernetes", "AWS", "CI/CD", "Docker"],
+        bio: "Specializing in cloud infrastructure and DevOps practices. Love helping teams improve their deployment processes.",
+        yearsOfExperience: 10,
+        interests: ["Infrastructure as Code", "Site Reliability", "Automation"],
+        socials: {
+          linkedin: "linkedin.com/in/marcusj",
+          github: "github.com/mjohnson"
+        },
+        achievements: [
+          "AWS Certified Solutions Architect",
+          "Kubernetes Certified Administrator",
+          "Built scalable infrastructure for unicorn startups"
+        ],
+        availability: ["Mon-Thu 6-9pm GMT"],
+        languages: ["English"],
+        location: "London, UK",
+        timezone: "GMT",
+        rating: 4.7,
+        email: undefined
+      },
+      {
+        id: 4,
+        name: "Marcus Johnson",
+        role: "DevOps Engineer",
+        type: "mentor",
+        company: "Amazon",
+        expertise: ["Kubernetes", "AWS", "CI/CD", "Docker"],
+        bio: "Specializing in cloud infrastructure and DevOps practices. Love helping teams improve their deployment processes.",
+        yearsOfExperience: 10,
+        interests: ["Infrastructure as Code", "Site Reliability", "Automation"],
+        socials: {
+          linkedin: "linkedin.com/in/marcusj",
+          github: "github.com/mjohnson"
+        },
+        achievements: [
+          "AWS Certified Solutions Architect",
+          "Kubernetes Certified Administrator",
+          "Built scalable infrastructure for unicorn startups"
+        ],
+        availability: ["Mon-Thu 6-9pm GMT"],
+        languages: ["English"],
+        location: "London, UK",
+        timezone: "GMT",
+        rating: 4.7,
+        email: undefined
+      },
     ];
 
 
@@ -3944,12 +4172,60 @@ export default function MentorshipPortal() {
               <div className="flex flex-col items-center justify-center text-center">
                 <CardTitle>Community Members</CardTitle>
                 <CardDescription>Connect with mentors and fellow developers in our community</CardDescription>
+                <div className="flex items-center gap-2 mt-4">
+                  <Menubar className="border-2 border-primary">
+                    <MenubarMenu>
+                      <MenubarTrigger className="gap-2">
+                        <Filter className="h-4 w-4" />
+                        Filter Members
+                      </MenubarTrigger>
+                      <MenubarContent>
+                        <MenubarSub>
+                          <MenubarSubTrigger>Role Type</MenubarSubTrigger>
+                          <MenubarSubContent>
+                            <MenubarItem>Mentor</MenubarItem>
+                            <MenubarItem>Member</MenubarItem>
+                          </MenubarSubContent>
+                        </MenubarSub>
+                        <MenubarSeparator />
+                        <MenubarSub>
+                          <MenubarSubTrigger>Expertise</MenubarSubTrigger>
+                          <MenubarSubContent>
+                            <MenubarItem>Frontend</MenubarItem>
+                            <MenubarItem>Backend</MenubarItem>
+                            <MenubarItem>DevOps</MenubarItem>
+                            <MenubarItem>Machine Learning</MenubarItem>
+                          </MenubarSubContent>
+                        </MenubarSub>
+                        <MenubarSeparator />
+                        <MenubarSub>
+                          <MenubarSubTrigger>Experience Level</MenubarSubTrigger>
+                          <MenubarSubContent>
+                            <MenubarItem>0-2 years</MenubarItem>
+                            <MenubarItem>3-5 years</MenubarItem>
+                            <MenubarItem>5+ years</MenubarItem>
+                          </MenubarSubContent>
+                        </MenubarSub>
+                        <MenubarSeparator />
+                        <MenubarSub>
+                          <MenubarSubTrigger>Location</MenubarSubTrigger>
+                          <MenubarSubContent>
+                            <MenubarItem>North America</MenubarItem>
+                            <MenubarItem>Europe</MenubarItem>
+                            <MenubarItem>Asia</MenubarItem>
+                            <MenubarItem>Other</MenubarItem>
+                          </MenubarSubContent>
+                        </MenubarSub>
+                      </MenubarContent>
+                    </MenubarMenu>
+                  </Menubar>
+                </div>
               </div>
             </Card>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-[calc(100vh-16rem)]">
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <ScrollArea className="h-[calc(100vh-20rem)] overflow-y-auto">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
                 {communityMembers.map((member) => (
                   <Card key={member.id} className="hover:shadow-lg transition-shadow border-2 border-primary">
                     <CardContent className="pt-6">
@@ -3965,27 +4241,8 @@ export default function MentorshipPortal() {
                           {member.company && (
                             <p className="text-sm text-muted-foreground">at {member.company}</p>
                           )}
-                          <div className="flex gap-2 items-center">
-                            <Badge variant={member.type === 'mentor' ? 'default' : 'secondary'}>
-                              {member.type === 'mentor' ? 'Mentor' : 'Member'}
-                            </Badge>
-                            {member.rating && (
-                              <Badge variant="outline">
-                                ⭐ {member.rating}
-                              </Badge>
-                            )}
-                          </div>
                         </div>
                       </div>
-
-                      <div className="mt-4 h-[40]">
-                        <div className="flex flex-wrap gap-2 h-[48px] overflow-hidden">
-                          {member.expertise.slice(0, 3).map((skill, i) => (
-                            <Badge key={i} variant="outline">{skill}</Badge>
-                          ))}
-                        </div>
-                      </div>
-
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button className="w-full mt-4">
@@ -4075,7 +4332,7 @@ export default function MentorshipPortal() {
                                 </CardContent>
                               </Card>
 
-                              <div className="flex flex-col justify-center items-center">
+                              <div className="flex flex justify-center items-center">
                                 <Card className="border-2 border-primary">
                                   <CardContent className="flex flex-col gap-4 p-6">
                                     <div className="flex justify-center gap-4">
@@ -4098,6 +4355,30 @@ export default function MentorshipPortal() {
                                         <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
                                           <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                                         </svg>
+                                      </Button>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                                <Card className="border-2 border-primary ml-8">
+                                  <CardContent className="flex flex-col gap-4 p-6">
+                                    <div className="flex justify-center">
+                                      <Button 
+                                        variant="outline" 
+                                        className="flex items-center gap-2"
+                                        onClick={(e) => {
+                                          const button = e.currentTarget;
+                                          const icon = button.querySelector('.icon');
+                                          const text = button.querySelector('.text');
+                                          if (icon && text) {
+                                            icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M20 6L9 17l-5-5"/></svg>`;
+                                            text.textContent = 'Tagged';
+                                          }
+                                        }}
+                                      >
+                                        <span className="icon">
+                                          <Users2 className="h-5 w-5" />
+                                        </span>
+                                        <span className="text">Tag User</span>
                                       </Button>
                                     </div>
                                   </CardContent>
@@ -4153,6 +4434,7 @@ export default function MentorshipPortal() {
         {currentView === 'socials' && <SocialsView/>}
         {currentView === 'products' && <ProductView/>}
         {currentView === 'archives' && <ArchiveView/>}
+        {currentView === 'profile' && <ProfileView/>}
       </div>
     </div>
   );

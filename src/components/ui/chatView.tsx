@@ -22,6 +22,7 @@ import {
 } from "stream-chat-react";
 import "stream-chat-react/dist/css/v2/index.css";
 import { Carousel, CarouselContent, CarouselItem } from "./carousel";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./dialog";
 
 const useAuthenticatedUser = () => {
   const [userId, setUserId] = useState(null);
@@ -61,7 +62,7 @@ export function SpacesView() {
     {
       id: 4,
       name: "Community Feed", 
-      description: "Watch and interact during live YouTube tutorial recordings",
+      description: "Community activity stream",
       members: 12453,
       messages: 89234,
       type: "public"
@@ -69,7 +70,7 @@ export function SpacesView() {
     {
       id: 1,
       name: "Conference Room",
-      description: "Join weekly live coding sessions and workshops", 
+      description: "Community videostream", 
       members: 2341,
       messages: 15678,
       type: "public"
@@ -77,7 +78,7 @@ export function SpacesView() {
     {
       id: 2,
       name: "Discord Community",
-      description: "Connect with other developers",
+      description: "Community chatstream",
       members: 8934,
       messages: 234567,
       type: "public"
@@ -90,8 +91,19 @@ export function SpacesView() {
     setActiveSpace(space.name);
   };
 
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  function prevSlide(event: React.MouseEvent<HTMLButtonElement>): void {
+    setCurrentSlide((prev) => (prev - 1 + spaces.length) % spaces.length);
+  }
+
+  function nextSlide(event: React.MouseEvent<HTMLButtonElement>): void {
+    setCurrentSlide((prev) => (prev + 1) % spaces.length);
+  }
+
   return (
-      <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-hidden">      {!activeSpace ? (
+      <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-hidden"> 
+        {!activeSpace ? (
         <Card className="h-full w-full border-2 border-primary"> 
           <div className="flex flex-col items-center">
             <CardHeader>
@@ -102,100 +114,190 @@ export function SpacesView() {
             </CardHeader>
           </div>
           <CardContent>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-3 lg:grid-cols-3 gap-2">
               {spaces.map((space) => (
-                <Card key={space.id} className="hover:shadow-lg transition-shadow border-2 border-primary">
-                  <CardContent className="pt-6">
-                    <div>
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-semibold text-lg">{space.name}</h3>
-                          <p className="text-sm text-muted-foreground">{space.description}</p>
-                        </div>
-                        <Badge variant={space.type === "public" ? "default" : "secondary"}>
-                          {space.type}
-                        </Badge>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <div className="flex gap-4">
-                          <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                            <Users2 className="h-4 w-4" />
-                            <span>{space.members}</span>
+                <div>
+                  <Card key={space.id} className="hover:shadow-lg transition-shadow border-2 border-primary max-w-[300px]">
+                    <div className="flex justify-center">
+                      <CardContent className="p-auto">
+                        <div className="pt-4">
+                          <div className="flex items-center gap-[2%] pt-[2%]">
+                            <div className="h-[8%] w-[8%] rounded-full bg-primary/10 flex items-center justify-center">
+                              <Users2 className="h-[75%] w-[75%]" />
+                            </div>
+                            <div className="flex-grow">
+                              <h3 className="font-semibold text-[1vw] pl-5">{space.name}</h3>
+                            </div>
+                            <Badge variant={space.type === "public" ? "default" : "secondary"} className="text-[0.8vw]">
+                              {space.type}
+                            </Badge>
                           </div>
-                          <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                            <MessageCircle className="h-4 w-4" />
-                            <span>{space.messages}</span>
+                          
+                          <div className="relative aspect-[4/3] w-full rounded-lg overflow-hidden bg-muted mt-[2%] pt-1">
+                            <div className="flex flex-col items-center justify-center h-full p-4 bg-muted/50">
+                              <Users2 className="h-12 w-12 mb-2 text-muted-foreground" />
+                              <p className="text-sm text-center text-muted-foreground">
+                                A space for {space.type} discussions and collaboration
+                              </p>
+                              <p className="text-xs text-center text-muted-foreground mt-1">
+                                Join {space.members} others in meaningful conversations
+                              </p>
+                            </div>
+                          </div>
+
+                          <p className="text-[0.9vw] text-muted-foreground mt-[2%] pt-2">{space.description}</p>
+
+                          <div className="flex justify-between items-center mt-[5%]">
+                            <div className="flex gap-[1vw]">
+                              <div className="flex items-center gap-[0.5vw] text-[0.8vw] text-muted-foreground">
+                                <Users2 className="h-[1vw] w-[1vw]" />
+                                <span>{space.members}</span>
+                              </div>
+                              <div className="flex items-center gap-[0.5vw] text-[0.8vw] text-muted-foreground">
+                                <MessageCircle className="h-[1vw] w-[1vw]" />
+                                <span>{space.messages}</span>
+                              </div>
+                            </div>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="text-[0.8vw] py-[2%] px-[4%] h-auto"
+                              onClick={() => handleJoinSpace(space)}
+                            >
+                              Join Space
+                            </Button>
                           </div>
                         </div>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleJoinSpace(space)}
-                        >
-                          Join Space
-                        </Button>
-                      </div>
+                      </CardContent>
                     </div>
-                  </CardContent>
-                </Card>
+                  </Card>
+                </div>
               ))}
             </div>
           </CardContent>
-          <div className="px-6">
-            <Card className="w-full p-1 border-0">
-              <div className="relative w-full">
-                <Carousel className="w-full">
-                  <CarouselContent>
-                    {Array.from({ length: 6 }).map((_, index) => (
-                      <CarouselItem key={index} className="md:basis-1/3 lg:basis-1/4">
-                        <div className="p-1">
-                          <Card className="w-full border-2 border-primary p-4">
-                            <div className="space-y-2">
-                              <h4 className="font-semibold text-base border-b pb-2">
-                                {index === 0 && "Community Stats"}
-                                {index === 1 && "Space Purposes"}
-                                {index === 2 && "Quick Facts"}
-                                {index === 3 && "More Stats"}
-                                {index === 4 && "Other Stats"}
-                                {index === 5 && "Misc Stats"}
-                              </h4>
-                              <div className="space-y-2">
-                                <div className="flex items-center gap-2">
-                                  <Users2 className="h-4 w-4 text-muted-foreground" />
-                                  <span className="text-sm">23,728 Members</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <MessageCircle className="h-4 w-4 text-muted-foreground" />
-                                  <span className="text-sm">339,479 Messages</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <Globe className="h-4 w-4 text-muted-foreground" />
-                                  <span className="text-sm">3 Active Spaces</span>
+          <div className="w-fit mx-auto">
+            <Dialog>
+              <DialogTrigger asChild>
+                  <div className="absolute bottom-6 h-12 left-1/2 -translate-x-1/2">
+                    <Button variant="outline" className="w-full">
+                      View Stats
+                    </Button>
+                  </div>
+              </DialogTrigger>
+              <div>
+                <Card>
+                  <DialogContent className="max-w-2xl h-[60vh] overflow-y-auto">
+                    <Card className="w-full p-4 border-0">
+                      <div className="flex justify-center">
+                        <DialogHeader>
+                          <div className="p-2 pl-12">
+                            <DialogTitle className="pl-12">Space Statistics</DialogTitle>
+                          </div>
+                          <DialogDescription>
+                            View detailed statistics and information about this space.
+                          </DialogDescription>
+                        </DialogHeader>
+                      </div>
+                    </Card>
+                    <Card className="w-full p-3 border-0 pt-5">
+                      <div className="relative w-full">
+                        <div className="flex justify-center items-center">
+                          {Array.from({ length: 6 }).map((_, index) => {
+                            let distance = Math.abs(currentSlide - index);
+                            // Handle wrap-around distances
+                            if (distance > 3) {
+                              distance = 6 - distance;
+                            }
+                            
+                            const isCenter = distance === 0;
+                            let position;
+                            
+                            // Handle edge cases for infinite scroll effect
+                            if (currentSlide === 0 && index === 5) {
+                              position = -1;
+                            } else if (currentSlide === 5 && index === 0) {
+                              position = 1;
+                            } else if (index === (currentSlide + 1) % 6) {
+                              position = 1;
+                            } else if (index === (currentSlide - 1 + 6) % 6) {
+                              position = -1;
+                            } else {
+                              position = 0;
+                            }
+
+                            const overlap = position * 70;
+
+                            return (
+                              <div
+                                key={index}
+                                className="absolute transition-all duration-500 w-[40%]"
+                                style={{
+                                  transform: `translateX(${overlap}%) scale(${isCenter ? 1.2 : 0.9})`,
+                                  opacity: isCenter ? 1 : 0.5,
+                                  zIndex: isCenter ? 20 : position === -1 ? 10 : 1,
+                                  pointerEvents: isCenter ? 'auto' : 'none',
+                                  filter: isCenter ? 'none' : 'blur(2px)',
+                                  boxShadow: isCenter ? '0 10px 30px -12px rgba(0, 0, 0, 0.25)' : 'none',
+                                  transition: 'all 0.5s ease' // Added faster transition
+                                }}
+                              >
+                                <div>
+                                  <Card className="border-1">
+                                    <Button
+                                      variant="outline"
+                                      size="icon"
+                                      className="absolute -left-12 top-1/2 -translate-y-1/2 z-30"
+                                      onClick={() => setCurrentSlide((prev) => (prev - 1 + 6) % 6)}
+                                      >
+                                      <ChevronLeft className="h-4 w-4" />
+                                    </Button>
+                                    <Card className="w-full border-2 border-primary p-4">
+                                      
+                                      <div className="space-y-2">
+                                        <h4 className="font-semibold text-base border-b pb-2">
+                                          {index === 0 && "Stats"}
+                                          {index === 1 && "Space Purposes"}
+                                          {index === 2 && "Quick Facts"} 
+                                          {index === 3 && "More Stats"}
+                                          {index === 4 && "Other Stats"}
+                                          {index === 5 && "Misc Stats"}
+                                        </h4>
+                                        <div className="space-y-2">
+                                          <div className="flex items-center gap-2">
+                                            <Users2 className="h-4 w-4 text-muted-foreground" />
+                                            <span className="text-sm">23,728 Members</span>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <MessageCircle className="h-4 w-4 text-muted-foreground" />
+                                            <span className="text-sm">339,479 Messages</span>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <Globe className="h-4 w-4 text-muted-foreground" />
+                                            <span className="text-sm">3 Active Spaces</span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </Card>
+                                    <Button
+                                      variant="outline"
+                                      size="icon" 
+                                      className="absolute -right-12 top-1/2 -translate-y-1/2 z-30"
+                                      onClick={() => setCurrentSlide((prev) => (prev + 1) % 6)}
+                                      >
+                                      <ChevronRight className="h-4 w-4" />
+                                    </Button>
+                                  </Card>
                                 </div>
                               </div>
-                            </div>
-                          </Card>
+                            );
+                          })}
                         </div>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="absolute -left-12 top-1/2 -translate-y-1/2 z-10"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="absolute -right-12 top-1/2 -translate-y-1/2 z-10"
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </Carousel>
+                      </div>
+                    </Card>
+                  </DialogContent>
+                </Card>
               </div>
-            </Card>
+            </Dialog>
           </div>
         </Card>
       ) : (
