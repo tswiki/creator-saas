@@ -135,15 +135,20 @@ import {
   UserMinus,
   TrendingUp,
   Film,
-  Compass
+  Compass,
+  Icon,
+  Code,
+  PenTool,
+  Database,
+  FolderTree
 } from "lucide-react";
 import { Input } from '@/components/ui/input';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Label, DropdownMenuSeparator, RadioGroup } from '@radix-ui/react-dropdown-menu';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Label, DropdownMenuSeparator, RadioGroup, Separator } from '@radix-ui/react-dropdown-menu';
 import { Switch } from '@/components/ui/switch';
 import { useTheme } from 'next-themes';
 import { toast } from '@/hooks/use-toast';
 import { Textarea } from './textarea';
-import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarTrigger } from './menubar';
+import { Menubar, MenubarCheckboxItem, MenubarContent, MenubarItem, MenubarMenu, MenubarRadioGroup, MenubarRadioItem, MenubarSeparator, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarTrigger } from './menubar';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@radix-ui/react-tabs';
 import SpacesView from './chatView';
 import {EventCreationDialog} from '../event-creation-dialog'
@@ -151,7 +156,7 @@ import ResourceCreationDialog from '../resource-creation-dialog';
 import EmailInbox from '../email-inbox';
 import { useView } from '@/contexts/viewContext'
 import { useAdmin } from '@/contexts/adminContext';
-import { Carousel, CarouselContent, CarouselItem } from './carousel';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from './carousel';
 
 const DashboardView = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -4003,205 +4008,169 @@ export default function MentorshipPortal() {
       </Card>
     );
   };
-
   const ConnectView = () => {
-    const [showConnectDialog, setShowConnectDialog] = useState(false);
-    const [connections, setConnections] = useState<any[]>([]);
-
-    useEffect(() => {
-      // Simulated connections data
-      const mockConnections = [
-        {
-          id: 1,
-          name: "Sarah Johnson",
-          role: "Senior Developer",
-          avatar: "/avatars/sarah.png",
-          status: "online",
-          lastActive: "Just now"
-        },
-        {
-          id: 2, 
-          name: "Michael Chen",
-          role: "UX Designer",
-          avatar: "/avatars/michael.png", 
-          status: "offline",
-          lastActive: "2 hours ago"
-        },
-        {
-          id: 3,
-          name: "Emma Wilson",
-          role: "Product Manager",
-          avatar: "/avatars/emma.png",
-          status: "away",
-          lastActive: "5 mins ago"
-        }
-      ];
-      setConnections(mockConnections);
-    }, []);
-
     return (
       <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-auto">
         <Card className="h-full w-full border-2 border-primary">
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Connect</CardTitle>
-              <Button onClick={() => setShowConnectDialog(true)}>
-                <UserPlus className="h-4 w-4 mr-2" />
-                Add Connection
-              </Button>
+            <div className="flex justify-between items-center pt-2">
+              <CardTitle>Community Connect</CardTitle>
+              <div className="flex gap-2">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="flex items-center gap-2 h-[2.5rem] w-[9rem]">
+                      <Users className="h-4 w-4" />
+                      Browse Members
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl h-[calc(100vh-8rem)]">
+                    <DialogHeader>
+                      <DialogTitle>Community Members</DialogTitle>
+                      <DialogDescription>Browse and connect with members of the community</DialogDescription>
+                    <div className="flex flex-col gap-4 py-4">
+                      <div className="flex gap-4">
+                        <div className="relative flex-1">
+                          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            placeholder="Search members..."
+                            className="pl-8"
+                          />
+                        </div>
+                        <Menubar>
+                          <MenubarMenu>
+                            <MenubarTrigger className="flex gap-2">
+                              <Filter className="h-4 w-4" />
+                              Filters
+                            </MenubarTrigger>
+                            <MenubarContent>
+                              <MenubarCheckboxItem>
+                                Mentors Only
+                              </MenubarCheckboxItem>
+                              <MenubarCheckboxItem>
+                                Available for Mentoring
+                              </MenubarCheckboxItem>
+                              <MenubarSeparator />
+                              <MenubarRadioGroup>
+                                <MenubarRadioItem value="all">All Skills</MenubarRadioItem>
+                                <MenubarRadioItem value="frontend">Frontend</MenubarRadioItem>
+                                <MenubarRadioItem value="backend">Backend</MenubarRadioItem>
+                                <MenubarRadioItem value="fullstack">Full Stack</MenubarRadioItem>
+                              </MenubarRadioGroup>
+                            </MenubarContent>
+                          </MenubarMenu>
+                        </Menubar>
+                      </div>
+                    </div>
+                    </DialogHeader>
+                    <div className="">
+                      <ScrollArea className="h-[400px] w-full">
+                          <div className="grid grid-cols-2 gap-4">
+                            {/* Example member cards - replace with actual data */}
+                            {[1,2,3,4,5,6].map((member) => (
+                              <Card key={member} className="hover:shadow-lg transition-shadow">
+                                <CardContent className="p-4">
+                                  <div className="flex items-center gap-3">
+                                    <Avatar>
+                                      <AvatarImage src={`/avatars/0${member}.png`} />
+                                      <AvatarFallback>MB</AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                      <p className="font-medium">Member {member}</p>
+                                      <p className="text-sm text-muted-foreground">Developer</p>
+                                    </div>
+                                  </div>
+                                  <Button variant="outline" size="sm" className="w-full mt-4">
+                                    View Profile
+                                  </Button>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        </ScrollArea>
+                      </div>
+                  </DialogContent>
+                </Dialog>
+                <Button variant="outline" className="flex items-center gap-2">
+                  <FolderTree className="h-4 w-4" />
+                  Categories
+                </Button>
+              </div>
             </div>
             <CardDescription>
-              Manage your network and connections
+              Connect with mentors and peers in your learning journey
             </CardDescription>
           </CardHeader>
+          
           <CardContent>
-            <div className="grid md:grid-cols-3 gap-6">
-              {connections.map((connection) => (
-                <Card key={connection.id} className="border-2">
-                  <CardHeader>
-                    <div className="flex items-center space-x-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-10">
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="text-lg">Featured Members</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
                       <Avatar>
-                        <AvatarImage src={connection.avatar} />
-                        <AvatarFallback>{connection.name.charAt(0)}</AvatarFallback>
+                        <AvatarImage src="/avatars/01.png" />
+                        <AvatarFallback>JD</AvatarFallback>
                       </Avatar>
                       <div>
-                        <CardTitle className="text-lg">{connection.name}</CardTitle>
-                        <CardDescription>{connection.role}</CardDescription>
+                        <p className="font-medium">Jane Doe</p>
+                        <p className="text-sm text-muted-foreground">Senior Developer</p>
                       </div>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center space-x-2">
-                      <div className={`h-2 w-2 rounded-full ${
-                        connection.status === 'online' ? 'bg-green-500' : 
-                        connection.status === 'away' ? 'bg-yellow-500' : 'bg-gray-500'
-                      }`} />
-                      <span className="text-sm text-muted-foreground">
-                        {connection.status === 'online' ? 'Online' : 
-                         connection.status === 'away' ? 'Away' : 'Offline'}
-                      </span>
+                    <Button variant="outline" className="w-full">View All Members</Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="text-lg">Popular Categories</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <Button variant="outline" className="w-full justify-start">
+                      <Code className="h-4 w-4 mr-2" />
+                      Programming
+                    </Button>
+                    <Button variant="outline" className="w-full justify-start">
+                      <PenTool className="h-4 w-4 mr-2" />
+                      Design
+                    </Button>
+                    <Button variant="outline" className="w-full justify-start">
+                      <Database className="h-4 w-4 mr-2" />
+                      Data Science
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="text-lg">Recent Activities</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                      <p className="text-sm">New discussion in Programming</p>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Last active: {connection.lastActive}
-                    </p>
-                  </CardContent>
-                  <CardFooter>
-                    <div className="flex space-x-2">
-                      <Button variant="outline" size="sm">
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        Message
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        <UserMinus className="h-4 w-4 mr-2" />
-                        Remove
-                      </Button>
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                      <p className="text-sm">5 new members joined today</p>
                     </div>
-                  </CardFooter>
-                </Card>
-              ))}
+                    <Button variant="outline" className="w-full">View All Activities</Button>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-
-            <div className="mt-8">
-              <nav className="flex items-center justify-between bg-card rounded-lg p-4 border-2">
-                <div className="flex items-center space-x-6">
-                  <Button 
-                    variant="ghost" 
-                    className="flex items-center space-x-2"
-                    onClick={() => setCurrentView('explore')}
-                  >
-                    <Compass className="h-5 w-5" />
-                    <span>Explore</span>
-                  </Button>
-
-                  <Button
-                    variant="ghost"
-                    className="flex items-center space-x-2"
-                    onClick={() => setCurrentView('media')} 
-                  >
-                    <Film className="h-5 w-5" />
-                    <span>Media</span>
-                  </Button>
-
-                  <Button
-                    variant="ghost"
-                    className="flex items-center space-x-2"
-                    onClick={() => setCurrentView('trending')}
-                  >
-                    <TrendingUp className="h-5 w-5" />
-                    <span>Trending</span>
-                  </Button>
-
-                  <Button
-                    variant="ghost" 
-                    className="flex items-center space-x-2"
-                    onClick={() => setCurrentView('favorites')}
-                  >
-                    <Star className="h-5 w-5" />
-                    <span>Favorites</span>
-                  </Button>
-                </div>
-
-                <div className="flex items-center space-x-4">
-                  <Button variant="outline" size="sm">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create
-                  </Button>
-                  
-                  <Button variant="outline" size="sm">
-                    <Filter className="h-4 w-4 mr-2" />
-                    Filter
-                  </Button>
-                </div>
-              </nav>
-            </div>
-
           </CardContent>
         </Card>
-
-        <Dialog open={showConnectDialog} onOpenChange={setShowConnectDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New Connection</DialogTitle>
-              <DialogDescription>
-                Search and connect with other members
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="flex w-full max-w-sm items-center space-x-2">
-                <Input type="email" placeholder="Search by name or email" />
-                <Button type="submit">Search</Button>
-              </div>
-              <div className="border rounded-lg p-4">
-                <Label>Suggested Connections</Label>
-                <ScrollArea className="h-[200px] mt-2">
-                  <div className="space-y-4">
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <Avatar>
-                            <AvatarFallback>U{i}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="text-sm font-medium">User {i}</p>
-                            <p className="text-sm text-muted-foreground">user{i}@example.com</p>
-                          </div>
-                        </div>
-                        <Button variant="outline" size="sm">Connect</Button>
-                      </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowConnectDialog(false)}>Cancel</Button>
-              <Button>Add Selected</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </div>
     );
   };
+
   
   return (
     <div className="min-h-screen flex">
