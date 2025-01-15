@@ -1,251 +1,182 @@
+'use client';
 
-'use client'
+import { useChat } from 'ai/react';
+import { useRef, useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Loader2 } from 'lucide-react';
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Search, FolderOpen, File, ChevronRight, TrendingUp, Users, Sparkles, Music } from "lucide-react"
-import Image from "next/image"
-import { useState } from "react"
-
-export default function MediaExplorePage() {
-  const [currentFolder, setCurrentFolder] = useState<string>("root")
-  
-  const folders = {
-    root: {
-      name: "Explore",
-      subfolders: ["trending", "creators", "effects", "sounds"],
+export default function Page() {
+  const [messageHistory, setMessageHistory] = useState<any[]>([]);
+  const { messages, input, handleSubmit, handleInputChange, isLoading } = useChat({
+    api: '/api/chat',
+    onResponse: (response) => {
+      if (response.ok) {
+        setMessageHistory(prevMessages => [
+          ...prevMessages,
+          { role: 'assistant', content: response.text() }
+        ]);
+        scrollToBottom();
+      }
     },
-    trending: {
-      name: "Trending",
-      content: [
-        {
-          thumbnail: "/default-avatar.png",
-          icon: <TrendingUp />,
-          title: "Dance Challenges",
-          description: "Popular dance trends and challenges",
-          stats: {views: "2.1B", posts: "1.2M"},
-          items: ["#DanceWithMe", "#ViralDance2024", "#ChoreographyTrend"]
-        },
-        {
-          thumbnail: "/default-avatar.png",
-          icon: <TrendingUp />,
-          title: "Transition Effects",
-          description: "Creative video transitions",
-          stats: {views: "1.8B", posts: "890K"},
-          items: ["#SmoothTransition", "#OutfitTransition", "#MagicTransition"]
-        },
-        {
-          thumbnail: "/default-avatar.png",
-          icon: <TrendingUp />,
-          title: "Comedy Skits",
-          description: "Viral comedy formats",
-          stats: {views: "3.2B", posts: "2.1M"},
-          items: ["#ComedyTime", "#SkitLife", "#FunnyMoments"]
-        }
-      ]
-    },
-    creators: {
-      name: "Creators",
-      content: [
-        {
-          thumbnail: "/default-avatar.png",
-          icon: <Users />,
-          title: "Creator Tips",
-          description: "Growth strategies and content tips",
-          stats: {followers: "500K", engagement: "8.2%"},
-          items: ["Content Planning", "Audience Growth", "Engagement Tactics"]
-        },
-        {
-          thumbnail: "/default-avatar.png",
-          icon: <Users />,
-          title: "Essential Tools",
-          description: "Popular creator tools and apps",
-          stats: {users: "1M+", rating: "4.8"},
-          items: ["CapCut", "InShot", "Prequel"]
-        }
-      ]
-    },
-    effects: {
-      name: "Effects",
-      content: [
-        {
-          thumbnail: "/default-avatar.png",
-          icon: <Sparkles />,
-          title: "AR Effects",
-          description: "Augmented reality filters",
-          stats: {uses: "50M+", creators: "1K+"},
-          items: ["Face Effects", "Background Effects", "Interactive AR"]
-        },
-        {
-          thumbnail: "/default-avatar.png",
-          icon: <Sparkles />,
-          title: "Beauty Filters",
-          description: "Popular beauty effects",
-          stats: {uses: "100M+", variations: "50+"},
-          items: ["Glamour", "Natural", "Aesthetic"]
-        }
-      ]
-    },
-    sounds: {
-      name: "Sounds",
-      content: [
-        {
-          thumbnail: "/default-avatar.png",
-          icon: <Music />,
-          title: "Trending Sounds",
-          description: "Most used audio clips",
-          stats: {plays: "500M+", videos: "2M+"},
-          items: ["Viral Songs", "Sound Effects", "Voice Overs"]
-        },
-        {
-          thumbnail: "/default-avatar.png",
-          icon: <Music />,
-          title: "Original Audio",
-          description: "Create your own sounds",
-          stats: {creators: "10K+", uploads: "50K+"},
-          items: ["Voice Recording", "Music Creation", "Sound Mixing"]
-        }
-      ]
+    onFinish: () => {
+      setTimeout(scrollToBottom, 100);
     }
-  }
+  });
+
+  const [files, setFiles] = useState<FileList | undefined>(undefined);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    if (scrollAreaRef.current) {
+      scrollAreaRef.current.scrollTo({
+        top: scrollAreaRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // Scroll to bottom on new messages
+  useEffect(() => {
+    scrollToBottom();
+  }, [messageHistory]);
 
   return (
-    <div className="container mx-auto py-10">
-      <div className="flex flex-col space-y-8">
-        {/* Hero Section */}
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold">Explore Short-Form Content</h1>
-          <p className="text-muted-foreground">
-            Discover trending content, creators, and tools for TikTok and Instagram Reels
-          </p>
-          
-          {/* Search Bar */}
-          <div className="flex max-w-lg mx-auto gap-2">
-            <Input 
-              placeholder="Search trends, sounds, or creators..." 
-              className="w-full"
-            />
-            <Button>
-              <Search className="h-4 w-4 mr-2" />
-              Search
-            </Button>
-          </div>
-        </div>
 
-        {/* Folder Navigation */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Button 
-            variant="ghost" 
-            className="h-6 px-2"
-            onClick={() => setCurrentFolder("root")}
-          >
-            Home
-          </Button>
-          {currentFolder !== "root" && (
-            <>
-              <ChevronRight className="h-4 w-4" />
-              <span>{folders[currentFolder as keyof typeof folders].name}</span>
-            </>
-          )}
-        </div>
-
-        {/* Content Area */}
-        <div className="grid gap-6">
-          {currentFolder === "root" ? (
-            // Show folders
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {folders.root.subfolders.map((folder) => (
-                <Card 
-                  key={folder}
-                  className="cursor-pointer hover:bg-accent"
-                  onClick={() => setCurrentFolder(folder)}
-                >
-                  <CardHeader>
-                    <div className="flex items-center gap-2">
-                      <FolderOpen className="h-6 w-6 text-primary" />
-                      <CardTitle className="capitalize">{folders[folder as keyof typeof folders].name}</CardTitle>
+    <div className="flex flex-col h-[calc(100vh-4rem)] max-w-3xl mx-auto p-4">
+      
+      
+      
+      <Card className="flex-1 p-4 mb-4 overflow-hidden">
+        <ScrollArea 
+          className="h-full pr-4" 
+          ref={scrollAreaRef}
+        >
+          <div className="space-y-4">
+            {messageHistory.map((message, index) => (
+              <div
+                key={index}
+                className={`flex ${
+                  message.role === 'assistant' ? 'justify-start' : 'justify-end'
+                }`}
+              >
+                <div className={`flex gap-3 max-w-[80%] ${
+                  message.role === 'assistant' ? 'flex-row' : 'flex-row-reverse'
+                }`}>
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback>
+                      {message.role === 'assistant' ? 'AI' : 'You'}
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                  <div className={`rounded-lg p-4 ${
+                    message.role === 'assistant' 
+                      ? 'bg-secondary' 
+                      : 'bg-primary text-primary-foreground'
+                  }`}>
+                    <div className="whitespace-pre-wrap break-words">
+                      {message.content}
                     </div>
-                  </CardHeader>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            // Show folder contents
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {folders[currentFolder as keyof typeof folders].content.map((item, index) => (
-                <ContentCard
-                  key={index}
-                  {...item}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
+                    
+                    {message.experimental_attachments?.filter(attachment => 
+                      attachment.contentType?.startsWith('image/')
+                    ).map((attachment, index) => (
+                      <img
+                        key={`${message.id}-${index}`}
+                        src={attachment.url}
+                        alt={attachment.name}
+                        className="mt-2 max-w-full rounded"
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="flex gap-3 max-w-[80%]">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback>AI</AvatarFallback>
+                  </Avatar>
+                  <div className="rounded-lg p-4 bg-secondary">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+        </ScrollArea>
+      </Card>
 
-// Component for Content Cards
-function ContentCard({ 
-  thumbnail, 
-  icon, 
-  title, 
-  description, 
-  stats, 
-  items 
-}: { 
-  thumbnail: string,
-  icon: React.ReactNode,
-  title: string, 
-  description: string,
-  stats: Record<string, string>,
-  items: string[] 
-}) {
-  return (
-    <Card className="overflow-hidden">
-      <div className="relative h-48 w-full">
-        <Image
-          src={thumbnail}
-          alt={title}
-          fill
-          className="object-cover"
+      <form
+        onSubmit={async (event) => {
+          event.preventDefault();
+          if (!input.trim()) return;
+          
+          // Add user message to history
+          setMessageHistory(prev => [...prev, {
+            role: 'user',
+            content: input,
+            experimental_attachments: files
+          }]);
+          
+          handleSubmit(event, {
+            experimental_attachments: files,
+          });
+          
+          setFiles(undefined);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
+        }}
+        className="flex gap-4"
+      >
+        <Input
+          type="file"
+          onChange={event => {
+            if (event.target.files) {
+              setFiles(event.target.files);
+            }
+          }}
+          multiple
+          ref={fileInputRef}
+          className="hidden"
+          id="file-upload"
         />
-      </div>
-      <CardHeader>
-        <div className="flex items-center gap-2">
-          <div className="p-2 bg-primary/10 rounded-lg">
-            <File className="h-4 w-4" />
-          </div>
-          <div>
-            <CardTitle>{title}</CardTitle>
-            <CardDescription>{description}</CardDescription>
-          </div>
+        <div className="flex-1 flex gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => fileInputRef.current?.click()}
+            className="shrink-0"
+          >
+            Attach
+          </Button>
+          <Input
+            value={input}
+            placeholder="Type your message..."
+            onChange={handleInputChange}
+            disabled={isLoading}
+            className="flex-1"
+          />
+          <Button 
+            type="submit" 
+            disabled={isLoading || !input.trim()}
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              'Send'
+            )}
+          </Button>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="flex gap-4 mb-4">
-          {Object.entries(stats).map(([key, value]) => (
-            <div key={key} className="text-sm">
-              <div className="font-bold">{value}</div>
-              <div className="text-muted-foreground capitalize">{key}</div>
-            </div>
-          ))}
-        </div>
-        <ul className="list-disc pl-4 space-y-2">
-          {items.map((item, index) => (
-            <li key={index}>{item}</li>
-          ))}
-        </ul>
-      </CardContent>
-      <CardFooter>
-        <Button variant="outline" className="w-full">View Details</Button>
-      </CardFooter>
-    </Card>
-  )
+      </form>
+    </div>
+  );
 }
-
-
-
-

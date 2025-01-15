@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { ResourceFormData } from '../app/types/resource'
+import { ResourceFormData } from "@/types/resources"
 import { Step1Form } from "./step1-form"
 import { Step2Form } from "./step2-form"
 import { Step3Form } from "./step3-form"

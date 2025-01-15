@@ -12,7 +12,7 @@ import { Button } from './button';
 import { ScrollArea } from './scroll-area';
 ;
 import { useView } from '@/contexts/viewContext';
-import { SearchBar } from '@/components/search-bar';
+import { SearchBar } from '@/components/v0/search-bar';
 
 interface HeaderProps {
   logoSrc?: string;

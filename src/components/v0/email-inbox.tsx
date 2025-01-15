@@ -5,11 +5,11 @@ import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Mail, Inbox, Send, Star, Archive, Trash, Flag, Badge, FileText, LayoutDashboard, Search, Settings, User, Home, Wrench, Forward, Reply, X, Clock } from 'lucide-react'
-import { Card } from './ui/card'
+import { Card } from '../ui/card'
 import { EmailDialog } from './email-dialog'
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
-import { Input } from './ui/input'
-import { Textarea } from './ui/textarea'
+import { Input } from '../ui/input'
+import { Textarea } from '../ui/textarea'
 
 interface Email {
   id: string
@@ -359,24 +359,26 @@ export default function EmailInbox() {
         }}>
           {/* Email Sidebar */}
           <Card className="w-64 bg-background shadow-none border-0">
-            <div className="p-4 space-y-2">
+            <div className="p-4 space-y-2 justify">
               <h2 className="text-sm font-semibold text-muted-foreground mb-2">Main Tools</h2>
               <div className="w-full justify-start">
                 <EmailDialog />
               </div>
               {views.map((view) => (
-                <Button
-                  key={view.id}
-                  variant={selectedView === view.id ? "secondary" : "ghost"}
-                  className="w-full justify-start"
-                  onClick={() => {
-                    setSelectedView(view.id);
-                    setSelectedEmail(null); // Reset selected email when changing views
-                  }}
-                >
-                  <view.icon className="mr-2 h-4 w-4" />
-                  {view.label}
-                </Button>
+                <div className="ml-5 mr-5">
+                  <Button
+                    key={view.id}
+                    variant={selectedView === view.id ? "secondary" : "ghost"}
+                    className="w-full flex items-center justify-start"
+                    onClick={() => {
+                      setSelectedView(view.id);
+                      setSelectedEmail(null); // Reset selected email when changing views
+                    }}
+                  >
+                    <view.icon className="h-4 w-4" />
+                    <span className="ml-2">{view.label}</span>
+                  </Button>
+                </div>
               ))}
             </div>
           </Card>
@@ -384,7 +386,7 @@ export default function EmailInbox() {
           {/* Email Content */}
           <Card className="flex-1 flex flex-col bg-background shadow-none border-0">
             <Card className="p-4 shadow-none">
-              <div className="flex justify-between items-center">
+              <div className="flex justify-center items-center">
                 <h2 className="text-lg font-semibold">
                   {views.find(v => v.id === selectedView)?.label}
                 </h2>

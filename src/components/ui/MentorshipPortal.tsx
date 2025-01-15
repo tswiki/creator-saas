@@ -151,9 +151,9 @@ import { Textarea } from './textarea';
 import { Menubar, MenubarCheckboxItem, MenubarContent, MenubarItem, MenubarMenu, MenubarRadioGroup, MenubarRadioItem, MenubarSeparator, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarTrigger } from './menubar';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@radix-ui/react-tabs';
 import SpacesView from './chatView';
-import {EventCreationDialog} from '../event-creation-dialog'
-import ResourceCreationDialog from '../resource-creation-dialog';
-import EmailInbox from '../email-inbox';
+import {EventCreationDialog} from '../v0/event-creation-dialog'
+import ResourceCreationDialog from '../v0/resource-creation-dialog';
+import EmailInbox from '../v0/email-inbox';
 import { useView } from '@/contexts/viewContext'
 import { useAdmin } from '@/contexts/adminContext';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from './carousel';
