@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { UserCircle, BellRing, Menu, X, Calendar, Users, MessageSquare, Search, Bell, Mail, User } from 'lucide-react';
+import { UserCircle, BellRing, Menu, X, Calendar, Users, MessageSquare, Search, Bell, Mail, User, Settings } from 'lucide-react';
 import { useState } from 'react';
 import Profile from '@/components/ui/profile'
 import { useTheme } from 'next-themes';
@@ -107,7 +107,7 @@ export default function Header({ logoSrc, brandName = "dejitaru " }: HeaderProps
               onClick={() => {setCurrentView('emailInbox')}}
               className="border-2 border-primary rounded-full"
             >
-            <Mail className="h-5 w-5" />
+            <Settings className="h-5 w-5" />
             </Button>
             <Button 
               variant="ghost" 

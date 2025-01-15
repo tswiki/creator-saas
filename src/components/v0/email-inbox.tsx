@@ -51,16 +51,6 @@ const dummyEmails: Email[] = [
   }
 ]
 
-interface UserOverview {
-  name: string;
-  role: string;
-  joinDate: string;
-  activeProjects: number;
-  completedTasks: number;
-  skillLevel: string;
-  learningPath: string;
-  nextMilestone: string;
-}
 
 interface Rating {
   id: string;
@@ -87,51 +77,6 @@ interface AgentMessage {
   type: 'user' | 'agent';
   context?: string;
 }
-
-const dummyOverview: UserOverview = {
-  name: "John Doe",
-  role: "Frontend Developer",
-  joinDate: "2024-01-01",
-  activeProjects: 3,
-  completedTasks: 45,
-  skillLevel: "Intermediate",
-  learningPath: "React Advanced",
-  nextMilestone: "Complete TypeScript Certification",
-  email: "john.doe@company.com",
-  avatar: "/default-avatar.png",
-  department: "Engineering",
-  location: "San Francisco, CA",
-  languages: ["English", "Spanish"],
-  expertise: ["React", "TypeScript", "CSS", "Node.js"],
-  certifications: [
-    {
-      name: "AWS Cloud Practitioner",
-      issueDate: "2023-12-01",
-      expiryDate: "2026-12-01"
-    }
-  ],
-  performanceMetrics: {
-    codeQuality: 92,
-    projectDelivery: 88,
-    teamCollaboration: 95,
-    learningProgress: 85
-  },
-  currentGoals: [
-    "Master React Server Components",
-    "Contribute to open source",
-    "Mentor junior developers"
-  ],
-  availability: {
-    timezone: "PST",
-    workingHours: "9:00 AM - 5:00 PM",
-    nextAvailable: "2024-02-16T13:00:00"
-  },
-  recentActivity: {
-    lastActive: "2024-02-15T16:30:00",
-    lastProject: "E-commerce Dashboard",
-    lastCommit: "feat: add user authentication"
-  }
-};
 
 const dummyRatings: Rating[] = [
   {
@@ -314,9 +259,8 @@ const dummyAgentMessages: AgentMessage[] = [
 
 export default function EmailInbox() {
   const [emails, setEmails] = useState<Email[]>(dummyEmails)
-  const [selectedView, setSelectedView] = useState<string>('overview')
+  const [selectedView, setSelectedView] = useState<string>('mail')
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null)
-  const [overview, setOverview] = useState<UserOverview>(dummyOverview)
   const [ratings, setRatings] = useState<Rating[]>(dummyRatings)
   const [tools, setTools] = useState<Tool[]>(dummyTools)
   const [agentMessages, setAgentMessages] = useState<AgentMessage[]>(dummyAgentMessages)
@@ -325,8 +269,6 @@ export default function EmailInbox() {
     switch(selectedView) {
       case 'inbox':
         return emails.filter(e => !e.isArchived && !e.isDeleted && e.folder === 'inbox')
-      case 'overview':
-        return [overview]
       case 'mail':
         return emails
       case 'rating':
@@ -336,12 +278,11 @@ export default function EmailInbox() {
       case 'heji-shindo':
         return agentMessages
       default:
-        return [overview]
+        return [emails]
     }
   }
 
   const views = [
-    { id: 'overview', label: 'Overview', icon: Home, folder: 'overview' },
     { id: 'mail', label: 'Mail', icon: Mail, folder: 'mail' },
     { id: 'rating', label: 'Rating', icon: Star, folder: 'rating' },
     { id: 'tools', label: 'Tools', icon: Wrench, folder: 'tools' },
@@ -358,10 +299,10 @@ export default function EmailInbox() {
           }
         }}>
           {/* Email Sidebar */}
-          <Card className="w-64 bg-background shadow-none border-0">
+          <Card className="w-60 bg-background shadow-none border-0">
             <div className="p-4 space-y-2 justify">
               <h2 className="text-sm font-semibold text-muted-foreground mb-2">Main Tools</h2>
-              <div className="w-full justify-start">
+              <div className="justify-start ml-5 mr-5">
                 <EmailDialog />
               </div>
               {views.map((view) => (
@@ -412,128 +353,6 @@ export default function EmailInbox() {
                       setSelectedEmail(selectedEmail?.id === item.id ? null : item);
                     }}
                   >
-                    {selectedView === 'overview' && (
-                      <div className="max-h-[600px] space-y-4">
-                        {/* Header with Blur Effect */}
-                        <div className="sticky top-0 bg-background/80 backdrop-blur-sm z-10 pb-2 border-b">
-                          <div className="flex items-start gap-4">
-                            <Avatar className="h-12 w-12">
-                              <AvatarImage src={item.avatar} alt={item.name} />
-                              <AvatarFallback>{item.name[0]}</AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex justify-between items-center">
-                                <div className="truncate">
-                                  <h3 className="font-semibold text-lg truncate">{item.name}</h3>
-                                  <p className="text-sm text-muted-foreground truncate">{item.role} • {item.department}</p>
-                                </div>
-                                <Button variant="outline" size="sm" className="shrink-0">
-                                  <User className="h-4 w-4 mr-1" />
-                                  Connect
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Two Column Layout */}
-                        <div className="grid grid-cols-2 gap-4">
-                          {/* Left Column */}
-                          <div className="space-y-4">
-                            {/* Stats Card */}
-                            <Card className="p-4">
-                              <div className="grid grid-cols-2 gap-3">
-                                <div className="bg-muted/30 rounded p-2 text-center">
-                                  <p className="text-lg font-semibold text-primary">{item.performanceMetrics?.codeQuality}%</p>
-                                  <p className="text-xs text-muted-foreground">Code Quality</p>
-                                </div>
-                                <div className="bg-muted/30 rounded p-2 text-center">
-                                  <p className="text-lg font-semibold text-primary">{item.activeProjects}</p>
-                                  <p className="text-xs text-muted-foreground">Projects</p>
-                                </div>
-                                <div className="bg-muted/30 rounded p-2 text-center">
-                                  <p className="text-lg font-semibold text-primary">{item.completedTasks}</p>
-                                  <p className="text-xs text-muted-foreground">Tasks</p>
-                                </div>
-                                <div className="bg-muted/30 rounded p-2 text-center">
-                                  <p className="text-lg font-semibold text-primary">{item.performanceMetrics?.teamCollaboration}%</p>
-                                  <p className="text-xs text-muted-foreground">Collab</p>
-                                </div>
-                              </div>
-                            </Card>
-
-                            {/* Recent Activity Card */}
-                            <Card className="p-4">
-                              <div className="flex items-center gap-2 mb-3">
-                                <FileText className="h-4 w-4 text-primary" />
-                                <h4 className="font-medium">Latest Updates</h4>
-                              </div>
-                              <div className="space-y-2 text-sm">
-                                <p className="truncate">🔨 {item.recentActivity?.lastProject}</p>
-                                <p className="truncate">📝 {item.recentActivity?.lastCommit}</p>
-                              </div>
-                            </Card>
-
-                            {/* Skills Card */}
-                            <Card className="p-4">
-                              <div className="flex items-center gap-2 mb-3">
-                                <Wrench className="h-4 w-4 text-primary" />
-                                <h4 className="font-medium">Top Skills</h4>
-                              </div>
-                              <div className="flex flex-wrap gap-2">
-                                {item.expertise?.slice(0, 4).map((skill: string) => (
-                                  <span key={skill} className="px-2 py-1 bg-primary/10 text-primary rounded-full text-xs">
-                                    {skill}
-                                  </span>
-                                ))}
-                              </div>
-                            </Card>
-                          </div>
-
-                          {/* Right Column */}
-                          <div className="space-y-4">
-                            {/* Goals Card */}
-                            <Card className="p-4">
-                              <div className="flex items-center gap-2 mb-3">
-                                <Flag className="h-4 w-4 text-primary" />
-                                <h4 className="font-medium">Current Goals</h4>
-                              </div>
-                              <div className="space-y-2">
-                                {item.currentGoals?.slice(0, 2).map((goal: string, index: number) => (
-                                  <p key={index} className="text-sm">• {goal}</p>
-                                ))}
-                              </div>
-                            </Card>
-
-                            {/* Quick Info Card */}
-                            <Card className="p-4">
-                              <div className="flex items-center gap-2 mb-3">
-                                <Home className="h-4 w-4 text-primary" />
-                                <h4 className="font-medium">Quick Info</h4>
-                              </div>
-                              <div className="grid gap-2 text-sm">
-                                <p className="truncate">📍 {item.location}</p>
-                                <p className="truncate">🌐 {item.timezone}</p>
-                                <p className="truncate">💼 {item.skillLevel}</p>
-                                <p className="truncate">📚 {item.learningPath}</p>
-                              </div>
-                            </Card>
-
-                            {/* Availability Card */}
-                            <Card className="p-4">
-                              <div className="flex items-center gap-2 mb-3">
-                                <Clock className="h-4 w-4 text-primary" />
-                                <h4 className="font-medium">Availability</h4>
-                              </div>
-                              <div className="space-y-2 text-sm">
-                                <p>🕒 {item.availability?.workingHours}</p>
-                                <p className="text-green-500">● Currently Available</p>
-                              </div>
-                            </Card>
-                          </div>
-                        </div>
-                      </div>
-                    )}
                     {selectedView === 'mail' && (
                       <div className="flex flex-col space-y-4">
                         <div className="flex items-center justify-between">
