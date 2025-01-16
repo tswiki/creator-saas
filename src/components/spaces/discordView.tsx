@@ -1,55 +1,40 @@
 
-
-"use client"
-
-import type { User, ChannelSort, ChannelFilters, ChannelOptions } from 'stream-chat';
 import {
-  useCreateChatClient,
   Chat,
   Channel,
-  ChannelHeader,
   ChannelList,
-  MessageInput,
-  MessageList,
-  Thread,
   Window,
-} from 'stream-chat-react';
+  ChannelHeader,
+  MessageList,
+  MessageInput,
+  Thread,
+  useCreateChatClient,
+} from "stream-chat-react";
+import "stream-chat-react/dist/css/v2/index.css";
 
-import 'stream-chat-react/dist/css/v2/index.css';
-import '@/app/spaces/layout.css';
+const apiKey = process.env.STREAM_KEY!;
+const userId = "user-id";
+const token = process.env.USER_TOKEN!;
 
-const apiKey = 'dz5f4d5kzrue';
-const userId = 'white-term-9';
-const userName = 'white';
-const userToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoid2hpdGUtdGVybS05IiwiZXhwIjoxNzM1ODkyMDQzfQ.FsoOTUkcimI7owtF6pz_9jkrjY3UhNvO2lf64IX3ucI';
+const filters = { members: { $in: [userId] }, type: "messaging" };
+const options = { presence: true, state: true };
+const sort = { last_message_at: -1 };
 
-const user: User = {
-  id: userId,
-  name: userName,
-  image: `https://getstream.io/random_png/?name=${userName}`,
-};
+const App = () => {
 
-const sort: ChannelSort = { last_message_at: -1 };
-const filters: ChannelFilters = {
-  type: 'messaging',
-  members: { $in: [userId] },
-};
-const options: ChannelOptions = {
-  limit: 10,
-};
-
-const DiscordApp = () => {
   const client = useCreateChatClient({
     apiKey,
-    tokenOrProvider: userToken,
-    userData: user,
+    tokenOrProvider: token,
+    userData: { id: userId },
   });
 
-  if (!client) return <div>Setting up client & connection...</div>;
+  console.log(client)
+
+  if (!client) return <div>Loading...</div>;
 
   return (
     <Chat client={client}>
-      <ChannelList filters={filters} sort={sort} options={options} />
+      <ChannelList sort={{ last_message_at: -1 as const }} filters={filters} options={options} />
       <Channel>
         <Window>
           <ChannelHeader />
@@ -62,4 +47,4 @@ const DiscordApp = () => {
   );
 };
 
-export default DiscordApp;
+export default App;

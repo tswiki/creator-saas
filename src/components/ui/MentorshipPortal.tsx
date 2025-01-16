@@ -153,7 +153,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@radix-ui/react-tabs';
 import SpacesView from './chatView';
 import {EventCreationDialog} from '../v0/event-creation-dialog'
 import ResourceCreationDialog from '../v0/resource-creation-dialog';
-import EmailInbox from '../v0/email-inbox';
+import EmailInbox from '../v0/SystemView';
 import { useView } from '@/contexts/viewContext'
 import { useAdmin } from '@/contexts/adminContext';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from './carousel';
@@ -1644,7 +1644,7 @@ export default function MentorshipPortal() {
             </div>
           </div>
 
-          <div className="px-4">
+          <div className="px-3">
             <Card className="border-2 border-primary">
               <CardContent className="p-4">
                 <div className="flex flex-col items-center gap-2">
@@ -2167,7 +2167,7 @@ export default function MentorshipPortal() {
         <Card className="h-full w-full border-2 border-primary">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle>Archive</CardTitle>
+              <CardTitle>Folder</CardTitle>
               <div className="flex gap-2">
                 <Menubar>
                   <MenubarMenu>

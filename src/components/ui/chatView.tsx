@@ -6,7 +6,7 @@ import { Badge } from "./badge";
 import { Button } from "./button";
 import { Calendar, ChevronLeft, ChevronRight, Clock, Globe, MessageCircle, MessageSquare, Share2, Users, Users2, Video, X } from "lucide-react";
 import { Input } from "./input";
-import DiscordApp from '../spaces/discordView';
+// import DiscordApp from '../spaces/discordView';
 import VidView from '../spaces/videoView';
 
 import {
@@ -312,7 +312,7 @@ export function SpacesView() {
           {activeSpace === "Discord Community" && (
             <div className="h-[calc(100vh-4rem)]">
               <Card className="h-full border-2 border-primary ">
-                <DiscordApp/>
+                {/* <DiscordApp/> */}
               </Card>
             </div>
           )}
