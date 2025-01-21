@@ -1,15 +1,14 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { Search, Mic, TimerIcon as Tune, HelpCircle, Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { Search, Mic, TimerIcon as Tune, HelpCircle, Loader2, ImagePlus } from 'lucide-react'
+import { Button } from '@/components/v0/ui/button'
+import { Input } from '@/components/v0/ui/input'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/v0/ui/dialog'
 import { useTheme } from 'next-themes'
 import { useChat } from 'ai/react'
-import { Card } from '@/components/ui/card'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { ScrollArea } from '@/components/v0/ui/scroll-area'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/v0/ui/avatar'
 
 export function SearchBar() {
   const [query, setQuery] = useState('')
@@ -49,21 +48,19 @@ export function SearchBar() {
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <div className="max-w-4xl mx-auto p-2">
-          <div className="flex items-center space-x-2 bg-background border-2 border-primary shadow-md rounded-full px-4 py-1 cursor-pointer">
-            <Search className="text-muted-foreground h-5 w-5" />
+        <div className="max-w-[467px] w-full mx-auto p-4">
+          <div className="flex items-center w-full bg-background hover:bg-background/90 border rounded-full px-3 cursor-text transition-all duration-200 border-2">
+            <Search className="h-4 w-4 mr-2 text-muted-foreground" />
             <Input
               type="text"
               placeholder="Search and chat with your data"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="flex-grow border-none focus:ring-0 text-sm bg-transparent"
+              className="flex-grow border-none focus-visible:ring-0 focus-visible:ring-offset-0 text-sm bg-transparent text-foreground placeholder:text-muted-foreground"
               autoFocus
             />
-            <div className="flex items-center space-x-2">
-              <Mic className="h-5 w-5 text-muted-foreground" />
-              <Tune className="h-5 w-5 text-muted-foreground" />
-              <HelpCircle className="h-5 w-5 text-muted-foreground" />
+            <div className="flex items-center space-x-3 ml-2">
+              <Mic className="h-5 w-5 text-muted-foreground hover:text-foreground cursor-pointer transition-colors" />
             </div>
           </div>
         </div>

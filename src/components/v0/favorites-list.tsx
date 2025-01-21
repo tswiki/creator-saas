@@ -1,8 +1,8 @@
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { ScrollArea } from "@/components/v0/ui/scroll-area"
 import { Star, File, MessageSquare, Folder, MoreHorizontal } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Card } from "@/components/ui/card"
+import { Button } from "@/components/v0/ui/button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/v0/ui/dropdown-menu"
+import { Card } from "@/components/v0/ui/card"
 
 interface FavoritesListProps {
   filter: string

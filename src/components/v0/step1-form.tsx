@@ -1,8 +1,8 @@
 import { useFormContext } from "react-hook-form"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Input } from "@/components/v0/ui/input"
+import { Label } from "@/components/v0/ui/label"
+import { Textarea } from "@/components/v0/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/v0/ui/select"
 import { ResourceFormData } from "@/types/resource"
 
 const users = [

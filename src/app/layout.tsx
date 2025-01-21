@@ -5,9 +5,9 @@ import "./globals.css";
 import { headers } from 'next/headers'; // Add this import
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { ThemeProvider } from '@/components/ui/theme-provider'
+import { ThemeProvider } from '@/components/v0/ui/theme-provider'
 import { ViewProvider } from "@/contexts/viewContext";
-import { AdminProvider} from "@/contexts/adminContext"
+import { AdminProvider} from "@/contexts/adminContext";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",

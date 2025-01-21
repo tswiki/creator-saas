@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/v0/ui/card";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/v0/ui/popover";
+import { Button } from "@/components/v0/ui/button";
+import { Input } from "@/components/v0/ui/input";
+import { Textarea } from "@/components/v0/ui/textarea";
 import { Camera, Globe, MapPin, Mail, User, X } from "lucide-react";
 
 interface ProfileProps {

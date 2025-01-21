@@ -1,6 +1,6 @@
 
 "use client"
 
-import App from '@/components/spaces/discordView';
+import StreamView from '@/components/spaces/streamView';
 
-export default App;
+export default StreamView;

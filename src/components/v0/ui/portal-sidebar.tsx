@@ -1,11 +1,11 @@
 
 
 import { SetStateAction, useEffect, useRef, useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import HeroVideoDialog from "@/components/ui/hero-video-dialog";
+import { Button } from "@/components/v0/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/v0/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/v0/ui/avatar";
+import { Badge } from "@/components/v0/ui/badge";
+import HeroVideoDialog from "@/components/v0/ui/hero-video-dialog";
 import { auth } from '@/firebase/firebaseConfig';
 import {
   Dialog,
@@ -15,21 +15,21 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/v0/ui/dialog"
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Calendar } from "@/components/ui/calendar";
+} from "@/components/v0/ui/sheet";
+import { ScrollArea } from "@/components/v0/ui/scroll-area";
+import { Calendar } from "@/components/v0/ui/calendar";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/v0/ui/select";
 import { 
   BookOpen, 
   Calendar as CalendarIcon, 
@@ -63,14 +63,14 @@ import {
   Sun,
   LogOut
 } from "lucide-react";
-import { Separator } from '@/components/ui/separator';
-import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/v0/ui/separator';
+import { Input } from '@/components/v0/ui/input';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Label } from '@radix-ui/react-dropdown-menu';
-import { Switch } from '@/components/ui/switch';
+import { Switch } from '@/components/v0/ui/switch';
 import { useTheme } from 'next-themes';
 import { toast } from '@/hooks/use-toast';
 import { Form, useForm } from 'react-hook-form';
-import { FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
+import { FormField, FormItem, FormLabel, FormControl } from '@/components/v0/ui/form';
 
 
 const Sidebar = () => {

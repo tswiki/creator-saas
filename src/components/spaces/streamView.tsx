@@ -2,38 +2,21 @@
 'use client';
 
 import { auth } from '@/firebase/firebaseConfig';
-import {
-  CallControls,
-  SpeakerLayout, 
-  StreamCall,
-  StreamTheme,
-  StreamVideo,
-  StreamVideoClient,
-  User,
-  useCallStateHooks,
-  CallingState,
-  ParticipantView,
-  useCall,
-  StreamVideoParticipant
-} from "@stream-io/video-react-sdk";
-import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
-
-import "@stream-io/video-react-sdk/dist/css/styles.css";
+import axios from 'axios';
+import stream from 'getstream';
 import { Card } from '../v0/ui/card';
-import { ScrollArea } from '@radix-ui/react-scroll-area';
 
 const apiKey = process.env.NEXT_PUBLIC_STREAM_KEY!;
 
-export const VideoView = () => {
+export const StreamView = () => {
   const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
   const [userName, setUserName] = useState<string>('anon');
   const [userId, setUserId] = useState<string | null>(null);
-  const [client, setClient] = useState<StreamVideoClient | null>(null);
-  const [call, setCall] = useState<any>(null);
+  const [client, setClient] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,12 +38,11 @@ export const VideoView = () => {
     return () => {
       unsubscribe();
       if (client) {
-        client.disconnectUser();
+        client.disconnect();
         setClient(null);
-        setCall(null);
       }
     };
-  }, [router]);
+  }, [router, client]);
 
   useEffect(() => {
     const getToken = async () => {
@@ -96,74 +78,39 @@ export const VideoView = () => {
   useEffect(() => {
     if (!token || !userId) return;
 
-    const initializeVideo = async () => {
+    const initializeStream = async () => {
       try {
-        const user: User = { 
-          id: userId,
-          name: userName,
-          image: '/default-avatar.png'
-        };
-
-        const videoClient = new StreamVideoClient({ 
+        const streamClient = stream.connect(
           apiKey,
-          user,
-          token
-        });
+          token,
+          process.env.NEXT_PUBLIC_STREAM_APP_ID
+        );
 
-        const videoCall = videoClient.call('default', 'general-room');
-        videoCall.join({ create: true });
-
-        setClient(videoClient);
-        setCall(videoCall);
+        setClient(streamClient);
 
       } catch (error) {
-        console.error('Error initializing video:', error);
+        console.error('Error initializing stream:', error);
         if (error instanceof Error) {
           setError(`Failed to connect: ${error.message}`);
         }
       }
     };
 
-    initializeVideo();
-  }, [token, userId, userName]);
+    initializeStream();
+  }, [token, userId]);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
-  if (!client || !call) return <div>Connecting to video...</div>;
-  if (!auth.currentUser) return <div>Please login to access video</div>;
-
-  
-  const MyUILayout = () => {
-    const { useCallCallingState } = useCallStateHooks();
-    const callingState = useCallCallingState();
-  
-    if (callingState !== CallingState.JOINED) {
-      return <div>Loading...</div>;
-    }
-  
-    return (
-      <StreamTheme>
-        <SpeakerLayout participantsBarPosition='bottom' />
-        <CallControls />
-      </StreamTheme>
-    );
-  };
+  if (!client) return <div>Connecting to activity stream...</div>;
+  if (!auth.currentUser) return <div>Please login to access activity stream</div>;
 
   return (
     <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-hidden">
-    <Card className="h-full w-full border-2 border-primary">
-      <div className="h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)]">
-        <ScrollArea className="h-[calc(100vh-3.5rem)] w-full overflow">
-          <StreamVideo client={client}>
-            <StreamCall call={call}>
-              <MyUILayout />
-            </StreamCall>
-          </StreamVideo>
-        </ScrollArea>
-      </div>
-    </Card>
+      <Card className="h-full w-full border-2 border-primary">
+        <div>Activity Stream Connected</div>
+      </Card>
     </div>
   );
 };
 
-export default VideoView;
+export default StreamView;

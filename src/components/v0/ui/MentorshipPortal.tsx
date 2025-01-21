@@ -3,11 +3,11 @@
 
 import React, { useMemo } from 'react';
 import { AwaitedReactNode, JSXElementConstructor, Key, ReactElement, ReactNode, SetStateAction, useEffect, useRef, useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import HeroVideoDialog from "@/components/ui/hero-video-dialog";
+import { Button } from "@/components/v0/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/v0/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/v0/ui/avatar";
+import { Badge } from "@/components/v0/ui/badge";
+import HeroVideoDialog from "@/components/v0/ui/hero-video-dialog";
 import { auth } from '@/firebase/firebaseConfig';
 import {
   Dialog,
@@ -17,20 +17,20 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/v0/ui/dialog"
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import { ScrollArea } from "@/components/ui/scroll-area";
+} from "@/components/v0/ui/sheet";
+import { ScrollArea } from "@/components/v0/ui/scroll-area";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/v0/ui/select";
 import { 
   BookOpen, 
   Calendar as CalendarIcon, 
@@ -140,23 +140,30 @@ import {
   Code,
   PenTool,
   Database,
-  FolderTree
+  FolderTree,
+  Edit
 } from "lucide-react";
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/v0/ui/input';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Label, DropdownMenuSeparator, RadioGroup, Separator } from '@radix-ui/react-dropdown-menu';
-import { Switch } from '@/components/ui/switch';
+import { Switch } from '@/components/v0/ui/switch';
 import { useTheme } from 'next-themes';
 import { toast } from '@/hooks/use-toast';
 import { Textarea } from './textarea';
 import { Menubar, MenubarCheckboxItem, MenubarContent, MenubarItem, MenubarMenu, MenubarRadioGroup, MenubarRadioItem, MenubarSeparator, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarTrigger } from './menubar';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@radix-ui/react-tabs';
 import SpacesView from './chatView';
-import {EventCreationDialog} from '../v0/event-creation-dialog'
-import ResourceCreationDialog from '../v0/resource-creation-dialog';
-import EmailInbox from '../v0/SystemView';
+import {EventCreationDialog} from '../event-creation-dialog'
+import ResourceCreationDialog from '../resource-creation-dialog';
+import ConsoleView from '../SystemView';
 import { useView } from '@/contexts/viewContext'
 import { useAdmin } from '@/contexts/adminContext';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from './carousel';
+import ChannelView from '@/components/spaces/chatView';
+import VideoView from '@/components/spaces/videoView'
+import StreamView from '@/components/spaces/streamView';
+import AvatarCircles from './avatar-circles';
+import { Slider } from './slider';
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from './carousel';
+import Marquee from './marquee';
 
 const DashboardView = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -447,7 +454,7 @@ const DashboardView = () => {
                   <div className="flex items-center gap-3">
                     <Users2 className="h-5 w-5" />
                     <div>
-                      <p className="font-medium">Discord Community</p>
+                      <p className="font-medium">Community Chat</p>
                       <p className="text-sm text-muted-foreground">125 members online</p>
                     </div>
                   </div>
@@ -591,7 +598,7 @@ const DashboardView = () => {
 
   return (
     <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-hidden">
-      <Card className="h-full w-full border-2 border-primary">
+      <Card className="h-full w-full border-8 border-primary">
         <div className="relative h-full w-full overflow-hidden">
           <div className="flex items-center justify-center gap-6 p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300">
             <Card className="flex flex-col items-center p-3 border-2 border-primary">
@@ -677,11 +684,11 @@ const ProfileView = () => {
 
   return (
     <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-hidden">
-      <Card className="h-full w-full border-2 border-primary">
+      <Card className="h-full w-full border-8 border-primary">
         <div className="relative h-full w-full overflow-hidden">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
             <div className="flex flex-col">
-              <Card className="md:col-span-1 border-2 border-primary h-fit">
+              <Card className="md:col-span-1 border-4 border-primary h-fit">
                 <CardContent className="pt-12">
                   <div className="flex flex-col items-center gap-4">
                     <div className="relative w-24 h-24 md:w-32 md:h-32">
@@ -713,7 +720,7 @@ const ProfileView = () => {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="border-2 border-primary mt-5">
+              <Card className="border-4 border-primary mt-5">
                 <CardContent className="flex flex-col gap-4 p-6">
                   <div className="flex justify-center gap-4">
                     <Button variant="ghost" size="icon" onClick={() => window.open('https://linkedin.com', '_blank')}>
@@ -743,8 +750,8 @@ const ProfileView = () => {
 
                        
 
-            <div className="md:col-span-2 space-y-4 overflow-y-auto max-h-[calc(100vh-10rem)]">
-              <Card className="border-2 border-primary">
+            <div className="md:col-span-2 space-y-4 max-h-[calc(100vh-10rem)]">
+              <Card className="border-4 border-primary">
                 <CardHeader className="py-3">
                   <CardTitle className="flex items-center gap-2 text-base">
                     <FileText className="h-4 w-4" />
@@ -757,7 +764,7 @@ const ProfileView = () => {
               </Card>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card className="border-2 border-primary">
+                <Card className="border-4 border-primary">
                   <CardHeader className="py-3">
                     <CardTitle className="flex items-center gap-2 text-base">
                       <Sparkles className="h-4 w-4" />
@@ -775,7 +782,7 @@ const ProfileView = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="border-2 border-primary">
+                <Card className="border-4 border-primary">
                   <CardHeader className="py-3">
                     <CardTitle className="flex items-center gap-2 text-base">
                       <Trophy className="h-4 w-4" />
@@ -795,7 +802,7 @@ const ProfileView = () => {
                 </Card>
               </div>
 
-              <Card className="border-2 border-primary">
+              <Card className="border-4 border-primary">
                 <CardHeader className="py-3">
                   <CardTitle className="flex items-center gap-2 text-base">
                     <Target className="h-4 w-4" />
@@ -977,8 +984,8 @@ const ScheduleView = () => {
   };
 
   const renderTaskCard = (task: any) => (
-    <Card key={task.id} className="relative bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-shadow">
-      <Card className="p-4">
+    <Card key={task.id} className="pt-2 border-0">
+      <Card className="p-4 border-4">
         <div className="grid grid-cols-12 gap-6">
           {/* Left Column - Due Date */}
           <div className="col-span-2 p-4">
@@ -1085,7 +1092,7 @@ const ScheduleView = () => {
         </div>
       </Card>
 
-      <Card className="border-t rounded-t-none">
+      <Card className="border-t rounded-t-5 border-4 mt-2">
         <CardFooter className="pt-3 pb-3 px-6 flex items-center justify-between bg-black-50 dark:bg-black-800">
           <Card className="bg-white dark:bg-gray-800 shadow-sm">
             <CardContent className="p-2">
@@ -1207,9 +1214,9 @@ const ScheduleView = () => {
 
   return (
     <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4">
-      <Card className="w-full border-2 border-primary">
-        <Card className="rounded-b-none border-b-0">
-          <Card>
+      <Card className="w-full border-8 border-primary">
+        <Card className="rounded-b-none">
+          <Card className="border-4">
             <CardHeader className="sticky top-0 bg-background z-10">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pl-10">
                 <Card className="bg-white dark:bg-gray-800 shadow-sm">
@@ -1224,7 +1231,7 @@ const ScheduleView = () => {
                     placeholder="Search tasks..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="max-w-xs"
+                    className="max-w-xs border-2"
                   />
                   <Menubar>
                     <MenubarMenu>
@@ -2361,164 +2368,230 @@ export default function MentorshipPortal() {
 
     return (
       <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-auto">
-        <Card className="h-full w-full border-2 border-primary">
-          <CardContent>
-            <div>
-              <div className="flex items-center gap-2 p-2">
-                <h2 className="text-base font-semibold pt-5">Suggested Folders</h2>
-              </div>
-              <div className="space-y-4">              
-                <div className="grid grid-cols-3 gap-4">
-                  <Card className="hover:bg-accent/50 transition-colors cursor-pointer w-full" onClick={() => setCurrentView('products')}>
-                    <CardContent className="p-4 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Folder className="h-5 w-5 text-blue-500" />
-                        <div>
-                          <h3 className="font-semibold pl-12">Products</h3>
-                          <div className="flex justify-center pl-2">
-                            <p className="text-sm text-muted-foreground">Product resources and guides</p>
+        <Card className="h-full w-full border-8 border-primary">
+          <CardContent className="h-[calc(100vh-16rem)] pt-3 p-2">
+            <div className="grid grid-cols-3 gap-4 h-[calc(100vh-8rem)]">
+              {/* Column 1: Recommended Resources Carousel */}
+              <Card className="border-4 h-[95%]">
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <CardTitle className="text-lg">Recommended</CardTitle>
+                      <CardDescription>Curated resources for you</CardDescription>
+                    </div>
+                    <Badge variant="secondary" className="text-sm">
+                      {resources.length}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <ScrollArea className="h-[calc(100vh-15rem)] pb-2">
+                    <div className="space-y-4">
+                      {resources.map((resource, i) => (
+                        <Card key={i} className="p-4 border-4 border-primary hover:bg-accent cursor-pointer">
+                          <div className="flex flex-col gap-3">
+                            {/* Thumbnail */}
+                            <div className="w-full h-48 rounded-lg bg-muted overflow-hidden">
+                              <img 
+                                src={resource.thumbnail || '/default-avatar.png'} 
+                                alt={resource.title}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            
+                            {/* Title */}
+                            <h3 className="font-medium line-clamp-2">{resource.title}</h3>
+                            
+                            {/* Bottom row */}
+                            <div className="flex items-center justify-between">
+                              {/* Avatar */}
+                              <div className="flex items-center gap-2">
+                                <AvatarCircles 
+                                  avatarUrls={[
+                                    {
+                                      imageUrl: resource.instructor?.avatar || '/default-avatar.png',
+                                      profileUrl: '#'
+                                    },
+                                    {
+                                      imageUrl: '/default-avatar.png', 
+                                      profileUrl: '#'
+                                    },
+                                    {
+                                      imageUrl: '/default-avatar.png',
+                                      profileUrl: '#'
+                                    }
+                                  ]}
+                                  numPeople={1}
+                                  className="border-2 border-primary rounded-full [&>a:last-child]: [&>a:last-child]:bg-transparent [&>a:last-child]:text-black dark:[&>a:last-child]:text-white"
+                                />
+                              </div>
+                              
+                              {/* Outcome Badge */}
+                              <Badge variant="secondary" className="text-xs flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {resource.duration || '2h 30m'}
+                              </Badge>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                      <div onClick={(e) => e.stopPropagation()}>
-                        <Menubar>
-                          <MenubarMenu>
-                            <MenubarTrigger asChild>
-                              <Button variant="ghost" className="pl-1 pr-1">
-                                <MoreVertical className="h-3 w-3" />
-                              </Button>
-                            </MenubarTrigger>
-                            <MenubarContent>
-                              <MenubarItem>Open</MenubarItem>
-                              <MenubarItem>Share</MenubarItem>
-                              <MenubarItem>Move</MenubarItem>
-                              <MenubarSeparator />
-                              <MenubarItem className="text-red-600">Delete</MenubarItem>
-                            </MenubarContent>
-                          </MenubarMenu>
-                        </Menubar>
-                      </div>
-                    </CardContent>
-                  </Card>
+                        </Card>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </CardContent>
+              </Card>
 
-                  <Card className="hover:bg-accent/50 transition-colors cursor-pointer w-full" onClick={() => setCurrentView('socials')}>
-                    <CardContent className="p-4 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Folder className="h-5 w-5 text-blue-500" />
-                        <div>
-                          <h3 className="font-semibold pl-12">Socials</h3>
-                          <div className="flex justify-center pl-2">
-                            <p className="text-sm text-muted-foreground">Social media content</p>
-                          </div>
+              {/* Column 2: Course Messages */}
+              <Card className="border-4 border-primary h-[95%]">
+                <CardHeader>
+                  <CardTitle className="text-lg">Courses</CardTitle>
+                  <CardDescription>Latest additions and updates</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ScrollArea className="h-[calc(100vh-15rem)] pb-2">
+                    <div className="space-y-4">
+                      {resources.map((course, i) => (
+                        <div key={i} className="flex gap-2">
+                          <Card className="p-2 bg-accent rounded-lg flex-1 border-4">
+                            <div className="flex items-center">
+                            <Avatar className="h-6 w-6 rounded-full border-2 border-primary flex items-center justify-center">
+                            {(() => {
+                              const icons = [
+                                <Video className="h-3 w-3" />,
+                                <FileText className="h-3 w-3" />,
+                                <MonitorPlay className="h-3 w-3" />
+                              ];
+                              return icons[Math.floor(Math.random() * icons.length)];
+                            })()}
+                          </Avatar>
+                              <div className="flex justify-between items-start px-2">
+                                <Badge variant="secondary" className="text-xs text-muted-foreground">3/12</Badge>
+                              </div>
+                                <div className="top-2 right-2 ml-auto">
+                                  <Menubar className="border-0 bg-transparent p-0 h-auto">
+                                    <MenubarMenu>
+                                      <MenubarTrigger asChild>
+                                        <Badge variant="outline" className="cursor-pointer hover:bg-accent-foreground/10">
+                                          <MoreVertical className="h-4 w-4 rotate-90" />
+                                        </Badge>
+                                      </MenubarTrigger>
+                                      <MenubarContent>
+                                        <MenubarItem>
+                                          <Edit className="mr-2 h-4 w-4" />
+                                          Edit
+                                        </MenubarItem>
+                                        <MenubarItem>
+                                          <Share className="mr-2 h-4 w-4" />
+                                          Share
+                                        </MenubarItem>
+                                        <MenubarSeparator />
+                                        <MenubarItem className="text-destructive">
+                                          <Trash className="mr-2 h-4 w-4" />
+                                          Delete
+                                        </MenubarItem>
+                                      </MenubarContent>
+                                    </MenubarMenu>
+                                  </Menubar>
+                                </div>
+                            </div>
+                            <p className="text-xs text-muted-foreground p-2">{course.type || 'Video Course'} by {course.creator || 'Sarah Smith'}</p>
+                            <p className="font-medium">{course.title}</p>
+                            <div className="mt-3 space-y-2">
+                              <div className="w-full flex items-center gap-2">
+                                <Slider 
+                                  defaultValue={[(3/12) * 100]}
+                                  max={100}
+                                  step={1}
+                                  disabled
+                                  className="cursor-default"
+                                />
+                              </div>
+                              <div className="flex justify-between text-[0.7rem] text-muted-foreground">
+                                <span>Jan 15, 2024</span>
+                                <span>Feb 1, 2024</span>
+                              </div>
+                            </div>
+                          </Card>
                         </div>
-                      </div>
-                      <div onClick={(e) => e.stopPropagation()}>
-                        <Menubar>
-                          <MenubarMenu>
-                            <MenubarTrigger asChild>
-                              <Button variant="ghost" className="pl-1 pr-1">
-                                <MoreVertical className="h-3 w-3" />
-                              </Button>
-                            </MenubarTrigger>
-                            <MenubarContent>
-                              <MenubarItem>Open</MenubarItem>
-                              <MenubarItem>Share</MenubarItem>
-                              <MenubarItem>Move</MenubarItem>
-                              <MenubarSeparator />
-                              <MenubarItem className="text-red-600">Delete</MenubarItem>
-                            </MenubarContent>
-                          </MenubarMenu>
-                        </Menubar>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </CardContent>
+              </Card>
 
-                  <Card className="hover:bg-accent/50 transition-colors cursor-pointer w-full" onClick={() => setCurrentView('archives')}>
-                    <CardContent className="p-4 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Folder className="h-5 w-5 text-blue-500" />
-                        <div>
-                          <h3 className="font-semibold pl-12">Archive</h3>
-                          <div className="flex justify-center pl-3">
-                            <p className="text-xs text-muted-foreground">Past resources and materials</p>
-                          </div>
+              {/* Column 3: Featured Section */}
+              <Card className="border-4 border-primary h-[95%]">
+                <CardHeader>
+                  <CardTitle className="text-lg">Featured</CardTitle>
+                  <CardDescription>Highlights and important updates</CardDescription>
+                </CardHeader>
+                <CardContent className="overflow-0">
+                  <div className="h-[calc(100vh-20rem)] relative">
+                    <div>
+                      <Card className="p-4 border-4 border-primary bg-accent hover:bg-accent/80 transition-colors">
+                        <div className="flex items-center gap-2 ">
+                          <Star className="h-5 w-5 text-primary" />
+                          <h3 className="font-semibold">Featured Course</h3>
                         </div>
-                      </div>
-                      <div onClick={(e) => e.stopPropagation()}>
-                        <Menubar>
-                          <MenubarMenu>
-                            <MenubarTrigger asChild>
-                              <Button variant="ghost" className="pl-1 pr-1">
-                                <MoreVertical className="h-3 w-3" />
-                              </Button>
-                            </MenubarTrigger>
-                            <MenubarContent>
-                              <MenubarItem>Open</MenubarItem>
-                              <MenubarItem>Share</MenubarItem>
-                              <MenubarItem>Move</MenubarItem>
-                              <MenubarSeparator />
-                              <MenubarItem className="text-red-600">Delete</MenubarItem>
-                            </MenubarContent>
-                          </MenubarMenu>
-                        </Menubar>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center gap-2 p-2">
-                <h2 className="text-base font-semibold">Suggested Files</h2>
-              </div>
-              <div className="space-y-4">
-                <div className="grid grid-cols-3 gap-7">
-                  {resources.map((resource, i) => (
-                    <Button variant="ghost" className="w-full h-full p-0" onClick={() => setCurrentView('course')}>
-                      <Card key={i} className="hover:bg-accent/50 transition-colors w-full min-h-[250px] flex flex-col">
-                        <CardHeader className="p-4 pb-2 flex-none">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3 min-w-0 pr-2">
-                              <FileText className="h-5 w-5 text-blue-500 flex-none" />
-                              <h3 className="font-semibold truncate">{resource.title}</h3>
-                            </div>
-                            <div onClick={(e) => e.stopPropagation()} className="flex-none">
-                              <Menubar>
-                                <MenubarMenu>
-                                  <MenubarTrigger asChild>
-                                    <Button variant="ghost" className="pl-1 pr-1">
-                                      <MoreVertical className="h-2 w-2" />
-                                    </Button>
-                                  </MenubarTrigger>
-                                  <MenubarContent>
-                                    <MenubarItem>Open</MenubarItem>
-                                    <MenubarItem>Share</MenubarItem>
-                                    <MenubarItem>Move</MenubarItem>
-                                    <MenubarSeparator />
-                                    <MenubarItem className="text-red-600">Delete</MenubarItem>
-                                  </MenubarContent>
-                                </MenubarMenu>
-                              </Menubar>
-                            </div>
-                          </div>
-                        </CardHeader>
-                        <CardContent className="px-4 py-2 flex-grow overflow-auto">
-                          <div className="flex flex-col items-center justify-center h-full">
-                            <div className="w-24 h-24 bg-muted/50 rounded-lg flex items-center justify-center">
-                              <FileText className="w-12 h-12 text-muted-foreground" />
-                            </div>
-                          </div>
-                        </CardContent>
-                        <CardFooter className="px-4 pt-2 pb-4 flex-none">
-                          <p className="text-xs text-muted-foreground">
-                            Last accessed {new Date().toLocaleDateString()}
-                          </p>
-                        </CardFooter>
+                        <p className="text-sm text-muted-foreground mb-4">Advanced TypeScript Masterclass</p>
+                        <p className="text-sm mb-4">Master TypeScript with hands-on projects and advanced concepts</p>
+                        <div className="flex items-center gap-2 mb-4">
+                          <Clock className="h-4 w-4" />
+                          <span className="text-sm">8 weeks</span>
+                        </div>
+                        <Button className="w-full hover:bg-primary/90">Enroll Now</Button>
                       </Card>
-                    </Button>
-                  ))}
-                </div>
-              </div>
+                    </div>
+                    <div className="">
+                      {/* summarise the reviews for a more consise feedback loop/message */}
+                      <Marquee className="bg-muted/50 rounded-lg" pauseOnHover>
+                        <div className="flex items-center gap-4 px-3">
+                          <Card className="w-[224px] p-3 border-2 mb-2">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Avatar className="h-6 w-6">
+                                <AvatarImage src="/avatars/user1.jpg" />
+                                <AvatarFallback>JD</AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="text-xs font-medium">John Doe</p>
+                                <p className="text-[10px] text-muted-foreground">TypeScript Student</p>
+                              </div>
+                            </div>
+                            <p className="text-xs">"The TypeScript course was exactly what I needed!"</p>
+                          </Card>
+
+                          <Card className="w-[224px] p-3 border-2 mb-2">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Avatar className="h-6 w-6">
+                                <AvatarImage src="/avatars/user2.jpg" />
+                                <AvatarFallback>AR</AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="text-xs font-medium">Alice Rodriguez</p>
+                                <p className="text-[10px] text-muted-foreground">Full Stack Developer</p>
+                              </div>
+                            </div>
+                            <p className="text-xs">"Sarah's teaching style is incredible."</p>
+                          </Card>
+
+                          <Card className="w-[224px] p-3 border-2 mb-2">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Avatar className="h-6 w-6">
+                                <AvatarImage src="/avatars/user3.jpg" />
+                                <AvatarFallback>MK</AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="text-xs font-medium">Mike Kim</p>
+                                <p className="text-[10px] text-muted-foreground">React Developer</p>
+                              </div>
+                            </div>
+                            <p className="text-xs">"The hands-on projects really helped cement the concepts."</p>
+                          </Card>
+                        </div>
+                      </Marquee>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </CardContent>
         </Card>
@@ -4011,7 +4084,7 @@ export default function MentorshipPortal() {
   const ConnectView = () => {
     return (
       <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-auto">
-        <Card className="h-full w-full border-2 border-primary">
+        <Card className="h-full w-full border-8 border-primary">
           <CardHeader>
             <div className="flex justify-between items-center pt-2">
               <CardTitle>Community Connect</CardTitle>
@@ -4062,11 +4135,11 @@ export default function MentorshipPortal() {
                       </div>
                     </div>
                     </DialogHeader>
-                    <div className="">
-                      <ScrollArea className="h-[400px] w-full">
-                          <div className="grid grid-cols-2 gap-4">
+                    <ScrollArea className="h-[400px] w-full">
+                      <div className="overflow-hidden">
+                          <div className="grid grid-cols-2 gap-4 max-h-[400px]">
                             {/* Example member cards - replace with actual data */}
-                            {[1,2,3,4,5,6].map((member) => (
+                            {[1,2,3,4].map((member) => (
                               <Card key={member} className="hover:shadow-lg transition-shadow">
                                 <CardContent className="p-4">
                                   <div className="flex items-center gap-3">
@@ -4086,8 +4159,8 @@ export default function MentorshipPortal() {
                               </Card>
                             ))}
                           </div>
-                        </ScrollArea>
                       </div>
+                    </ScrollArea>
                   </DialogContent>
                 </Dialog>
                 <Button variant="outline" className="flex items-center gap-2">
@@ -4103,7 +4176,7 @@ export default function MentorshipPortal() {
           
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-10">
-              <Card className="hover:shadow-lg transition-shadow">
+              <Card className="hover:shadow-lg transition-shadow border-4">
                 <CardHeader>
                   <CardTitle className="text-lg">Featured Members</CardTitle>
                 </CardHeader>
@@ -4119,26 +4192,26 @@ export default function MentorshipPortal() {
                         <p className="text-sm text-muted-foreground">Senior Developer</p>
                       </div>
                     </div>
-                    <Button variant="outline" className="w-full">View All Members</Button>
+                    <Button variant="outline" className="w-full border-4">View All Members</Button>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="hover:shadow-lg transition-shadow">
+              <Card className="hover:shadow-lg transition-shadow border-4">
                 <CardHeader>
                   <CardTitle className="text-lg">Popular Categories</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start border-4">
                       <Code className="h-4 w-4 mr-2" />
                       Programming
                     </Button>
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start border-4">
                       <PenTool className="h-4 w-4 mr-2" />
-                      Design
+                      Graphic Design
                     </Button>
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start border-4">
                       <Database className="h-4 w-4 mr-2" />
                       Data Science
                     </Button>
@@ -4146,7 +4219,7 @@ export default function MentorshipPortal() {
                 </CardContent>
               </Card>
 
-              <Card className="hover:shadow-lg transition-shadow">
+              <Card className="hover:shadow-lg transition-shadow border-4">
                 <CardHeader>
                   <CardTitle className="text-lg">Recent Activities</CardTitle>
                 </CardHeader>
@@ -4160,7 +4233,7 @@ export default function MentorshipPortal() {
                       <Users className="h-4 w-4 text-muted-foreground" />
                       <p className="text-sm">5 new members joined today</p>
                     </div>
-                    <Button variant="outline" className="w-full">View All Activities</Button>
+                    <Button variant="outline" className="w-full border-4">View All Activities</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -4201,12 +4274,15 @@ export default function MentorshipPortal() {
         {currentView === 'tiktok' && <TikTokView/>}
         {currentView === 'twitter' && <TwitterView/>}
         {currentView === 'instagram' && <InstagramView/>}
-        {currentView === 'emailInbox' && <EmailInbox/>}
+        {currentView === 'console' && <ConsoleView/>}
         {currentView === 'files' && <FilesView/>}
         {currentView === 'socials' && <SocialsView/>}
         {currentView === 'products' && <ProductView/>}
         {currentView === 'archives' && <ArchiveView/>}
         {currentView === 'profile' && <ProfileView/>}
+        {currentView === 'stream' && <StreamView/>}
+        {currentView === 'video' && <VideoView/>}
+        {currentView === 'channel' && <ChannelView/>}
       </div>
     </div>
   );

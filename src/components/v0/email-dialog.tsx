@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useForm } from "react-hook-form"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/v0/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -11,10 +11,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+} from "@/components/v0/ui/dialog"
+import { Input } from "@/components/v0/ui/input"
+import { Label } from "@/components/v0/ui/label"
+import { Textarea } from "@/components/v0/ui/textarea"
+import { Mail } from "lucide-react"
+import { Card } from "./ui/card"
 
 type EmailFormData = {
   to: string
@@ -36,8 +38,8 @@ export function EmailDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="default" className="w-full justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="M12 5v14M5 12h14"/></svg>
+        <Button className="flex items-center gap-2">
+          <Mail className="h-4 w-4" />
           Compose
         </Button>
       </DialogTrigger>
@@ -56,7 +58,8 @@ export function EmailDialog() {
               </Label>
               <Input
                 id="to"
-                placeholder="recipient@example.com"
+                placeholder="johndoe@example.com"
+                className="border-2 border-primary"
                 {...register("to", { 
                   required: "Recipient is required",
                   pattern: {
@@ -74,6 +77,7 @@ export function EmailDialog() {
               <Input
                 id="subject"
                 placeholder="Enter the email subject"
+                className="border-2 border-primary"
                 {...register("subject", { required: "Subject is required" })}
               />
               {errors.subject && <p className="text-sm text-red-500">{errors.subject.message}</p>}
@@ -82,12 +86,14 @@ export function EmailDialog() {
               <Label htmlFor="message">
                 Message
               </Label>
-              <Textarea
-                id="message"
-                placeholder="Type your message here..."
-                className="h-32"
-                {...register("message", { required: "Message is required" })}
-              />
+              <Card className="border-2 border-primary">
+                <Textarea
+                  id="message"
+                  placeholder="Type your message here..."
+                  className="h-28 py-10 text-center"
+                  {...register("message", { required: "Message is required" })}
+                />
+              </Card>
               {errors.message && <p className="text-sm text-red-500">{errors.message.message}</p>}
             </div>
           </div>

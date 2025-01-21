@@ -1,7 +1,7 @@
 import { useFormContext, useFieldArray } from "react-hook-form"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
+import { Input } from "@/components/v0/ui/input"
+import { Label } from "@/components/v0/ui/label"
+import { Button } from "@/components/v0/ui/button"
 import { ResourceFormData } from "@/app/types/resource"
 import { PlusCircle, Trash2 } from 'lucide-react'
 

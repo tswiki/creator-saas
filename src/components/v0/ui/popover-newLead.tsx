@@ -1,11 +1,11 @@
 
 
 import * as React from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/v0/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/v0/ui/card";
+import { Input } from "@/components/v0/ui/input";
+import { Label } from "@/components/v0/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/v0/ui/select";
 
 // Define prop types for the component
 interface PopoverNewLeadProps {
@@ -13,12 +13,12 @@ interface PopoverNewLeadProps {
   onClose: () => void;
 }
 
-export function PopoverCurrentLead({ onSubmit, onClose }: PopoverNewLeadProps) {
+export function PopoverNewLead({ onSubmit, onClose }: PopoverNewLeadProps) {
   const [name, setName] = React.useState<string>("");
   const [surname, setSurname] = React.useState<string>("");
   const [email, setEmail] = React.useState<string>("");
   const [phoneNo, setPhoneNo] = React.useState<string>("");
-  const [status, setStatus] = React.useState<string>("New Lead");
+  const [status, setStatus] = React.useState<string>("");
 
   const handleAddLead = () => {
     onSubmit({ name, surname, email, phoneNo, status });

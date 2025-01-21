@@ -1,15 +1,15 @@
 'use client';
 
 import { cn } from "@/lib/utils";
-import Marquee from "@/components/ui/marquee";
-import HeroVideoDialog from "@/components/ui/hero-video-dialog";
-import { CardWithForm } from '@/components/ui/waitlist';
+import Marquee from "@/components/v0/ui/marquee";
+import HeroVideoDialog from "@/components/v0/ui/hero-video-dialog";
+import { CardWithForm } from '@/components/v0/ui/waitlist';
 import { useState } from 'react';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@/components/v0/ui/popover";
 
 const reviews = [
   {

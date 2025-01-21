@@ -1,4 +1,4 @@
-import { MenubarMenu, MenubarTrigger, MenubarContent, MenubarRadioGroup, MenubarRadioItem, Menubar } from "@/components/ui/menubar"
+import { MenubarMenu, MenubarTrigger, MenubarContent, MenubarRadioGroup, MenubarRadioItem, Menubar } from "@/components/v0/ui/menubar"
 
 interface MenuBarProps {
   onFilterChange: (filter: string) => void

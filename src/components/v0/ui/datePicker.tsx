@@ -8,8 +8,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { toast } from "@/hooks/use-toast"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
+import { Button } from "@/components/v0/ui/button"
+import { Calendar } from "@/components/v0/ui/calendar"
 import {
   Form,
   FormControl,
@@ -18,7 +18,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
+} from "@/components/v0/ui/form"
 
 const FormSchema = z.object({
   dob: z.date({

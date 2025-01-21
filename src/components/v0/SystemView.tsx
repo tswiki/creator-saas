@@ -1,15 +1,18 @@
 
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Search, Filter, Mail, Star, Inbox, Send, Archive, Trash2, Tag, Settings2, Clock, Library, MessagesSquare, ChevronLeft, ChevronRight, Badge } from "lucide-react";
-import { Textarea } from "../ui/textarea";
+import { Button } from "@/components/v0/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/v0/ui/card";
+import { Input } from "@/components/v0/ui/input";
+import { Search, Filter, Mail, Star, Inbox, Send, Archive, Trash2, Tag, Settings2, Clock, Library, MessagesSquare, ChevronLeft, ChevronRight, Badge, Users } from "lucide-react";
+import { Textarea } from "./ui/textarea";
 import React from 'react';
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@radix-ui/react-select";
+import EmailDialog from "./email-dialog";
+import { Label } from "./ui/label";
+import { Slider } from "./ui/slider";
 
-export const SystemView = () => {
+export const ConsoleView = () => {
   const [activeSlide, setActiveSlide] = React.useState(0);
   const totalSlides = 3;
 
@@ -20,17 +23,64 @@ export const SystemView = () => {
   const prevSlide = () => {
     setActiveSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
   };
+  const [selectedSetting, setSelectedSetting] = React.useState({
+    agentName: '',
+    agentRole: '',
+    agentBehavior: '',
+    customInstructions: '',
+    model: 'gpt4',
+    temperature: 0.7
+  });
+
+  const handleSettingChange = (field: string, value: string | number | File[]) => {
+    if (field === 'documents' && Array.isArray(value)) {
+      // Handle document uploads
+      const files = value as File[];
+      const allowedTypes = ['application/pdf', 'text/plain', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      
+      const validFiles = files.filter(file => allowedTypes.includes(file.type));
+      
+      if (validFiles.length !== files.length) {
+        console.warn('Some files were skipped due to invalid file type');
+      }
+
+      setSelectedSetting(prev => ({
+        ...prev,
+        documents: [...(prev.documents || []), ...validFiles]
+      }));
+
+    } else {
+      // Handle other setting changes
+      setSelectedSetting(prev => ({
+        ...prev,
+        [field]: value
+      }));
+    }
+  };
+
+  const handleModelChange = (value: string) => {
+    handleSettingChange('model', value);
+  };
+
+  const handleTemperatureChange = (value: number[]) => {
+    handleSettingChange('temperature', value[0]);
+  };
+
+  const handleSaveSettings = () => {
+    // Here you would typically save the settings to your backend/state management
+    console.log('Saving agent settings:', selectedSetting);
+  };
+
+
+  
 
   return (
     <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-y-none">
-      <Card className="h-full w-full border-2 border-primary">
+      <Card className="h-full w-full border-8 border-primary">
         <CardHeader>
           <div className="flex justify-between items-center pt-2">
             <CardTitle>User Console</CardTitle>
-            <Button className="flex items-center gap-2">
-              <Mail className="h-4 w-4" />
-              Compose
-            </Button>
+            <EmailDialog />
           </div>
         </CardHeader>
         <CardContent>
@@ -64,6 +114,10 @@ export const SystemView = () => {
                       <Card>
                         <CardContent className="p-4">
                           <div className="space-y-2">
+                          <Button variant="ghost" className="w-full justify-start">
+                              <Users className="h-4 w-4 mr-2" />
+                              Community
+                            </Button>
                             <Button variant="ghost" className="w-full justify-start">
                               <Inbox className="h-4 w-4 mr-2" />
                               Inbox
@@ -83,10 +137,6 @@ export const SystemView = () => {
                             <Button variant="ghost" className="w-full justify-start">
                               <Trash2 className="h-4 w-4 mr-2" />
                               Trash
-                            </Button>
-                            <Button variant="ghost" className="w-full justify-start">
-                              <Tag className="h-4 w-4 mr-2" />
-                              Labels
                             </Button>
                           </div>
                         </CardContent>
@@ -109,19 +159,21 @@ export const SystemView = () => {
 
                           <div className="space-y-2">
                             {/* Email List Items */}
-                            {[1, 2, 3].map((i) => (
-                              <Card key={i} className="cursor-pointer hover:bg-accent">
-                                <CardContent className="p-4">
-                                  <div className="flex justify-between items-center">
-                                    <div>
-                                      <h4 className="font-medium">Sender Name</h4>
-                                      <p className="text-sm text-muted-foreground">Email Subject</p>
+                            <ScrollArea className="h-[calc(100vh-20rem)] overflow-auto">
+                              {[1, 2, 3, 4, 5].map((i) => (
+                                <Card key={i} className="cursor-pointer hover:bg-accent m-2">
+                                  <CardContent className="p-4">
+                                    <div className="flex justify-between items-center">
+                                      <div>
+                                        <h4 className="font-medium">Sender Name</h4>
+                                        <p className="text-sm text-muted-foreground">Email Subject</p>
+                                      </div>
+                                      <span className="text-sm text-muted-foreground">2:30 PM</span>
                                     </div>
-                                    <span className="text-sm text-muted-foreground">2:30 PM</span>
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            ))}
+                                  </CardContent>
+                                </Card>
+                              ))}
+                            </ScrollArea>
                           </div>
                         </CardContent>
                       </Card>
@@ -136,19 +188,63 @@ export const SystemView = () => {
                       <Card>
                         <CardContent className="p-4">
                           <div className="space-y-2">
-                            <Button variant="ghost" className="w-full justify-start">
+                            <Button 
+                              variant={selectedSetting.agentName === 'settings' ? 'default' : 'ghost'} 
+                              className="w-full justify-start"
+                              onClick={() => setSelectedSetting({
+                                agentName: 'settings',
+                                agentRole: '',
+                                agentBehavior: '',
+                                customInstructions: '',
+                                model: 'gpt4',
+                                temperature: 0.7
+                              })}
+                            >
                               <Settings2 className="h-4 w-4 mr-2" />
                               Agent Settings
                             </Button>
-                            <Button variant="ghost" className="w-full justify-start">
+                            <Button 
+                              variant={selectedSetting.agentName === 'history' ? 'default' : 'ghost'}
+                              className="w-full justify-start"
+                              onClick={() => setSelectedSetting({
+                                agentName: 'history',
+                                agentRole: '',
+                                agentBehavior: '',
+                                customInstructions: '',
+                                model: 'gpt4',
+                                temperature: 0.7
+                              })}
+                            >
                               <Clock className="h-4 w-4 mr-2" />
                               Conversation History
                             </Button>
-                            <Button variant="ghost" className="w-full justify-start">
+                            <Button 
+                              variant={selectedSetting.agentName === 'context' ? 'default' : 'ghost'}
+                              className="w-full justify-start"
+                              onClick={() => setSelectedSetting({
+                                agentName: 'context',
+                                agentRole: '',
+                                agentBehavior: '',
+                                customInstructions: '',
+                                model: 'gpt4',
+                                temperature: 0.7
+                              })}
+                            >
                               <Library className="h-4 w-4 mr-2" />
                               Context Library
                             </Button>
-                            <Button variant="ghost" className="w-full justify-start">
+                            <Button 
+                              variant={selectedSetting.agentName === 'prompts' ? 'default' : 'ghost'}
+                              className="w-full justify-start"
+                              onClick={() => setSelectedSetting({
+                                agentName: 'prompts',
+                                agentRole: '',
+                                agentBehavior: '',
+                                customInstructions: '',
+                                model: 'gpt4',
+                                temperature: 0.7
+                              })}
+                            >
                               <MessagesSquare className="h-4 w-4 mr-2" />
                               Prompt Templates
                             </Button>
@@ -160,51 +256,100 @@ export const SystemView = () => {
                     <div className="col-span-9">
                       <Card>
                         <CardContent className="p-4">
-                          <div className="h-[calc(100vh-20rem)] overflow-y-auto ">
-                            <ScrollArea className="h-full p-4">
-                              <div className="space-y-4">
-                                <div>
-                                  <h3 className="text-lg font-medium mb-2">Context Management</h3>
-                                  <Textarea 
-                                    placeholder="Add context for the agent..."
-                                    className="min-h-[100px]"
-                                  />
-                                </div>
-
-                                <div>
-                                  <h3 className="text-lg font-medium mb-2">Prompt Configuration</h3>
-                                  <Textarea 
-                                    placeholder="Customize agent prompts..."
-                                    className="min-h-[100px]"
-                                  />
-                                </div>
-
-                                <div>
-                                  <h3 className="text-lg font-medium mb-2">Conversation Summary</h3>
-                                  <Card className="bg-muted">
-                                    <CardContent className="p-4">
-                                      <div className="space-y-2">
-                                        <div className="flex justify-between">
-                                          <span className="text-sm font-medium">Total Interactions</span>
-                                          <span>127</span>
+                          <div className="h-[calc(100vh-20rem)]">
+                            <ScrollArea className="h-[calc(100vh-20rem)] overflow-auto">
+                              {selectedSetting.agentName === 'settings' && (
+                                <div className="space-y-6">
+                                  <Card className="border-2 border-primary">
+                                    <CardHeader>
+                                      <CardTitle className="text-lg font-medium">Agent Configuration</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                      <div className="space-y-4">
+                                        <div className="space-y-2">
+                                          <Label>Model Selection</Label>
+                                          <Select>
+                                            <SelectTrigger>
+                                              <SelectValue placeholder="Select model" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              <SelectItem value="gpt4">GPT-4</SelectItem>
+                                              <SelectItem value="gpt35">GPT-3.5</SelectItem>
+                                              <SelectItem value="claude">Claude</SelectItem>
+                                            </SelectContent>
+                                          </Select>
                                         </div>
-                                        <div className="flex justify-between">
-                                          <span className="text-sm font-medium">Average Response Time</span>
-                                          <span>2.3s</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                          <span className="text-sm font-medium">Common Topics</span>
-                                          <span>Code Review, Debugging, Architecture</span>
+                                        <div className="space-y-2">
+                                          <Label>Temperature</Label>
+                                          <Slider defaultValue={[0.7]} max={1} step={0.1} />
                                         </div>
                                       </div>
                                     </CardContent>
                                   </Card>
                                 </div>
+                              )}
 
-                                <Button className="w-full">
-                                  Save Configuration
-                                </Button>
-                              </div>
+                              {selectedSetting.agentName === 'history' && (
+                                <div className="space-y-4">
+                                  {[1,2,3].map((i) => (
+                                    <Card key={i} className="border-2">
+                                      <CardContent className="p-4">
+                                        <div className="flex justify-between items-center">
+                                          <div>
+                                            <h4 className="font-medium">Conversation #{i}</h4>
+                                            <p className="text-sm text-muted-foreground">2 hours ago</p>
+                                          </div>
+                                          <Button variant="outline" size="sm">View</Button>
+                                        </div>
+                                      </CardContent>
+                                    </Card>
+                                  ))}
+                                </div>
+                              )}
+
+                              {selectedSetting.agentName === 'context' && (
+                                <div className="space-y-6">
+                                  <Card className="border-2 border-primary">
+                                    <CardHeader>
+                                      <CardTitle className="text-lg font-medium">Context Management</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                      <Textarea 
+                                        placeholder="Add context for the agent..."
+                                        className="min-h-[100px] border-2 border-primary"
+                                      />
+                                    </CardContent>
+                                  </Card>
+                                </div>
+                              )}
+
+                              {selectedSetting.agentName === 'prompts' && (
+                                <div className="space-y-4">
+                                  <Card className="border-2 border-primary">
+                                    <CardHeader>
+                                      <CardTitle className="text-lg font-medium">Prompt Templates</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                      <div className="space-y-4">
+                                        {['Code Review', 'Bug Analysis', 'Architecture Review'].map((template) => (
+                                          <Card key={template} className="border-2">
+                                            <CardContent className="p-4">
+                                              <div className="flex justify-between items-center">
+                                                <span className="font-medium">{template}</span>
+                                                <Button variant="outline" size="sm">Edit</Button>
+                                              </div>
+                                            </CardContent>
+                                          </Card>
+                                        ))}
+                                      </div>
+                                    </CardContent>
+                                  </Card>
+                                </div>
+                              )}
+
+                              <Button className="w-full border-2 border-primary mt-6">
+                                Save Changes
+                              </Button>
                             </ScrollArea>
                           </div>
                         </CardContent>
@@ -344,4 +489,4 @@ export const SystemView = () => {
   );
 };
 
-export default SystemView;
+export default ConsoleView;

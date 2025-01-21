@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import React from 'react'
-import Header from '@/components/ui/header'
+import Header from '@/components/v0/ui/header'
 
 export default async function CohortLayout({
   children,
