@@ -1,7 +1,6 @@
-
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../auth/session/route';
+import { cookies } from 'next/headers';
+import { adminAuth } from '@/firebase/admin-config';
 
 // Types based on the MentorshipPortal component
 type Task = {
@@ -54,27 +53,39 @@ const mockTasks: Task[] = [
 ];
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
+  try {
+    const sessionCookie = (await cookies()).get('session')?.value;
+    if (!sessionCookie) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const decodedClaims = await adminAuth.verifySessionCookie(sessionCookie, true);
+    if (!decodedClaims) {
+      return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
+    }
+
+    return NextResponse.json({
+      progress: mockProgress,
+      objectives: mockObjectives,
+      tasks: mockTasks
+    });
+  } catch (error) {
+    return NextResponse.json({ error: 'Authentication failed' }, { status: 401 });
   }
-
-  return NextResponse.json({
-    progress: mockProgress,
-    objectives: mockObjectives,
-    tasks: mockTasks
-  });
 }
 
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   try {
+    const sessionCookie = (await cookies()).get('session')?.value;
+    if (!sessionCookie) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const decodedClaims = await adminAuth.verifySessionCookie(sessionCookie, true);
+    if (!decodedClaims) {
+      return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { type, data } = body;
 
@@ -104,13 +115,17 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   try {
+    const sessionCookie = (await cookies()).get('session')?.value;
+    if (!sessionCookie) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const decodedClaims = await adminAuth.verifySessionCookie(sessionCookie, true);
+    if (!decodedClaims) {
+      return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { taskId, updates } = body;
 
@@ -122,13 +137,17 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   try {
+    const sessionCookie = (await cookies()).get('session')?.value;
+    if (!sessionCookie) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const decodedClaims = await adminAuth.verifySessionCookie(sessionCookie, true);
+    if (!decodedClaims) {
+      return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const taskId = searchParams.get('taskId');
 

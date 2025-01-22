@@ -22,6 +22,10 @@ type FormData = {
   linkedin: string
   twitter: string
   commitmentType: string
+  socials: string[]
+  instagram: string
+  youtube: string
+  tiktok: string
 }
 
 const INITIAL_DATA: FormData = {
@@ -34,7 +38,11 @@ const INITIAL_DATA: FormData = {
   github: "",
   linkedin: "",
   twitter: "",
-  commitmentType: ""
+  commitmentType: "",
+  socials: [],
+  instagram: "",
+  youtube: "",
+  tiktok: ""
 }
 
 export function OnboardingSurvey() {
@@ -75,7 +83,15 @@ export function OnboardingSurvey() {
     <About key="about" currentSituation={data.currentSituation} biggestBottleneck={data.biggestBottleneck} updateFields={updateFields} />,
     <Skills key="skills" skills={data.skills} updateFields={updateFields} />,
     <NicheAndGoals key="nicheAndGoals" niche={data.niche} biggestGoal={data.biggestGoal} updateFields={updateFields} />,
-    <InterestsAndSocial key="interestsAndSocial" interests={data.interests} github={data.github} linkedin={data.linkedin} twitter={data.twitter} updateFields={updateFields} />,
+    <InterestsAndSocial 
+      key="interestsAndSocial" 
+      socials={data.socials}
+      tiktok={data.tiktok}
+      instagram={data.instagram}
+      youtube={data.youtube}
+      twitter={data.twitter}
+      updateFields={updateFields} 
+    />,
     <CommitmentAndInvestment key="commitmentAndInvestment" commitmentType={data.commitmentType} updateFields={updateFields} />,
   ]
 

@@ -3,7 +3,6 @@ import { Input } from "@/components/v0/ui/input"
 import { Label } from "@/components/v0/ui/label"
 import { Textarea } from "@/components/v0/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/v0/ui/select"
-import { ResourceFormData } from "@/types/resource"
 
 const users = [
   { id: "1", name: "Alice Johnson" },
@@ -11,8 +10,14 @@ const users = [
   { id: "3", name: "Charlie Brown" },
 ]
 
+type FormData = {
+  title?: string;
+  description?: string;
+  createdBy?: string;
+}
+
 export function Step1Form() {
-  const { register, formState: { errors }, control } = useFormContext<ResourceFormData>()
+  const { register, formState: { errors }, control } = useFormContext<FormData>()
 
   return (
     <div className="space-y-4">
@@ -54,4 +59,3 @@ export function Step1Form() {
     </div>
   )
 }
-

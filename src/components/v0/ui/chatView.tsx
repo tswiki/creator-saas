@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 
 const ChatView = () => {
-  const { currentView, setCurrentView } = useView();
+  const { currentView, setCurrentView } = useView(' ');
 
   const handleJoinChannel = () => {
     setCurrentView('channel');

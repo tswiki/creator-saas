@@ -12,10 +12,23 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/v0/ui/dialog"
-import { ResourceFormData } from "@/types/resources"
 import { Step1Form } from "./step1-form"
 import { Step2Form } from "./step2-form"
 import { Step3Form } from "./step3-form"
+
+type ResourceFormData = {
+  title?: string;
+  description?: string;
+  creator?: string;
+  type?: string;
+  modules: {
+    title: string;
+    description: string;
+  }[];
+  benefits: string[];
+  price?: number;
+  contact?: string;
+}
 
 const steps = [
   { title: "Basic Information", description: "Enter resource title, description, and creator" },

@@ -6,7 +6,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ResourceFormData, ResourceType } from "@/app/types/resource"
 import { PlusCircle, Trash2 } from 'lucide-react'
 
-const resourceTypes: ResourceType[] = ["document", "course", "video", "audio"]
+const DOCUMENT = "'document'" as const
+const COURSE = "'course'" as const
+const VIDEO = "'video'" as const 
+const AUDIO = "'audio'" as const
+
+const resourceTypes = [DOCUMENT, COURSE, VIDEO, AUDIO] as const
+
 const documentFormats = ["PDF", "DOCX", "TXT", "EPUB"]
 const videoResolutions = ["720p", "1080p", "1440p", "4K"]
 const audioFormats = ["MP3", "WAV", "AAC", "FLAC"]
@@ -31,7 +37,7 @@ export function Step2Form() {
           <SelectContent>
             {resourceTypes.map((type) => (
               <SelectItem key={type} value={type}>
-                {type.charAt(0).toUpperCase() + type.slice(1)}
+                {type.replace(/'/g, '').charAt(0).toUpperCase() + type.replace(/'/g, '').slice(1)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -39,7 +45,7 @@ export function Step2Form() {
         {errors.type && <p className="text-sm text-red-500">{errors.type.message}</p>}
       </div>
 
-      {resourceType === "document" && (
+      {resourceType === DOCUMENT && (
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="documentDetails.fileFormat">File Format</Label>
@@ -72,7 +78,7 @@ export function Step2Form() {
         </div>
       )}
 
-      {resourceType === "course" && (
+      {resourceType === COURSE && (
         <div className="space-y-4">
           <Label>Course Modules</Label>
           {modules.map((module, moduleIndex) => (
@@ -120,7 +126,7 @@ export function Step2Form() {
         </div>
       )}
 
-      {resourceType === "video" && (
+      {resourceType === VIDEO && (
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="videoDetails.duration">Duration (minutes)</Label>
@@ -153,7 +159,7 @@ export function Step2Form() {
         </div>
       )}
 
-      {resourceType === "audio" && (
+      {resourceType === AUDIO && (
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="audioDetails.duration">Duration (minutes)</Label>
@@ -188,4 +194,3 @@ export function Step2Form() {
     </div>
   )
 }
-

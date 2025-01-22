@@ -1,20 +1,32 @@
 import { Input } from "@/components/v0/ui/input"
 import { Label } from "@/components/v0/ui/label"
 
-export function InterestsAndSocial({
-  instagram,
-  youtube,
-  tiktok,
-  twitter,
-  updateFields
-}: {
-  instagram: string,
-  youtube: string,
-  tiktok: string
-  twitter: string
+// Define FormData type to include social media fields
+type FormData = {
+  socials: string[];
+  tiktok: string;
+  instagram: string;
+  youtube: string;
+  twitter: string;
+}
 
-  updateFields: (fields: Partial<{instagram: string, youtube: string, tiktok: string, twitter: string }>) => void
-}) {
+interface InterestsAndSocialProps {
+  socials: string[],
+  tiktok: string;
+  instagram: string;
+  youtube: string;
+  twitter: string;
+  updateFields: (fields: Partial<FormData>) => void;
+}
+
+export function InterestsAndSocial({ 
+  socials,
+  tiktok, 
+  youtube, 
+  instagram, 
+  twitter, 
+  updateFields 
+}: InterestsAndSocialProps) {
   return (
     <div className="grid w-full gap-6">
       <div className="space-y-3 text-center">

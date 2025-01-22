@@ -19,13 +19,6 @@ export const ConsoleView = () => {
   const [activeSlide, setActiveSlide] = React.useState(0);
   const totalSlides = 3;
 
-  const nextSlide = () => {
-    setActiveSlide((prev) => (prev + 1) % totalSlides);
-  };
-
-  const prevSlide = () => {
-    setActiveSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
-  };
 
   const [selectedReview, setSelectedReview] = React.useState({
     rating: 0,
@@ -61,9 +54,10 @@ export const ConsoleView = () => {
         console.warn('Some files were skipped due to invalid file type');
       }
 
+      // Since documents is not in the type, we need to use type assertion
       setSelectedSetting(prev => ({
         ...prev,
-        documents: [...(prev.documents || []), ...validFiles]
+        ...{documents: [...((prev as any).documents || []), ...validFiles]}
       }));
 
     } else {
@@ -398,62 +392,6 @@ export const ConsoleView = () => {
                                             </DropdownMenuContent>
                                           </DropdownMenu>
                                         </div>
-
-                                        <div className="space-y-2">
-                                          <Label>Agent Name</Label>
-                                          <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                              <Button variant="outline" className="w-full justify-between">
-                                                <div className="flex items-center">
-                                                  {selectedSetting.agentName === 'settings' && (
-                                                    <>
-                                                      <span>Settings</span>
-                                                    </>
-                                                  )}
-                                                  {selectedSetting.agentName === 'agent' && (
-                                                    <>
-                                                      <span>Agent</span>
-                                                    </>
-                                                  )}
-                                                  {selectedSetting.agentName === 'mentor' && (
-                                                    <>
-                                                      <span>Mentor</span>
-                                                    </>
-                                                  )}
-                                                  {selectedSetting.agentName === 'expert' && (
-                                                    <>
-                                                      <span>Expert</span>
-                                                    </>
-                                                  )}
-                                                  {!selectedSetting.agentName && 'Select agent name'}
-                                                </div>
-                                              </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent className="w-56">
-                                              <DropdownMenuItem onClick={() => handleSettingChange('agentName', 'settings')}>
-                                                <div className="flex items-center">
-                                                  <span>Settings</span>
-                                                </div>
-                                              </DropdownMenuItem>
-                                              <DropdownMenuItem onClick={() => handleSettingChange('agentName', 'agent')}>
-                                                <div className="flex items-center">
-                                                  <span>Agent</span>
-                                                </div>
-                                              </DropdownMenuItem>
-                                              <DropdownMenuItem onClick={() => handleSettingChange('agentName', 'mentor')}>
-                                                <div className="flex items-center">
-                                                  <span>Mentor</span>
-                                                </div>
-                                              </DropdownMenuItem>
-                                              <DropdownMenuItem onClick={() => handleSettingChange('agentName', 'expert')}>
-                                                <div className="flex items-center">
-                                                  <span>Expert</span>
-                                                </div>
-                                              </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                          </DropdownMenu>
-                                        </div>
-
                                         <div className="space-y-2">
                                           <Label>Agent Role</Label>
                                           <Input

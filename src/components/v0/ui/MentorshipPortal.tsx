@@ -1551,7 +1551,7 @@ async function refreshSession() {
 
 export default function MentorshipPortal() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { currentView, setCurrentView } = useView();
+  const { currentView, setCurrentView } = useView(' ');
   useEffect(() => {
     setCurrentView('dashboard');
   }, []);
@@ -1802,7 +1802,12 @@ export default function MentorshipPortal() {
                 </label>
               </div>
               {uploadProgress > 0 && (
-                <Progress value={uploadProgress} className="w-full" />
+                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-primary transition-all duration-300 ease-in-out"
+                    style={{ width: `${uploadProgress}%` }}
+                  />
+                </div>
               )}
             </div>
           </DialogContent>
@@ -3608,19 +3613,19 @@ export default function MentorshipPortal() {
                               <Card className="p-3 hover:bg-accent transition-colors">
                                 <div className="flex items-center space-x-2">
                                   <RadioGroup value="a" id="a" />
-                                  <Label htmlFor="a">Data privacy and encapsulation</Label>
+                                  <Label className="cursor-pointer">Data privacy and encapsulation</Label>
                                 </div>
                               </Card>
                               <Card className="p-3 hover:bg-accent transition-colors">
                                 <div className="flex items-center space-x-2">
                                   <RadioGroup value="b" id="b" />
-                                  <Label htmlFor="b">Memory optimization</Label>
+                                  <Label className="cursor-pointer">Memory optimization</Label>
                                 </div>
                               </Card>
                               <Card className="p-3 hover:bg-accent transition-colors">
                                 <div className="flex items-center space-x-2">
                                   <RadioGroup value="c" id="c" />
-                                  <Label htmlFor="c">Code organization</Label>
+                                  <Label className="cursor-pointer">Code organization</Label>
                                 </div>
                               </Card>
                             </RadioGroup>
@@ -4015,20 +4020,20 @@ export default function MentorshipPortal() {
                                     <div className="space-y-4">
                                       <div className="font-medium">Question 1</div>
                                       <div className="text-sm">What is the main purpose of closures in JavaScript?</div>
-                                      <RadioGroup className="space-y-2">
+                                      <div className="space-y-2">
                                         <div className="flex items-center space-x-2">
-                                          <RadioGroup value="a" id="a" />
-                                          <Label htmlFor="a">Data privacy and encapsulation</Label>
+                                          <input type="radio" name="quiz" id="a" value="a" className="radio" />
+                                          <label htmlFor="a" className="text-sm">Data privacy and encapsulation</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                          <RadioGroup value="b" id="b" />
-                                          <Label htmlFor="b">Memory optimization</Label>
+                                          <input type="radio" name="quiz" id="b" value="b" className="radio" />
+                                          <label htmlFor="b" className="text-sm">Memory optimization</label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                          <RadioGroup value="c" id="c" />
-                                          <Label htmlFor="c">Code organization</Label>
+                                          <input type="radio" name="quiz" id="c" value="c" className="radio" />
+                                          <label htmlFor="c" className="text-sm">Code organization</label>
                                         </div>
-                                      </RadioGroup>
+                                      </div>
                                     </div>
                                   </CardContent>
                                   <CardFooter>

@@ -74,8 +74,9 @@ export function CalendarForm() {
                     getButtonWidth(),
                     "bg-gray-700 border-gray-600 text-white"
                   )}
-                  value={field.value}
-                  onChange={field.onChange}
+                  mode="single"
+                  selected={field.value}
+                  onSelect={field.onChange}
                 />
               </FormControl>
               <FormDescription className="text-gray-400">

@@ -7,26 +7,26 @@ import { PlusCircle, Trash2 } from 'lucide-react'
 
 export function Step3Form() {
   const { register, control, formState: { errors } } = useFormContext<ResourceFormData>()
-  const { fields: benefits, append: appendBenefit, remove: removeBenefit } = useFieldArray({
+  const { fields: modules, append: appendModule, remove: removeModule } = useFieldArray({
     control,
-    name: "benefits",
+    name: "modules",
   })
 
   return (
     <div className="space-y-4">
       <div className="space-y-2">
         <Label>Program Benefits</Label>
-        {benefits.map((benefit, index) => (
-          <div key={benefit.id} className="flex items-center space-x-2">
+        {modules.map((module, index) => (
+          <div key={module.id} className="flex items-center space-x-2">
             <Input
-              {...register(`benefits.${index}` as const, { required: "Benefit is required" })}
+              {...register(`modules.${index}.title` as const, { required: "Benefit is required" })}
               placeholder="Enter a benefit"
             />
             <Button
               type="button"
               variant="ghost"
               size="sm"
-              onClick={() => removeBenefit(index)}
+              onClick={() => removeModule(index)}
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -36,7 +36,7 @@ export function Step3Form() {
           type="button"
           variant="outline"
           size="sm"
-          onClick={() => appendBenefit("")}
+          onClick={() => appendModule({ title: "", chapters: [] })}
         >
           <PlusCircle className="h-4 w-4 mr-2" />
           Add Benefit
@@ -76,4 +76,3 @@ export function Step3Form() {
     </div>
   )
 }
-

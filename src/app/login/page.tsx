@@ -153,11 +153,7 @@ export default function LoginPage() {
             <Window>
               <ChannelHeader />
               <MessageList />
-              <button
-                onClick={handleGoogleSignIn}
-                variant="ghost"
-                className="p-4 w-full text-center text-black-500 font-bold underline hover:text-primary transition-colors"
-              >
+              <button>
                 Login to Send Messages
               </button>
             </Window>

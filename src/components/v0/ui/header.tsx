@@ -22,7 +22,7 @@ interface HeaderProps {
 
 export default function Header({ logoSrc, brandName = "dejitaru " }: HeaderProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { currentView, setCurrentView } = useView();
+  const { currentView, setCurrentView } = useView(' ');
   const [open, setOpen] = useState(false);
   const { theme } = useTheme();
 
