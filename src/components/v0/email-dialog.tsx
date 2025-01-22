@@ -38,7 +38,7 @@ export function EmailDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="flex items-center gap-2">
+        <Button variant="ghost" className="w-full flex items-center justify-center gap-2 bg-white text-black">
           <Mail className="h-4 w-4" />
           Compose
         </Button>

@@ -3,7 +3,7 @@
 import { Button } from "@/components/v0/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/v0/ui/card";
 import { Input } from "@/components/v0/ui/input";
-import { Search, Filter, Mail, Star, Inbox, Send, Archive, Trash2, Tag, Settings2, Clock, Library, MessagesSquare, ChevronLeft, ChevronRight, Badge, Users, Reply, Forward } from "lucide-react";
+import { Search, Filter, Mail, Star, Inbox, Send, Archive, Trash2, Tag, Settings2, Clock, Library, MessagesSquare, ChevronLeft, ChevronRight, Badge, Users, Reply, Forward, MessageSquare, Activity, PenSquare } from "lucide-react";
 import { Textarea } from "./ui/textarea";
 import React from 'react';
 import { ScrollArea } from "@radix-ui/react-scroll-area";
@@ -13,6 +13,7 @@ import { Label } from "./ui/label";
 import { Slider } from "./ui/slider";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 export const ConsoleView = () => {
   const [activeSlide, setActiveSlide] = React.useState(0);
@@ -80,28 +81,48 @@ export const ConsoleView = () => {
         <CardHeader>
           <div className="flex justify-between items-center pt-2">
             <CardTitle>User Console</CardTitle>
-            <EmailDialog />
+            <div className="flex gap-4">
+              <div className="relative">
+                <Button
+                  onClick={() => setActiveSlide(0)}
+                  aria-label="Email View"
+                  className="rounded-full w-12 h-12 dark:bg-slate-800 bg-slate-200 hover:bg-primary/20 dark:hover:bg-primary/20 focus:outline-none focus:ring-2 focus:ring-primary flex items-center justify-center transition-colors"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="dark:text-white text-slate-900">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <polyline points="22,6 12,13 2,6"/>
+                  </svg>
+                </Button>
+              </div>
+              <div className="relative">
+                <Button 
+                  onClick={() => setActiveSlide(1)}
+                  aria-label="AI Assistant"
+                  className="rounded-full w-12 h-12 dark:bg-slate-800 bg-slate-200 hover:bg-primary/20 dark:hover:bg-primary/20 focus:outline-none focus:ring-2 focus:ring-primary flex items-center justify-center transition-colors"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="dark:text-white text-slate-900">
+                    <path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2m0 6a4 4 0 0 0-4 4c0 2.21 1.79 4 4 4s4-1.79 4-4c0-2.21-1.79-4-4-4"/>
+                    <path d="M15 9l-3 3"/>
+                  </svg>
+                </Button>
+              </div>
+              <div className="relative">
+                <Button
+                  onClick={() => setActiveSlide(2)} 
+                  aria-label="Reviews"
+                  className="rounded-full w-12 h-12 dark:bg-slate-800 bg-slate-200 hover:bg-primary/20 dark:hover:bg-primary/20 focus:outline-none focus:ring-2 focus:ring-primary flex items-center justify-center transition-colors"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="dark:text-white text-slate-900">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                  </svg>
+                </Button>
+              </div>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
           <div className="relative">
             <div className="overflow-hidden">
-              {/* Navigation Buttons */}
-              <button 
-                onClick={prevSlide}
-                aria-label="Previous slide"
-                className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 bg-primary/10 hover:bg-primary/20 rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                <ChevronLeft className="h-6 w-6" />
-              </button>
-              <button
-                onClick={nextSlide}
-                aria-label="Next slide" 
-                className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 bg-primary/10 hover:bg-primary/20 rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                <ChevronRight className="h-6 w-6" />
-              </button>
-
               <div 
                 className="flex transition-transform duration-300 ease-in-out"
                 style={{ transform: `translateX(-${activeSlide * 100}%)` }}
@@ -114,7 +135,10 @@ export const ConsoleView = () => {
                       <Card>
                         <CardContent className="p-4">
                           <div className="space-y-2">
-                          <Button variant="ghost" className="w-full justify-start">
+                            <div>
+                              <EmailDialog />
+                            </div>
+                            <Button variant="ghost" className="w-full justify-start">
                               <Users className="h-4 w-4 mr-2" />
                               Community
                             </Button>
@@ -717,293 +741,400 @@ export const ConsoleView = () => {
                     {/* Main Content */}
                     <div className="col-span-9">
                       <Card>
-                        <CardContent className="p-4">
+                        <CardContent className="p-2">
 
                           {selectedReview.filter === 'all' && (
-                            <ScrollArea className="h-[calc(100vh-15rem)] overflow-y-auto">
-                              <div className="flex gap-4 mb-4">
-                                <div className="relative flex-1">
-                                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                                  <Input placeholder="Search feedback..." className="pl-8" />
-                                </div>
-                                <Button variant="outline" className="flex items-center gap-2">
-                                  <Filter className="h-4 w-4" />
-                                  Filter
-                                </Button>
+                            <div>
+                              {/* Stats Row */}
+                              <div className="grid grid-cols-3 gap-2 mb-6">
+                                {/* Total Reviews */}
+                                <Card className="p-4">
+                                  <h4 className="font-medium text-lg mb-4 text-center">Total Reviews</h4>
+                                  <div className="flex flex-col items-center justify-center">
+                                    <span className="text-4xl font-bold my-6">1,247</span>
+                                    <div className="text-sm text-muted-foreground">
+                                      <span className="text-green-500">+12.5%</span>
+                                      <span className="ml-1">increase from previous period</span>
+                                    </div>
+                                  </div>
+                                </Card>
+
+                                {/* Average Rating */}
+                                <Card className="p-4">
+                                  <h4 className="font-medium text-lg mb-2 text-center">Average Rating</h4>
+                                  <div className="flex flex-col items-center justify-center">
+                                    <span className="text-4xl font-bold my-6">4.7</span>
+                                    <div className="flex text-yellow-400 mt-2 justify-center">
+                                      <Star className="h-5 w-5 fill-current" />
+                                      <Star className="h-5 w-5 fill-current" />
+                                      <Star className="h-5 w-5 fill-current" />
+                                      <Star className="h-5 w-5 fill-current" />
+                                      <Star className="h-5 w-5 fill-current" />
+                                    </div>
+                                    <div className="text-sm text-muted-foreground mt-2 text-center">
+                                      <span className="text-green-500">+0.2</span>
+                                      <span className="ml-1">vs last 30 days</span>
+                                    </div>
+                                  </div>
+                                </Card>
+
+                                {/* Rating Distribution */}
+                                <Card className="p-4">
+                                  <h4 className="font-medium text-lg text-center">Rating Distribution</h4>
+                                  <div className="space-y-2 flex flex-col justify-center">
+                                    <div className="flex items-center gap-2 justify-center">
+                                      <span className="w-12">5 ★</span>
+                                      <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                        <div className="bg-yellow-400 rounded-full h-2 w-[70%]"></div>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 justify-center">
+                                      <span className="w-12">4 ★</span>
+                                      <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                        <div className="bg-yellow-400 rounded-full h-2 w-[20%]"></div>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 justify-center">
+                                      <span className="w-12">3 ★</span>
+                                      <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                        <div className="bg-yellow-400 rounded-full h-2 w-[5%]"></div>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 justify-center">
+                                      <span className="w-12">2 ★</span>
+                                      <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                        <div className="bg-yellow-400 rounded-full h-2 w-[3%]"></div>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 justify-center">
+                                      <span className="w-12">1 ★</span>
+                                      <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                        <div className="bg-yellow-400 rounded-full h-2 w-[2%]"></div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </Card>
                               </div>
 
-                              <div className="space-y-4">
-                                {/* Feedback List */}
+                              {/* Reviews List */}
+                              <ScrollArea className="h-[calc(100vh-30rem)] w-full overflow-auto">
                                 <div className="space-y-4">
-                                  <Card className="p-4 border-2 border-primary">
-                                    <div className="flex justify-between items-start mb-2">
-                                      <div>
-                                        <h4 className="font-medium">Critical Performance Issue</h4>
-                                        <p className="text-sm text-muted-foreground">Sarah Chen • 1 hour ago</p>
+                                  {/* Individual Review */}
+                                  <Card className="p-4">
+                                    <div className="flex gap-4">
+                                      {/* User Info Column - 30% */}
+                                      <div className="w-[30%]">
+                                        <div className="flex items-center gap-3">
+                                          <Avatar>
+                                            <AvatarImage src="/default-avatar.png" />
+                                            <AvatarFallback>JD</AvatarFallback>
+                                          </Avatar>
+                                          <div>
+                                            <h4 className="font-medium">John Doe</h4>
+                                            <p className="text-sm text-muted-foreground">Total Reviews: 15</p>
+                                          </div>
+                                        </div>
                                       </div>
-                                      <Badge>Urgent</Badge>
-                                    </div>
-                                    <p className="text-sm mb-4">System response times have increased significantly in the past hour. Multiple users reporting delays of 5+ seconds.</p>
-                                    <div className="flex gap-2">
-                                      <Button variant="outline" size="sm">⚠️ High Priority</Button>
-                                      <Button variant="outline" size="sm">👥 15 affected</Button>
+
+                                      {/* Review Content Column - 70% */}
+                                      <div className="w-[70%]">
+                                        <div className="flex text-yellow-400 mb-2">
+                                          <Star className="h-4 w-4 fill-current" />
+                                          <Star className="h-4 w-4 fill-current" />
+                                          <Star className="h-4 w-4 fill-current" />
+                                          <Star className="h-4 w-4 fill-current" />
+                                          <Star className="h-4 w-4 fill-current" />
+                                        </div>
+                                        <p className="text-sm mb-4">Excellent product! The user interface is intuitive and the features are exactly what I needed for my workflow.</p>
+                                        <div className="flex gap-2">
+                                          <Button variant="outline" size="sm">
+                                            <MessagesSquare className="h-4 w-4 mr-2" />
+                                            Message
+                                          </Button>
+                                          <Button variant="outline" size="sm">
+                                            <Star className="h-4 w-4 mr-2" />
+                                            Like
+                                          </Button>
+                                          <Button variant="outline" size="sm">
+                                            <Reply className="h-4 w-4 mr-2" />
+                                            Reply
+                                          </Button>
+                                        </div>
+                                      </div>
                                     </div>
                                   </Card>
 
-                                  <Card className="p-4">
-                                    <div className="flex justify-between items-start mb-2">
-                                      <div>
-                                        <h4 className="font-medium">UI Enhancement Success</h4>
-                                        <p className="text-sm text-muted-foreground">Mike Johnson • 3 hours ago</p>
-                                      </div>
-                                      <Badge>Positive</Badge>
-                                    </div>
-                                    <p className="text-sm mb-4">The new dashboard layout has received overwhelmingly positive feedback. User engagement up by 40%.</p>
-                                    <div className="flex gap-2">
-                                      <Button variant="outline" size="sm">👍 47</Button>
-                                      <Button variant="outline" size="sm">📈 Trending</Button>
-                                    </div>
-                                  </Card>
-
-                                  <Card className="p-4">
-                                    <div className="flex justify-between items-start mb-2">
-                                      <div>
-                                        <h4 className="font-medium">Feature Request Cluster</h4>
-                                        <p className="text-sm text-muted-foreground">User Community • 24 hours ago</p>
-                                      </div>
-                                      <Badge>Trending</Badge>
-                                    </div>
-                                    <p className="text-sm mb-4">Multiple users requesting dark mode support. This has become the most requested feature this week.</p>
-                                    <div className="flex gap-2">
-                                      <Button variant="outline" size="sm">🔥 High Demand</Button>
-                                      <Button variant="outline" size="sm">👥 89 requests</Button>
-                                    </div>
-                                  </Card>
-
-                                  <Card className="p-4">
-                                    <div className="flex justify-between items-start mb-2">
-                                      <div>
-                                        <h4 className="font-medium">Integration Bug Report</h4>
-                                        <p className="text-sm text-muted-foreground">Dev Team • 2 days ago</p>
-                                      </div>
-                                      <Badge>Bug</Badge>
-                                    </div>
-                                    <p className="text-sm mb-4">Third-party API integration failing intermittently. Affects approximately 5% of transactions.</p>
-                                    <div className="flex gap-2">
-                                      <Button variant="outline" size="sm">🐛 In Progress</Button>
-                                      <Button variant="outline" size="sm">📊 5% Impact</Button>
-                                    </div>
-                                  </Card>
+                                  {/* Additional reviews would follow the same pattern */}
                                 </div>
-                              </div>
-                            </ScrollArea>
+                              </ScrollArea>
+                            </div>
                           )}
                         {selectedReview.filter === 'featured' && (
                           <ScrollArea className="h-[calc(100vh-20rem)] w-full overflow-auto">
-                            <div className="p-4">
-                              <div className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                  <Card className="p-4">
-                                    <div className="flex justify-between items-start mb-2">
+                            <div className="space-y-4">
+                              <Card className="p-4">
+                                <div className="flex gap-4">
+                                  <div className="w-[30%]">
+                                    <div className="flex items-center gap-3">
+                                      <Avatar>
+                                        <AvatarImage src="/default-avatar.png" />
+                                        <AvatarFallback>PT</AvatarFallback>
+                                      </Avatar>
                                       <div>
-                                        <h4 className="font-medium">Advanced Analytics Feature</h4>
-                                        <p className="text-sm text-muted-foreground">Product Team • 2 days ago</p>
+                                        <h4 className="font-medium">Product Team</h4>
+                                        <p className="text-sm text-muted-foreground">Total Reviews: 42</p>
                                       </div>
-                                      <Badge>Featured</Badge>
+                                    </div>
+                                  </div>
+
+                                  <div className="w-[70%]">
+                                    <div className="flex text-yellow-400 mb-2">
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
                                     </div>
                                     <p className="text-sm mb-4">New predictive analytics dashboard enables data-driven decision making with real-time insights.</p>
                                     <div className="flex gap-2">
-                                      <Button variant="outline" size="sm">📊 Analytics</Button>
-                                      <Button variant="outline" size="sm">✨ New Feature</Button>
+                                      <Button variant="outline" size="sm">
+                                        <MessagesSquare className="h-4 w-4 mr-2" />
+                                        Message
+                                      </Button>
+                                      <Button variant="outline" size="sm">
+                                        <Star className="h-4 w-4 mr-2" />
+                                        Like
+                                      </Button>
+                                      <Button variant="outline" size="sm">
+                                        <Reply className="h-4 w-4 mr-2" />
+                                        Reply
+                                      </Button>
                                     </div>
-                                  </Card>
+                                  </div>
+                                </div>
+                              </Card>
 
-                                  <Card className="p-4">
-                                    <div className="flex justify-between items-start mb-2">
+                              <Card className="p-4">
+                                <div className="flex gap-4">
+                                  <div className="w-[30%]">
+                                    <div className="flex items-center gap-3">
+                                      <Avatar>
+                                        <AvatarImage src="/default-avatar.png" />
+                                        <AvatarFallback>UX</AvatarFallback>
+                                      </Avatar>
                                       <div>
-                                        <h4 className="font-medium">Collaboration Tools Update</h4>
-                                        <p className="text-sm text-muted-foreground">UX Team • 1 week ago</p>
+                                        <h4 className="font-medium">UX Team</h4>
+                                        <p className="text-sm text-muted-foreground">Total Reviews: 28</p>
                                       </div>
-                                      <Badge>Featured</Badge>
+                                    </div>
+                                  </div>
+
+                                  <div className="w-[70%]">
+                                    <div className="flex text-yellow-400 mb-2">
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
                                     </div>
                                     <p className="text-sm mb-4">Introduced real-time collaboration features including shared workspaces and live editing.</p>
                                     <div className="flex gap-2">
-                                      <Button variant="outline" size="sm">👥 Collaboration</Button>
-                                      <Button variant="outline" size="sm">🔄 Real-time</Button>
+                                      <Button variant="outline" size="sm">
+                                        <MessagesSquare className="h-4 w-4 mr-2" />
+                                        Message
+                                      </Button>
+                                      <Button variant="outline" size="sm">
+                                        <Star className="h-4 w-4 mr-2" />
+                                        Like
+                                      </Button>
+                                      <Button variant="outline" size="sm">
+                                        <Reply className="h-4 w-4 mr-2" />
+                                        Reply
+                                      </Button>
                                     </div>
-                                  </Card>
-
-                                  <Card className="p-4">
-                                    <div className="flex justify-between items-start mb-2">
-                                      <div>
-                                        <h4 className="font-medium">Mobile Integration</h4>
-                                        <p className="text-sm text-muted-foreground">Mobile Team • 3 days ago</p>
-                                      </div>
-                                      <Badge>Featured</Badge>
-                                    </div>
-                                    <p className="text-sm mb-4">Cross-platform synchronization now available with offline mode support.</p>
-                                    <div className="flex gap-2">
-                                      <Button variant="outline" size="sm">📱 Mobile</Button>
-                                      <Button variant="outline" size="sm">🔄 Sync</Button>
-                                    </div>
-                                  </Card>
-
-                                  <Card className="p-4">
-                                    <div className="flex justify-between items-start mb-2">
-                                      <div>
-                                        <h4 className="font-medium">API Integration Hub</h4>
-                                        <p className="text-sm text-muted-foreground">Integration Team • 5 days ago</p>
-                                      </div>
-                                      <Badge>Featured</Badge>
-                                    </div>
-                                    <p className="text-sm mb-4">New API hub launched with support for 20+ popular third-party integrations.</p>
-                                    <div className="flex gap-2">
-                                      <Button variant="outline" size="sm">🔌 Integration</Button>
-                                      <Button variant="outline" size="sm">🚀 API Hub</Button>
-                                    </div>
-                                  </Card>
+                                  </div>
                                 </div>
-                              </div>
+                              </Card>
                             </div>
                           </ScrollArea>
                         )}
 
                         {selectedReview.filter === 'recent' && (
                           <ScrollArea className="h-[calc(100vh-20rem)] w-full overflow-auto">
-                            <div className="p-4">
-                              <div className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                  <Card className="p-4">
-                                    <div className="flex justify-between items-start mb-2">
+                            <div className="space-y-4">
+                              <Card className="p-4">
+                                <div className="flex gap-4">
+                                  <div className="w-[30%]">
+                                    <div className="flex items-center gap-3">
+                                      <Avatar>
+                                        <AvatarImage src="/default-avatar.png" />
+                                        <AvatarFallback>ST</AvatarFallback>
+                                      </Avatar>
                                       <div>
-                                        <h4 className="font-medium">Latest Platform Update</h4>
-                                        <p className="text-sm text-muted-foreground">System Update • Just now</p>
+                                        <h4 className="font-medium">System Team</h4>
+                                        <p className="text-sm text-muted-foreground">Total Reviews: 156</p>
                                       </div>
-                                      <Badge>Recent</Badge>
+                                    </div>
+                                  </div>
+
+                                  <div className="w-[70%]">
+                                    <div className="flex text-yellow-400 mb-2">
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
                                     </div>
                                     <p className="text-sm mb-4">New features deployed including improved dashboard analytics and reporting tools.</p>
                                     <div className="flex gap-2">
-                                      <Button variant="outline" size="sm">🆕 Latest</Button>
-                                      <Button variant="outline" size="sm">📊 Analytics</Button>
+                                      <Button variant="outline" size="sm">
+                                        <MessagesSquare className="h-4 w-4 mr-2" />
+                                        Message
+                                      </Button>
+                                      <Button variant="outline" size="sm">
+                                        <Star className="h-4 w-4 mr-2" />
+                                        Like
+                                      </Button>
+                                      <Button variant="outline" size="sm">
+                                        <Reply className="h-4 w-4 mr-2" />
+                                        Reply
+                                      </Button>
                                     </div>
-                                  </Card>
+                                  </div>
+                                </div>
+                              </Card>
 
-                                  <Card className="p-4">
-                                    <div className="flex justify-between items-start mb-2">
+                              <Card className="p-4">
+                                <div className="flex gap-4">
+                                  <div className="w-[30%]">
+                                    <div className="flex items-center gap-3">
+                                      <Avatar>
+                                        <AvatarImage src="/default-avatar.png" />
+                                        <AvatarFallback>DT</AvatarFallback>
+                                      </Avatar>
                                       <div>
-                                        <h4 className="font-medium">Mobile App Release</h4>
-                                        <p className="text-sm text-muted-foreground">Dev Team • 2 hours ago</p>
+                                        <h4 className="font-medium">Dev Team</h4>
+                                        <p className="text-sm text-muted-foreground">Total Reviews: 89</p>
                                       </div>
-                                      <Badge>Recent</Badge>
+                                    </div>
+                                  </div>
+
+                                  <div className="w-[70%]">
+                                    <div className="flex text-yellow-400 mb-2">
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
                                     </div>
                                     <p className="text-sm mb-4">Mobile app v2.0 released with offline capabilities and improved UI.</p>
                                     <div className="flex gap-2">
-                                      <Button variant="outline" size="sm">📱 Mobile</Button>
-                                      <Button variant="outline" size="sm">✨ New UI</Button>
+                                      <Button variant="outline" size="sm">
+                                        <MessagesSquare className="h-4 w-4 mr-2" />
+                                        Message
+                                      </Button>
+                                      <Button variant="outline" size="sm">
+                                        <Star className="h-4 w-4 mr-2" />
+                                        Like
+                                      </Button>
+                                      <Button variant="outline" size="sm">
+                                        <Reply className="h-4 w-4 mr-2" />
+                                        Reply
+                                      </Button>
                                     </div>
-                                  </Card>
-
-                                  <Card className="p-4">
-                                    <div className="flex justify-between items-start mb-2">
-                                      <div>
-                                        <h4 className="font-medium">API Performance Update</h4>
-                                        <p className="text-sm text-muted-foreground">Backend Team • 3 hours ago</p>
-                                      </div>
-                                      <Badge>Recent</Badge>
-                                    </div>
-                                    <p className="text-sm mb-4">Response times improved by 40% after latest infrastructure upgrades.</p>
-                                    <div className="flex gap-2">
-                                      <Button variant="outline" size="sm">⚡ Performance</Button>
-                                      <Button variant="outline" size="sm">🔧 Backend</Button>
-                                    </div>
-                                  </Card>
-
-                                  <Card className="p-4">
-                                    <div className="flex justify-between items-start mb-2">
-                                      <div>
-                                        <h4 className="font-medium">User Feedback Implementation</h4>
-                                        <p className="text-sm text-muted-foreground">Product Team • 4 hours ago</p>
-                                      </div>
-                                      <Badge>Recent</Badge>
-                                    </div>
-                                    <p className="text-sm mb-4">Top requested features from last month's survey now live in production.</p>
-                                    <div className="flex gap-2">
-                                      <Button variant="outline" size="sm">👥 User-Driven</Button>
-                                      <Button variant="outline" size="sm">✅ Completed</Button>
-                                    </div>
-                                  </Card>
+                                  </div>
                                 </div>
-                              </div>
+                              </Card>
                             </div>
                           </ScrollArea>
                         )}
 
                         {selectedReview.filter === 'by-product' && (
                           <ScrollArea className="h-[calc(100vh-20rem)] w-full overflow-auto">
-                            <div className="p-4">
-                              <div className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                  <Card className="p-4">
-                                    <div className="flex justify-between items-start mb-2">
+                            <div className="space-y-4">
+                              <Card className="p-4">
+                                <div className="flex gap-4">
+                                  <div className="w-[30%]">
+                                    <div className="flex items-center gap-3">
+                                      <Avatar>
+                                        <AvatarImage src="/default-avatar.png" />
+                                        <AvatarFallback>MT</AvatarFallback>
+                                      </Avatar>
                                       <div>
-                                        <h4 className="font-medium">Mobile App Feedback</h4>
-                                        <p className="text-sm text-muted-foreground">Mobile Team • 2 hours ago</p>
+                                        <h4 className="font-medium">Mobile Team</h4>
+                                        <p className="text-sm text-muted-foreground">Total Reviews: 67</p>
                                       </div>
-                                      <Badge>Mobile App</Badge>
+                                    </div>
+                                  </div>
+
+                                  <div className="w-[70%]">
+                                    <div className="flex text-yellow-400 mb-2">
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
                                     </div>
                                     <p className="text-sm mb-4">Users love the new offline mode but request better sync capabilities.</p>
                                     <div className="flex gap-2">
-                                      <Button variant="outline" size="sm">📱 Mobile</Button>
-                                      <Button variant="outline" size="sm">🔄 Sync</Button>
+                                      <Button variant="outline" size="sm">
+                                        <MessagesSquare className="h-4 w-4 mr-2" />
+                                        Message
+                                      </Button>
+                                      <Button variant="outline" size="sm">
+                                        <Star className="h-4 w-4 mr-2" />
+                                        Like
+                                      </Button>
+                                      <Button variant="outline" size="sm">
+                                        <Reply className="h-4 w-4 mr-2" />
+                                        Reply
+                                      </Button>
                                     </div>
-                                  </Card>
+                                  </div>
+                                </div>
+                              </Card>
 
-                                  <Card className="p-4">
-                                    <div className="flex justify-between items-start mb-2">
+                              <Card className="p-4">
+                                <div className="flex gap-4">
+                                  <div className="w-[30%]">
+                                    <div className="flex items-center gap-3">
+                                      <Avatar>
+                                        <AvatarImage src="/default-avatar.png" />
+                                        <AvatarFallback>DT</AvatarFallback>
+                                      </Avatar>
                                       <div>
-                                        <h4 className="font-medium">Desktop Client Review</h4>
-                                        <p className="text-sm text-muted-foreground">Desktop Team • 3 hours ago</p>
+                                        <h4 className="font-medium">Desktop Team</h4>
+                                        <p className="text-sm text-muted-foreground">Total Reviews: 45</p>
                                       </div>
-                                      <Badge>Desktop</Badge>
+                                    </div>
+                                  </div>
+
+                                  <div className="w-[70%]">
+                                    <div className="flex text-yellow-400 mb-2">
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
+                                      <Star className="h-4 w-4 fill-current" />
                                     </div>
                                     <p className="text-sm mb-4">Performance improvements needed for large file handling.</p>
                                     <div className="flex gap-2">
-                                      <Button variant="outline" size="sm">💻 Desktop</Button>
-                                      <Button variant="outline" size="sm">⚡ Performance</Button>
+                                      <Button variant="outline" size="sm">
+                                        <MessagesSquare className="h-4 w-4 mr-2" />
+                                        Message
+                                      </Button>
+                                      <Button variant="outline" size="sm">
+                                        <Star className="h-4 w-4 mr-2" />
+                                        Like
+                                      </Button>
+                                      <Button variant="outline" size="sm">
+                                        <Reply className="h-4 w-4 mr-2" />
+                                        Reply
+                                      </Button>
                                     </div>
-                                  </Card>
-
-                                  <Card className="p-4">
-                                    <div className="flex justify-between items-start mb-2">
-                                      <div>
-                                        <h4 className="font-medium">Web Platform Updates</h4>
-                                        <p className="text-sm text-muted-foreground">Web Team • 4 hours ago</p>
-                                      </div>
-                                      <Badge>Web App</Badge>
-                                    </div>
-                                    <p className="text-sm mb-4">New dashboard features receiving positive feedback from users.</p>
-                                    <div className="flex gap-2">
-                                      <Button variant="outline" size="sm">🌐 Web</Button>
-                                      <Button variant="outline" size="sm">✨ UI/UX</Button>
-                                    </div>
-                                  </Card>
-
-                                  <Card className="p-4">
-                                    <div className="flex justify-between items-start mb-2">
-                                      <div>
-                                        <h4 className="font-medium">API Integration Feedback</h4>
-                                        <p className="text-sm text-muted-foreground">API Team • 5 hours ago</p>
-                                      </div>
-                                      <Badge>API</Badge>
-                                    </div>
-                                    <p className="text-sm mb-4">Third-party integration requests and documentation improvements needed.</p>
-                                    <div className="flex gap-2">
-                                      <Button variant="outline" size="sm">🔌 API</Button>
-                                      <Button variant="outline" size="sm">📚 Docs</Button>
-                                    </div>
-                                  </Card>
+                                  </div>
                                 </div>
-                              </div>
+                              </Card>
                             </div>
                           </ScrollArea>
                         )}
