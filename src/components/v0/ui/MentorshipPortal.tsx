@@ -827,8 +827,20 @@ const ProfileView = () => {
     </div>
   );
 };
-
-
+interface Task {
+  title: string;
+  description: string;
+  date: Date;
+  time: string;
+  venue: string;
+  priority: 'low' | 'medium' | 'high';
+  status: 'upcoming' | 'completed';
+  type: 'meeting' | 'task';
+  invitees: string[];
+  createdAt: string;
+  createdBy: string;
+}
+/*
 const ScheduleView = () => {
   const [tasks, setTasks] = useState<any[]>([
     // Sample data for better visualization
@@ -987,7 +999,7 @@ const ScheduleView = () => {
     <Card key={task.id} className="pt-2 border-0">
       <Card className="p-4 border-4">
         <div className="grid grid-cols-12 gap-6">
-          {/* Left Column - Due Date */}
+          {/* Left Column - Due Date 
           <div className="col-span-2 p-4">
             <Card className="h-full shadow-md border-2 border-gray-200 dark:border-gray-700">
               <CardContent className="flex items-center justify-center h-full p-4">
@@ -1010,7 +1022,7 @@ const ScheduleView = () => {
             </Card>
           </div>
 
-          {/* Middle Column - Time & Location */}
+          {/* Middle Column - Time & Location 
           <div className="col-span-3 p-4">
             <Card className="h-full shadow-md border-2 border-gray-200 dark:border-gray-700">
               <CardContent className="space-y-3 p-4">
@@ -1045,7 +1057,7 @@ const ScheduleView = () => {
             </Card>
           </div>
 
-          {/* Right Column - Description & Attendees */}
+          {/* Right Column - Description & Attendees 
           <div className="col-span-7 p-4">
             <Card className="h-full shadow-md border-2 border-gray-200 dark:border-gray-700">
               <CardContent className="space-y-4 p-4">
@@ -1476,6 +1488,860 @@ const ScheduleView = () => {
                     onChange={(e) => setNewTask({
                       ...newTask, 
                       attendees: e.target.value.split(',').map(email => email.trim())
+                    })}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddDialog(false)}>Cancel</Button>
+            <Button onClick={addTask}>Add</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};*/
+const ScheduleView = () => {
+  const [tasks, setTasks] = useState<any[]>([
+
+    // Sample data for better visualization
+    /*
+    {
+      id: '1',
+      title: 'Weekly Team Standup',
+      description: 'Regular team sync meeting to discuss progress and blockers',
+      date: new Date(Date.now() + 1000 * 60 * 60).toISOString(), // 1 hour from now
+      priority: 'medium',
+      status: 'current',
+      type: 'meeting',
+      attendees: ['john@example.com', 'sarah@example.com', 'mike@example.com'],
+      location: 'Conference Room A'
+    },
+    {
+      id: '2',
+      title: 'Project Deadline',
+      description: 'Complete and submit the Q1 project deliverables',
+      date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2).toISOString(), // 2 days from now
+      priority: 'high',
+      status: 'upcoming',
+      type: 'task'
+    },
+    {
+      id: '3',
+      title: 'Client Presentation',
+      description: 'Present new features to key stakeholders',
+      date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 5).toISOString(), // 5 days from now
+      priority: 'high',
+      status: 'upcoming',
+      type: 'meeting',
+      attendees: ['client@external.com', 'ceo@example.com'],
+      location: 'Virtual - Zoom'
+    }*/
+  ]);
+
+  const processTaskDate = (task: any) => {
+    if (!task.date || !task.time) return new Date(); // Return current date as fallback
+
+    // Handle Firestore Timestamp
+    const timestamp = task.date.toDate ? task.date.toDate() : new Date(task.date);
+
+    // Parse the time string
+    const [hours, minutes] = task.time.split(':').map(Number);
+
+    // Create new date object and set hours/minutes
+    const combinedDate = new Date(timestamp);
+    combinedDate.setHours(hours, minutes, 0, 0);
+
+    return combinedDate;
+  };
+
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterType, setFilterType] = useState<'all' | 'meeting' | 'task'>('all');
+  const [filterPriority, setFilterPriority] = useState<'all' | 'low' | 'medium' | 'high'>('all');
+
+  const [newTask, setNewTask] = useState<Task>({
+    title: '',
+    description: '',
+    date: new Date(),
+    time: '',
+    venue: '',
+    priority: 'medium',
+    status: 'upcoming',
+    type: 'task',
+    invitees: [],
+    createdAt: new Date().toISOString(),
+    createdBy: auth.currentUser?.uid || '',
+  });
+
+  const filteredTasks = useMemo(() => {
+    if (!tasks) return [];
+
+    return tasks
+      .filter(task => {
+        if (!task) return false;
+        const matchesSearch = task.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          task.description?.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesType = filterType === 'all' || task.type === filterType;
+        const matchesPriority = filterPriority === 'all' || task.priority === filterPriority;
+        return matchesSearch && matchesType && matchesPriority;
+      })
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }, [tasks, searchQuery, filterType, filterPriority]);
+
+  const fetchTasks = async () => {
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error('No user logged in');
+      }
+
+      const response = await fetch('/api/schedule');
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch tasks');
+      }
+
+      const data = await response.json();
+      setTasks(data.tasks || []); // Ensure we always set an array, even if empty
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+      setTasks([]); // Set empty array on error
+      toast({
+        title: "Error",
+        description: "Failed to fetch tasks",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  const groupedTasks = useMemo(() => {
+    if (!filteredTasks) return {
+      overdue: [],
+      today: [],
+      tomorrow: [],
+      thisWeek: [],
+      later: [],
+      completed: []
+    };
+
+    const now = new Date();
+    const groups = {
+      overdue: [] as typeof tasks,
+      today: [] as typeof tasks,
+      tomorrow: [] as typeof tasks,
+      thisWeek: [] as typeof tasks,
+      later: [] as typeof tasks,
+      completed: [] as typeof tasks,
+    };
+
+    filteredTasks.forEach(task => {
+      if (!task) return;
+
+      if (task.status === 'completed') {
+        groups.completed.push(task);
+        return;
+      }
+
+      // Convert Firestore timestamp to Date object
+      let taskDate;
+      if (task.date && task.time) {
+        // Handle Firestore timestamp conversion
+        const timestamp = task.date;
+        const date = new Date(timestamp._seconds * 1000); // Convert seconds to milliseconds
+
+        // Parse time string
+        const [hours, minutes] = task.time.split(':').map(Number);
+
+        // Set the hours and minutes
+        taskDate = new Date(date);
+        taskDate.setHours(hours, minutes, 0, 0);
+      } else {
+        taskDate = new Date();
+      }
+      console.log('Task date raw:', task.date);
+      console.log('Task time:', task.time);
+      console.log('Processed date:', taskDate);
+
+      const isToday = taskDate.toDateString() === now.toDateString();
+      const isTomorrow = taskDate.toDateString() === new Date(now.getTime() + 86400000).toDateString();
+      const isThisWeek = taskDate <= new Date(now.getTime() + 7 * 86400000);
+
+      if (taskDate < now && !isToday) {
+        groups.overdue.push(task);
+      } else if (isToday) {
+        groups.today.push(task);
+      } else if (isTomorrow) {
+        groups.tomorrow.push(task);
+      } else if (isThisWeek) {
+        groups.thisWeek.push(task);
+      } else {
+        groups.later.push(task);
+      }
+    });
+
+    return groups;
+  }, [filteredTasks]);
+
+  const addTask = async () => {
+    try {
+      const token = await auth.currentUser?.getIdToken();
+      const newTaskData = {
+        ...newTask,
+        status: 'upcoming',
+        date: new Date(newTask.date).toISOString()
+      };
+
+      const response = await fetch('/api/schedule', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newTaskData)
+      });
+
+      //fetchTasks();
+
+      if (!response.ok) {
+        throw new Error('Failed to add task');
+      }
+
+      const data = await response.json();
+      setTasks([...tasks, data.task]);
+      setShowAddDialog(false);
+      setNewTask({
+        title: '',
+        description: '',
+        date: new Date(),
+        time: '',
+        priority: 'medium',
+        status: 'upcoming',
+        type: 'task',
+        invitees: [],
+        venue: '',
+        createdAt: new Date().toISOString(),
+        createdBy: auth.currentUser?.uid || ''
+      });
+
+      toast({
+        title: "Success",
+        description: "Task added successfully"
+      });
+    } catch (error) {
+      console.error('Error adding task:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add task",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const updateTaskStatus = async (taskId: string, newStatus: string) => {
+    try {
+      const token = await auth.currentUser?.getIdToken();
+      const response = await fetch('/api/schedule', {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          taskId,
+          updates: { status: newStatus }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update task');
+      }
+
+      setTasks(tasks.map(task =>
+        task.id === taskId ? { ...task, status: newStatus } : task
+      ));
+
+      toast({
+        title: "Success",
+        description: "Task status updated"
+      });
+    } catch (error) {
+      console.error('Error updating task:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update task status",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Modify deleteTask function to use API
+  const deleteTask = async (task: Task) => {
+    try {
+      console.log("deleteTask input", task)
+
+      const taskKey = `${task.date}-${task.time}`;
+
+      const token = await auth.currentUser?.getIdToken();
+      const response = await fetch(`/api/schedule?taskKey=${taskKey}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete task');
+      }
+
+      setTasks(tasks.filter(task => `${task.date}-${task.time}` !== taskKey));
+      toast({
+        title: "Success",
+        description: "Task deleted successfully"
+      });
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete task",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Add loading state handling
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+  const renderTaskCard = (task: any) => {
+
+    console.log("render task date: ", task.date)
+    const taskDate = new Date(task.date._seconds * 1000)
+    //const taskDate = task.date.toDate ? task.date.toDate() : new Date(task.date);
+    //const formattedDate = taskDate.toLocaleDateString();
+    console.log("created: ", task.createdAt)
+    //console.log("formattedDate: ", formattedDate)
+
+    const getCombinedDateTime = (date: Date, timeString: string) => {
+      if (!date || !timeString) return new Date();
+
+      const [hours, minutes] = timeString.split(':');
+      const combinedDate = new Date(date);
+      combinedDate.setHours(parseInt(hours, 10));
+      combinedDate.setMinutes(parseInt(minutes, 10));
+      return combinedDate;
+    };
+
+    const taskDateTime = getCombinedDateTime(taskDate, task.time);
+
+    console.log("taskDateTime: ", taskDateTime)
+
+
+    return (
+
+      <Card key={`${task.date}-${task.time}`} className="relative bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="p-4">
+          <div className="grid grid-cols-12 gap-6">
+            {/* Left Column - Due Date */}
+            <div className="col-span-2 p-4">
+              <Card className="h-full shadow-md border-2 border-gray-200 dark:border-gray-700">
+                <CardContent className="flex items-center justify-center h-full p-4">
+                  <Card className="w-full transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/20 border border-transparent hover:border-primary">
+                    <CardContent className="p-2">
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="text-3xl font-bold">
+                          {taskDateTime.getDate()}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {taskDateTime.toLocaleDateString('en-US', { month: 'short' })}
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          {taskDateTime.getFullYear()}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Middle Column - Time & Location */}
+            <div className="col-span-3 p-4">
+              <Card className="h-full shadow-md border-2 border-gray-200 dark:border-gray-700">
+                <CardContent className="space-y-3 p-4">
+                  <Card className="transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/20 border border-transparent hover:border-primary">
+                    <CardContent className="p-2">
+                      <div className="flex items-center text-sm">
+                        <Clock className="mr-2 h-4 w-4 text-gray-400" />
+                        {task.time}
+                      </div>
+                    </CardContent>
+                  </Card>
+                  {task.type === 'meeting' && (
+                    <Card className="transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/20 border border-transparent hover:border-primary">
+                      <CardContent className="p-2">
+                        <div className="flex items-center text-sm text-muted-foreground group cursor-pointer">
+                          <MapPin className="mr-2 h-4 w-4 text-gray-400 group-hover:text-primary transition-colors" />
+                          <span className="hover:underline group-hover:text-primary transition-colors">{task.location}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+                  <Badge
+                    variant={task.priority === 'high' ? 'destructive' : task.priority === 'medium' ? 'default' : 'secondary'}
+                    className="capitalize"
+                  >
+                    {task.priority}
+                  </Badge>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Right Column - Description & Attendees */}
+            <div className="col-span-7 p-4">
+              <Card className="h-full shadow-md border-2 border-gray-200 dark:border-gray-700">
+                <CardContent className="space-y-4 p-4">
+                  <Card className="transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/20 border border-transparent hover:border-primary">
+                    <CardContent className="p-2">
+                      <div>
+                        <h3 className="font-medium text-lg mb-1">{task.title}</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+                          {task.description}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {task.attendees && task.attendees.length > 0 && (
+                    <div className="flex items-center space-x-2">
+                      <div className="flex -space-x-2">
+                        {task.attendees.map((attendee: string, index: number) => (
+                          <Avatar key={index} className="h-8 w-8 border-2 border-white dark:border-slate-900">
+                            <AvatarFallback className="bg-blue-500 text-white text-xs">
+                              {attendee.substring(0, 2).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                        ))}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 w-8 rounded-full border-2 border-white dark:border-slate-900 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
+                          onClick={() => {
+                            // Add attendee logic here
+                          }}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <span className="text-sm text-gray-500">
+                        {task.attendees.length} {task.attendees.length === 1 ? 'attendee' : 'attendees'}
+                      </span>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="border-t rounded-t-none">
+          <CardFooter className="pt-3 pb-3 px-6 flex items-center justify-between bg-black-50 dark:bg-black-800">
+            <Card className="bg-white dark:bg-gray-800 shadow-sm">
+              <CardContent className="p-2">
+                <div className="text-sm text-gray-500 flex items-center">
+                  <span>{task.type === 'meeting' ? 'Meeting' : 'Task'}</span>
+                  <span className="mx-2">•</span>
+                  <span>Created {new Date(task.createdAt).toISOString().split('T')[0]}</span>
+                </div>
+              </CardContent>
+            </Card>
+            <div className="flex items-center space-x-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 inline-flex items-center"
+                  >
+                    <Pencil className="h-4 w-4 mr-1" />
+                    Edit
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>Edit {task.type === 'meeting' ? 'Meeting' : 'Task'}</DialogTitle>
+                  </DialogHeader>
+                  <Tabs defaultValue="date">
+                    <TabsList className="grid w-full grid-cols-3">
+                      <TabsTrigger value="date">Date</TabsTrigger>
+                      <TabsTrigger value="details">Details</TabsTrigger>
+                      <TabsTrigger value="content">Content</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="date" className="space-y-4">
+                      <div className="space-y-2">
+                        <Label>Due Date</Label>
+                        <Input type="date" defaultValue={taskDate.toISOString().split('T')[0]} />
+                      </div>
+                    </TabsContent>
+                    <TabsContent value="details" className="space-y-4">
+                      <div className="space-y-2">
+                        <Label>Time</Label>
+                        <Input type="time" defaultValue={task.time} />
+                      </div>
+                      {task.type === 'meeting' && (
+                        <div className="space-y-2">
+                          <Label>Location</Label>
+                          <Input defaultValue={task.location} />
+                        </div>
+                      )}
+                      <div className="space-y-2">
+                        <Label>Priority</Label>
+                        <Select defaultValue={task.priority}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="low">Low</SelectItem>
+                            <SelectItem value="medium">Medium</SelectItem>
+                            <SelectItem value="high">High</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </TabsContent>
+                    <TabsContent value="content" className="space-y-4">
+                      <div className="space-y-2">
+                        <Label>Title</Label>
+                        <Input defaultValue={task.title} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Description</Label>
+                        <Textarea defaultValue={task.description} />
+                      </div>
+                      {task.type === 'meeting' && (
+                        <div className="space-y-2">
+                          <Label>Attendees</Label>
+                          <Input defaultValue={task.attendees?.join(', ')} placeholder="Enter email addresses separated by commas" />
+                        </div>
+                      )}
+                    </TabsContent>
+                  </Tabs>
+                  <DialogFooter>
+                    <Button type="submit">Save Changes</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-gray-600 hover:text-gray-900 inline-flex items-center"
+                onClick={() => updateTaskStatus(task.id, task.status === 'completed' ? 'upcoming' : 'completed')}
+              >
+                {task.status === 'completed' ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-1" />
+                    Reopen
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="h-4 w-4 mr-1" />
+                    Complete
+                  </>
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-red-600 hover:text-red-900 hover:bg-red-100 dark:hover:text-red-400 dark:hover:bg-red-950 inline-flex items-center"
+                onClick={() => deleteTask(task)}
+              >
+                <Trash2 className="h-4 w-4 mr-1" />
+                Delete
+              </Button>
+            </div>
+          </CardFooter>
+        </Card>
+      </Card>
+    );
+  };
+
+  return (
+    <div className="space-y-6 pt-10">
+      <Card className="h-[80vh] flex flex-col">
+        <Card className="rounded-b-none border-b-0">
+          <Card>
+            <CardHeader className="sticky top-0 bg-background z-10">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <Card className="bg-white dark:bg-gray-800 shadow-sm">
+                  <CardHeader className="p-2">
+                    <CardTitle>Timeline</CardTitle>
+                  </CardHeader>
+                </Card>
+                <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+                  <Input
+                    placeholder="Search tasks..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="max-w-xs"
+                  />
+                  <Menubar>
+                    <MenubarMenu>
+                      <MenubarTrigger asChild>
+                        <Button variant="ghost" className="w-[120px]">
+                          <Filter className="mr-2 h-4 w-4" />
+                          Filters
+                        </Button>
+                      </MenubarTrigger>
+                      <MenubarContent>
+                        <MenubarSub>
+                          <MenubarSubTrigger>Type ({filterType})</MenubarSubTrigger>
+                          <MenubarSubContent>
+                            <MenubarItem onClick={() => setFilterType('all')}>
+                              <Check className={`mr-2 h-4 w-4 ${filterType === 'all' ? 'opacity-100' : 'opacity-0'}`} />
+                              All Types
+                            </MenubarItem>
+                            <MenubarItem onClick={() => setFilterType('meeting')}>
+                              <Check className={`mr-2 h-4 w-4 ${filterType === 'meeting' ? 'opacity-100' : 'opacity-0'}`} />
+                              Meetings
+                            </MenubarItem>
+                            <MenubarItem onClick={() => setFilterType('task')}>
+                              <Check className={`mr-2 h-4 w-4 ${filterType === 'task' ? 'opacity-100' : 'opacity-0'}`} />
+                              Tasks
+                            </MenubarItem>
+                          </MenubarSubContent>
+                        </MenubarSub>
+                        <MenubarSeparator />
+                        <MenubarSub>
+                          <MenubarSubTrigger>Priority ({filterPriority})</MenubarSubTrigger>
+                          <MenubarSubContent>
+                            <MenubarItem onClick={() => setFilterPriority('all')}>
+                              <Check className={`mr-2 h-4 w-4 ${filterPriority === 'all' ? 'opacity-100' : 'opacity-0'}`} />
+                              All Priorities
+                            </MenubarItem>
+                            <MenubarItem onClick={() => setFilterPriority('low')}>
+                              <Check className={`mr-2 h-4 w-4 ${filterPriority === 'low' ? 'opacity-100' : 'opacity-0'}`} />
+                              Low
+                            </MenubarItem>
+                            <MenubarItem onClick={() => setFilterPriority('medium')}>
+                              <Check className={`mr-2 h-4 w-4 ${filterPriority === 'medium' ? 'opacity-100' : 'opacity-0'}`} />
+                              Medium
+                            </MenubarItem>
+                            <MenubarItem onClick={() => setFilterPriority('high')}>
+                              <Check className={`mr-2 h-4 w-4 ${filterPriority === 'high' ? 'opacity-100' : 'opacity-0'}`} />
+                              High
+                            </MenubarItem>
+                          </MenubarSubContent>
+                        </MenubarSub>
+                      </MenubarContent>
+                    </MenubarMenu>
+                  </Menubar>
+                  <div>
+                    <EventCreationDialog />
+                  </div>
+                </div>
+              </div>
+            </CardHeader>
+          </Card>
+        </Card>
+
+        <Card className="flex-1 rounded-t-none border-t-0">
+          <CardContent className="flex-1 overflow-y-auto pr-4 custom-scrollbar" style={{
+            scrollbarWidth: 'thin',
+            scrollbarColor: 'rgb(203 213 225) transparent'
+          }}>
+            <style jsx global>{`
+              .custom-scrollbar::-webkit-scrollbar {
+                width: 8px;
+              }
+              .custom-scrollbar::-webkit-scrollbar-track {
+                background: transparent;
+              }
+              .custom-scrollbar::-webkit-scrollbar-thumb {
+                background-color: rgb(203 213 225);
+                border-radius: 20px;
+                border: 2px solid transparent;
+              }
+              .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background-color: rgb(148 163 184);
+              }
+            `}</style>
+
+            <div className="space-y-8">
+              {groupedTasks.overdue.length > 0 && (
+                <div>
+                  <h3 className="text-red-500 font-semibold mb-4">Passed</h3>
+                  <div className="space-y-4">
+                    {groupedTasks.overdue.map((task) => renderTaskCard(task))}
+                  </div>
+                </div>
+              )}
+
+              {groupedTasks.today.length > 0 && (
+                <div className="pt-4">
+                  <Card className="bg-white dark:bg-gray-800 shadow-sm">
+                    <CardContent className="p-2">
+                      <div className="flex items-center justify-center gap-3">
+                        <h3 className="text-blue-500 font-semibold">Today :</h3>
+                        <span className="text-blue-500 font-semibold">
+                          {new Date().toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            month: 'short',
+                            day: 'numeric'
+                          })}
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <div className="space-y-4">
+                    {groupedTasks.today.map((task) => renderTaskCard(task))}
+                  </div>
+                </div>
+              )}
+
+              {groupedTasks.tomorrow.length > 0 && (
+                <div>
+                  <h3 className="text-green-500 font-semibold mb-4">Tomorrow</h3>
+                  <div className="space-y-4">
+                    {groupedTasks.tomorrow.map((task) => renderTaskCard(task))}
+                  </div>
+                </div>
+              )}
+
+              {groupedTasks.thisWeek.length > 0 && (
+                <div>
+                  <Card className="bg-white dark:bg-gray-800 shadow-sm">
+                    <CardContent className="p-2">
+                      <div className="flex items-center justify-center gap-3">
+                        <h3 className="text-purple-500 font-semibold">This Week :</h3>
+                        <span className="text-purple-500 font-semibold">
+                          {new Date().toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric'
+                          })} - {new Date(Date.now() + 6 * 86400000).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric'
+                          })}
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <div className="space-y-4">
+                    {groupedTasks.thisWeek.map((task) => renderTaskCard(task))}
+                  </div>
+                </div>
+              )}
+
+              {groupedTasks.later.length > 0 && (
+                <div>
+                  <h3 className="text-gray-500 font-semibold mb-4">Later</h3>
+                  <div className="space-y-4">
+                    {groupedTasks.later.map((task) => renderTaskCard(task))}
+                  </div>
+                </div>
+              )}
+
+              {groupedTasks.completed.length > 0 && (
+                <div>
+                  <h3 className="text-gray-400 font-semibold mb-4">Completed</h3>
+                  <div className="space-y-4">
+                    {groupedTasks.completed.map((task) => renderTaskCard(task))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </Card>
+
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Task/Meeting</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Title</Label>
+              <Input
+                value={newTask.title}
+                onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Description</Label>
+              <Textarea
+                value={newTask.description}
+                onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Due Date</Label>
+              <Input
+                type="datetime-local"
+                value={newTask.date instanceof Date ? newTask.date.toISOString().slice(0, 16) : ''}
+                onChange={(e) => setNewTask({ ...newTask, date: new Date(e.target.value) })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Type</Label>
+              <Select
+                value={newTask.type}
+                onValueChange={(value: 'meeting' | 'task') => setNewTask({ ...newTask, type: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="meeting">Meeting</SelectItem>
+                  <SelectItem value="task">Task</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Priority</Label>
+              <Select
+                value={newTask.priority}
+                onValueChange={(value: 'low' | 'medium' | 'high') => setNewTask({ ...newTask, priority: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {newTask.type === 'meeting' && (
+              <>
+                <div className="space-y-2">
+                  <Label>Location</Label>
+                  <Input
+                    value={newTask.venue}
+                    onChange={(e) => setNewTask({ ...newTask, venue: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Attendees (comma-separated emails)</Label>
+                  <Input
+                    value={newTask.invitees.join(', ')}
+                    onChange={(e) => setNewTask({
+                      ...newTask,
+                      invitees: e.target.value.split(',').map(email => email.trim())
                     })}
                   />
                 </div>

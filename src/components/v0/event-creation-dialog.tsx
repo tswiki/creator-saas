@@ -1,5 +1,7 @@
 "use client"
 
+import { auth, db } from "@/firebase/firebaseConfig"; // Add this import
+import { collection, doc, updateDoc, arrayUnion, getDoc, setDoc } from "firebase/firestore";
 import { useState } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { Button } from "@/components/v0/ui/button"
@@ -22,15 +24,106 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/v0/ui/popo
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Calendar } from "./ui/calendar"
+import { useToast } from '@/hooks/use-toast';
+
+// Add these functions at the top level of the file
+async function createCalendarEvent(event: any, accessToken: string) {
+  try {
+    console.log("e.date: ", event.date)
+    //const formattedDate = event.date.toISOString().split('T')[0];
+    const formattedDate = event.date.toLocaleDateString('en-CA');
+    console.log("formated: ", formattedDate)
+    // Create a new Date object by combining the formatted date and time
+    const startDateTime = new Date(`${formattedDate}T${event.time}`);
+    
+    // Create end time (1 hour after start time)
+    const endDateTime = new Date(startDateTime.getTime() + 60 * 60 * 1000);
+
+    console.log("start: ", startDateTime)
+    console.log("end dt: ", endDateTime)
+    const response = await fetch(
+      'https://www.googleapis.com/calendar/v3/calendars/primary/events',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          summary: event.title,
+          description: event.description,
+          start: {
+            dateTime: startDateTime.toISOString(),
+          },
+          end: {
+            dateTime:endDateTime.toISOString(), // Add 1 hour
+          },
+          location: event.venue,
+          attendees: event.invitees?.map((email: string) => ({ email })) || [],
+        }),
+      }
+    );
+    console.log("response:", response)
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('Calendar API Error:', errorData);
+      throw new Error(`Calendar API error: ${response.status} ${errorData}`);
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Error creating calendar event:', error);
+    throw error;
+  }
+}
+
+async function syncEventsToGoogleCalendar(userId: string, accessToken: string) {
+  try {
+    // Get all events from Firestore
+    const scheduleRef = doc(db, 'User_Data', userId, 'schedule', 'tasks');
+    const scheduleDoc = await getDoc(scheduleRef);
+    const tasks = scheduleDoc.exists() ? scheduleDoc.data()?.tasks || [] : [];
+
+    // Get existing calendar events
+    const calendarResponse = await fetch(
+      'https://www.googleapis.com/calendar/v3/calendars/primary/events',
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    const calendarData = await calendarResponse.json();
+    const existingEvents = calendarData.items || [];
+
+    // Sync each task that's not already in Google Calendar
+    for (const task of tasks) {
+      const eventExists = existingEvents.some(
+        (event: any) => 
+          event.summary === task.title && 
+          event.description === task.description
+      );
+
+      if (!eventExists) {
+        await createCalendarEvent(task, accessToken);
+      }
+    }
+  } catch (error) {
+    console.error('Error syncing events:', error);
+    throw error;
+  }
+}
+
+
 
 type EventFormData = {
-  date: Date
-  time: string
-  venue: string
-  priority: string
-  title: string
-  description: string
-  invitees: string[]
+  title: string;
+  description: string;
+  date: Date;
+  time: string;
+  venue: string;
+  priority: 'low' | 'medium' | 'high';
+  type: 'meeting' | 'task';
+  invitees: string[];
 }
 
 const priorities = ["Low", "Medium", "High"]
@@ -44,17 +137,123 @@ const users = [
 ]
 
 export function EventCreationDialog() {
+  const { toast } = useToast();
+
   const [open, setOpen] = useState(false)
   const [step, setStep] = useState(1)
   const { control, register, handleSubmit, formState: { errors }, watch } = useForm<EventFormData>()
 
-  const onSubmit = (data: EventFormData) => {
-    console.log(data)
-    // Here you would typically save the event data
-    setOpen(false)
-    setStep(1)
-  }
+  const onSubmit = async (data: EventFormData) => {
+    try {
+      console.log("Form submission started with data:", data);
+      const user = auth.currentUser;
+      if (!user) {
+        console.log("No user found - authentication error");
+        toast({
+          title: "Error",
+          description: "You must be logged in to create events",
+          variant: "destructive"
+        });
+        return;
+      }
 
+      const userDocRef = doc(db, 'User_Data', user.uid, 'profile', 'info');
+      const userDoc = await getDoc(userDocRef);
+      console.log(userDoc)
+      const accessToken = userDoc.data()?.accessToken;
+
+      if (!data.date || !data.time || !data.venue || !data.priority || !data.title) {
+        toast({
+          title: "Error",
+          description: "Please fill in all required fields",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Create the event object
+      const eventData = {
+        date: data.date,
+        time: data.time,
+        venue: data.venue,
+        priority: data.priority,
+        type: data.type,
+        title: data.title,
+        description: data.description || '', // Provide default empty string if undefined
+        invitees: data.invitees || [], // Provide default empty array if undefined
+        /* createdAt: new Date().toISOString(),
+         createdBy: user.uid,
+         status: 'upcoming'*/
+      };
+
+      console.log("Sending event data to API:", eventData);
+
+      const response = await fetch('/api/schedule', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(eventData),
+      });
+
+      /*
+      // Reference to user's schedule document
+      const scheduleRef = doc(db, 'User_Data', user.uid, 'schedule', 'tasks');
+  
+      // Get the current document
+      const scheduleDoc = await getDoc(scheduleRef);
+  
+      if (!scheduleDoc.exists()) {
+        // If document doesn't exist, create it with an array containing the new event
+        await setDoc(scheduleRef, {
+          tasks: [eventData]
+        });
+      } else {
+        // If document exists, update it by adding the new event to the tasks array
+        await updateDoc(scheduleRef, {
+          tasks: arrayUnion(eventData)
+        });
+      }
+  */
+      console.log("API response status:", response.status);
+      if (!response.ok) {
+        console.log(response)
+        throw new Error('Failed to create event');
+
+      }
+      console.log("Access token: ", accessToken)
+      if (accessToken) {
+        try {
+          const calendarResult = await createCalendarEvent(data, accessToken);
+          console.log("Calendar event created:", calendarResult);
+        } catch (error) {
+          console.error("Failed to create calendar event:", error);
+          toast({
+            title: "Warning",
+            description: "Event saved but failed to sync with Google Calendar",
+            variant: "destructive"
+          });
+        }
+      }
+
+      const result = await response.json();
+
+      toast({
+        title: "Success",
+        description: "Event created successfully",
+      });
+
+      setOpen(false);
+      setStep(1);
+    } catch (error) {
+      console.error("Error creating event:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create event",
+        variant: "destructive"
+      });
+    }
+  };
   const nextStep = () => setStep(step + 1)
   const prevStep = () => setStep(step - 1)
 
@@ -227,6 +426,31 @@ export function EventCreationDialog() {
                     )}
                   />
                 </div>
+                <div className="grid gap-2">
+                  <Controller
+                    name="type"
+                    control={control}
+                    defaultValue="task"
+                    render={({ field }) => (
+                      <div className="mb-4">
+                        <Label htmlFor="type">Event Type</Label>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select event type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="meeting">Meeting</SelectItem>
+                            <SelectItem value="task">Task</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                  />
+
+
+
+                </div>
+
               </div>
             )}
           </div>
@@ -249,5 +473,4 @@ export function EventCreationDialog() {
     </Dialog>
   )
 }
-
 // export default EventCreationDialog();
