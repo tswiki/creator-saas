@@ -10,18 +10,7 @@ const nextConfig: NextConfig = {
       fs: false,
     }
     
-    // Add CometChat externals
-    config.externals = [
-      ...(config.externals || []),
-      "@cometchat-pro/chat",
-      "@cometchat/chat-sdk-javascript"
-    ];
-    
     return config
-  },
-  // Compiler options
-  experimental: {
-    // transpilePackages is no longer a valid experimental option
   }
 }
 

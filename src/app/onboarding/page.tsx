@@ -1,5 +1,5 @@
 
-import { OnboardingSurvey } from "@/components/OnboardingSurvey"
+import { OnboardingSurvey } from "@/components/onboarding/OnboardingSurvey"
 
 export default function OnboardingPage() {
   return (

@@ -15,3 +15,19 @@ declare module '*.json' {
     }
     export default value
   }
+
+  
+  export interface CampaignFormData {
+    id: string
+    idealCustomerProfile: string;
+    businessType: string;
+    solution: string;
+    relevancePoint: string;
+    language: string;
+    tone: string;
+    startDate: Date | null;
+  }
+
+  declare module 'date-fns' {
+    export function format(date: Date | number, format: string): string;
+  }

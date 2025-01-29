@@ -1,6 +1,7 @@
 
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { GeistSans } from 'geist/font/sans';
+import { GeistMono } from 'geist/font/mono';
 import "./globals.css";
 import { headers } from 'next/headers'; // Add this import
 import { cookies } from 'next/headers';
@@ -8,17 +9,9 @@ import { redirect } from 'next/navigation';
 import { ThemeProvider } from '@/components/v0/ui/theme-provider'
 import { ViewProvider } from "@/contexts/viewContext";
 import { AdminProvider} from "@/contexts/adminContext";
+import Header from "@/components/v0/ui/header";
+import { CampaignProvider } from "@/contexts/campaignContext";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
 
 export const metadata: Metadata = {
   title: "dejitaru",
@@ -53,8 +46,8 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+      <body>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -63,7 +56,9 @@ export default async function RootLayout({
         >
           <AdminProvider>
             <ViewProvider>
-              {children}
+              <CampaignProvider>
+                {children}
+              </CampaignProvider>
             </ViewProvider>
           </AdminProvider>
         </ThemeProvider>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { Search, Mic, TimerIcon as Tune, HelpCircle, Loader2, ImagePlus } from 'lucide-react'
+import { Search, Mic, TimerIcon as Tune, HelpCircle, Loader2, ImagePlus, ChevronRight, Paperclip, ChevronLeft, MessageSquare, Share, Trash2 } from 'lucide-react'
 import { Button } from '@/components/v0/ui/button'
 import { Input } from '@/components/v0/ui/input'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/v0/ui/dialog'
@@ -9,6 +9,8 @@ import { useTheme } from 'next-themes'
 import { useChat } from 'ai/react'
 import { ScrollArea } from '@/components/v0/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/v0/ui/avatar'
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
+import ConversationHistoryCard from '../chatbot/conversation-history-card'
 
 export function SearchBar() {
   const [query, setQuery] = useState('')
@@ -19,6 +21,11 @@ export function SearchBar() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
+  const [isCollapsed, setIsCollapsed] = useState(false)
+
+  const toggleSidebar = () => {
+    setIsCollapsed(prev => !prev)
+  }
 
   const { messages, input, handleSubmit, handleInputChange, isLoading } = useChat({
     api: '/api/chat',
@@ -66,116 +73,163 @@ export function SearchBar() {
         </div>
       </DialogTrigger>
 
-      <DialogContent className="max-w-4xl h-[80vh]">
-        <div className="flex flex-col h-full">
-            <div className="space-y-4 p-4">
-            <ScrollArea className="flex-1 p-2 h-[calc(80vh-8rem)] border-2 rounded-lg" ref={scrollAreaRef}>
-              {messageHistory.map((message, index) => (
-                <div
-                  key={index}
-                  className={`flex ${
-                    message.role === 'assistant' ? 'justify-start' : 'justify-end'
-                  }`}
-                >
-                  <div className={`flex gap-3 max-w-[80%] ${
-                    message.role === 'assistant' ? 'flex-row' : 'flex-row-reverse'
-                  }`}>
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback>
-                        {message.role === 'assistant' ? 'AI' : 'You'}
-                      </AvatarFallback>
-                    </Avatar>
-                    
-                    <div className={`rounded-lg p-4 ${
-                      message.role === 'assistant' 
-                        ? 'bg-secondary' 
-                        : 'bg-primary text-primary-foreground'
+      <DialogContent className="max-w-5xl h-[90vh] flex border-4 border-neutral-50">
+
+        {/* Collapsible Sidebar */}
+        <div className={`transition-all duration-200 flex flex-col ${isCollapsed ? 'w-16' : 'w-96'}`}>
+          <div className="p-2 flex justify-between items-center">
+              <div className="border-neutral-900 dark:border-neutral-50 flex justify-center items-center w-full pr-10">
+                <h2 className={`font-semibold text-foreground text-center ${isCollapsed ? 'hidden' : 'block'}`}>
+                  Chat History
+                </h2>
+              </div>
+              <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="ml-auto"
+            >
+              {isCollapsed ? (
+                <ChevronRight className="h-4 w-4" />
+              ) : (
+                <ChevronLeft className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+
+          {!isCollapsed && (
+            <div className="flex-1 h-full overflow-y-auto">
+              <div className="h-full w-full px-2">
+                <ConversationHistoryCard />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Main Chat Area */}
+        <div className="flex-1 flex flex-col h-full relative">
+          <ScrollArea className="flex-1 p-4 h-[calc(90vh-2rem)]" ref={scrollAreaRef}>
+            {messageHistory.map((message, index) => (
+              <div
+                key={index}
+                className={`flex ${
+                  message.role === 'assistant' ? 'justify-start' : 'justify-end'
+                } mb-4`}
+              >
+                <Card className={`max-w-[80%] border-2 ${
+                  message.role === 'assistant' 
+                    ? 'border-neutral-900 dark:border-neutral-50' 
+                    : 'border-primary'
+                }`}>
+                  <CardContent className="p-3">
+                    <div className={`flex items-start gap-3 ${
+                      message.role === 'assistant' ? 'flex-row' : ''
                     }`}>
-                      <div className="whitespace-pre-wrap break-words">
+                      {message.role === 'assistant' && (
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src="/default-avatar.png" alt="AI Assistant" />
+                          <AvatarFallback>AI</AvatarFallback>
+                        </Avatar>
+                      )}
+                      <div className="text-sm whitespace-pre-wrap break-words">
                         {message.content}
                       </div>
                     </div>
-                  </div>
-                </div>
-              ))}
-              {isLoading && (
-                <div className="flex justify-start">
-                  <div className="flex gap-3 max-w-[80%]">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback>AI</AvatarFallback>
-                    </Avatar>
-                    <div className="rounded-lg p-4 bg-secondary">
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                  </CardContent>
+                </Card>
+              </div>
+            ))}
+            {isLoading && (
+              <div className="flex justify-start mb-4">
+                <Card className="max-w-[80%] border-2 border-neutral-900 dark:border-neutral-50">
+                  <CardContent className="p-3">
+                    <div className="flex items-start gap-3">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src="@default-avatar.png" alt="AI Assistant" />
+                        <AvatarFallback>AI</AvatarFallback>
+                      </Avatar>
+                      <div className="flex items-center">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      </div>
                     </div>
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-              </ScrollArea>
-            </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </ScrollArea>
 
-          <form
-            onSubmit={async (event) => {
-              event.preventDefault()
-              if (!input.trim()) return
-              
-              setMessageHistory(prev => [...prev, {
-                role: 'user',
-                content: input,
-                experimental_attachments: files
-              }])
-              
-              handleSubmit(event, {
-                experimental_attachments: files,
-              })
-              
-              setFiles(undefined)
-              if (fileInputRef.current) {
-                fileInputRef.current.value = ''
-              }
-            }}
-            className="flex gap-4 p-2 border-none"
-          >
-            <Input
-              type="file"
-              onChange={event => {
-                if (event.target.files) {
-                  setFiles(event.target.files)
+          <div className="p-4 bg-background">
+            <form
+              onSubmit={async (event) => {
+                event.preventDefault()
+                if (!input.trim()) return
+                
+                setMessageHistory(prev => [...prev, {
+                  role: 'user',
+                  content: input,
+                  experimental_attachments: files
+                }])
+                
+                handleSubmit(event, {
+                  experimental_attachments: files,
+                })
+                
+                setFiles(undefined)
+                if (fileInputRef.current) {
+                  fileInputRef.current.value = ''
                 }
               }}
-              multiple
-              ref={fileInputRef}
-              className="hidden"
-              id="file-upload"
-            />
-            <div className="flex-1 flex gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-                className="shrink-0"
-              >
-                Attach
-              </Button>
+            >
               <Input
-                value={input}
-                placeholder="Type your message..."
-                onChange={handleInputChange}
-                disabled={isLoading}
-                className="flex-1"
+                type="file"
+                onChange={event => {
+                  if (event.target.files) {
+                    setFiles(event.target.files)
+                  }
+                }}
+                multiple
+                ref={fileInputRef}
+                className="hidden"
+                id="file-upload"
               />
-              <Button 
-                type="submit" 
-                disabled={isLoading || !input.trim()}
-              >
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  'Send'
-                )}
-              </Button>
-            </div>
-          </form>
+              <Card className="border-2 border-neutral-900 dark:border-neutral-50 rounded-full">
+                <CardContent className="p-2">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="hover:bg-secondary rounded-full"
+                    >
+                      <Paperclip className="h-4 w-4" />
+                    </Button>
+                    <Input
+                      value={input}
+                      placeholder="Type your message..."
+                      onChange={handleInputChange}
+                      disabled={isLoading}
+                      className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent rounded-full"
+                    />
+                    <Button 
+                      type="submit"
+                      disabled={isLoading || !input.trim()}
+                      size="icon"
+                      variant="ghost"
+                      className="hover:bg-secondary rounded-full"
+                    >
+                      {isLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <ChevronRight className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </form>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

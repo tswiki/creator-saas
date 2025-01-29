@@ -2,6 +2,7 @@
 // firebase-admin-config.ts
 import { initializeApp, getApps, cert } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
+import { getFirestore } from 'firebase-admin/firestore'
 
 // Import the service account file directly -> delete service account
 const serviceAccount = {
@@ -21,4 +22,6 @@ if (!getApps().length) {
   }
 }
 
+// Export both auth and firestore admin SDKs
 export const adminAuth = getAuth()
+export const adminDb = getFirestore()

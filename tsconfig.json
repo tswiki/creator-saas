@@ -1,4 +1,3 @@
-
 {
   "compilerOptions": {
     "target": "ES2017",
@@ -21,15 +20,17 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "~/*": ["./*"]  // Added to allow imports from root directory
+      "~/*": ["./*"],
+      "@/fonts/*": ["./public/fonts/*"]  // Add path for fonts
     }
   },
   "include": [
-    "next-env.d.ts",
+    "next-env.d.ts", 
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "*.json"  // Added to include JSON files
+    "*.json",
+    "public/fonts/**/*"  // Include fonts directory
   ],
   "exclude": ["node_modules"]
 }

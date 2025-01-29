@@ -1,73 +1,89 @@
-
 // src/lib/session.tsx
-import { cookies } from 'next/headers'
+import { auth } from '../firebase/firebaseConfig'
+import { browserLocalPersistence, signInWithCustomToken } from 'firebase/auth'
 import { adminAuth } from '../firebase/admin-config'
 
-if (!process.env.SESSION_SECRET) {
-  // Provide a default secret in development
-  process.env.SESSION_SECRET = 'development-secret-key'
-  // Or throw an error if you want to enforce setting it
-  // throw new Error('SESSION_SECRET environment variable is not set')
+interface SessionData {
+  userId: string;
+  createdAt: string;
+  expiresAt: string;
 }
 
-export async function createSession(userId: string) {
-  try {
-    // Get the current time
-    const now = new Date()
-    
-    // Set expiration to 5 days from now
-    const expiresIn = 5 * 24 * 60 * 60 * 1000 // 5 days in milliseconds
-    const expiresAt = new Date(now.getTime() + expiresIn)
-
-    // Create session data
-    const sessionData = {
-      userId,
-      createdAt: now.toISOString(),
-      expiresAt: expiresAt.toISOString()
+export class SessionManager {
+  private static instance: SessionManager;
+  
+  private constructor() {}
+  
+  static getInstance(): SessionManager {
+    if (!SessionManager.instance) {
+      SessionManager.instance = new SessionManager();
     }
-
-    // Set the session cookie
-    ;(await
-      // Set the session cookie
-      cookies()).set('session_data', JSON.stringify(sessionData), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      expires: expiresAt,
-      path: '/'
-    })
-
-    return true
-  } catch (error) {
-    console.error('Error creating session:', error)
-    throw error
+    return SessionManager.instance;
   }
-}
 
-export async function getSession() {
-  try {
-    const sessionCookie = (await cookies()).get('session')?.value
+  async createSession(idToken: string): Promise<void> {
+    try {
+      // Set session to expire in 14 days to match Firebase default
+      const expiresIn = 14 * 24 * 60 * 60 * 1000; // 14 days in milliseconds
+      
+      // Create session cookie on server side
+      const sessionCookie = await adminAuth.createSessionCookie(idToken, { expiresIn });
+      
+      // Use Firebase client SDK to persist session
+      await auth.setPersistence(browserLocalPersistence);
+      
+      // Get custom token from session cookie
+      const customToken = await adminAuth.createCustomToken(idToken);
+      await signInWithCustomToken(auth, customToken);
 
-    if (!sessionCookie) {
-      return null
+    } catch (error) {
+      console.error('Session creation error:', error);
+      throw new Error('Failed to create session');
     }
+  }
 
-    // Verify the session with Firebase Admin
-    const decodedToken = await adminAuth.verifySessionCookie(sessionCookie)
-    return decodedToken
-  } catch (error) {
-    console.error('Error getting session:', error)
-    return null
+  async getSession(): Promise<SessionData | null> {
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) return null;
+
+      const token = await currentUser.getIdTokenResult(true);
+      if (!token) return null;
+      
+      const sessionData: SessionData = {
+        userId: currentUser.uid,
+        createdAt: new Date(Number(token.issuedAtTime)).toISOString(),
+        expiresAt: new Date(Number(token.expirationTime)).toISOString()
+      };
+      return sessionData;
+
+    } catch (error) {
+      console.error('Error getting session:', error);
+      await this.destroySession();
+      return null;
+    }
+  }
+
+  async destroySession(): Promise<void> {
+    try {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        // Revoke refresh tokens on server side
+        await adminAuth.revokeRefreshTokens(currentUser.uid);
+      }
+      // Sign out the current user
+      await auth.signOut();
+    } catch (error) {
+      console.error('Error destroying session:', error);
+      // Try sign out again even if error
+      try {
+        await auth.signOut();
+      } catch (e) {
+        console.error('Final sign out attempt failed:', e);
+      }
+    }
   }
 }
 
-export async function destroySession() {
-  try {
-    (await cookies()).delete('session')
-    ;(await cookies()).delete('session_data')
-    return true
-  } catch (error) {
-    console.error('Error destroying session:', error)
-    throw error
-  }
-}
+// Export a singleton instance
+export const sessionManager = SessionManager.getInstance();

@@ -1,16 +1,12 @@
-
 'use client';
 
-import Link from 'next/link';
-import { UserCircle, BellRing, Menu, X, Calendar, Users, MessageSquare, Search, Bell, Mail, User, Settings } from 'lucide-react';
-import { useState } from 'react';
-import Profile from '@/components/v0/ui/profile'
+import { useEffect, useState } from 'react';
+import {Bell, User, Settings } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './dialog';
 import { Button } from './button';
 import { ScrollArea } from './scroll-area';
-;
 import { useView } from '@/contexts/viewContext';
 import { SearchBar } from '@/components/v0/search-bar';
 import { Card, CardContent } from './card';
@@ -21,20 +17,20 @@ interface HeaderProps {
 }
 
 export default function Header({ logoSrc, brandName = "dejitaru " }: HeaderProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const { currentView, setCurrentView } = useView(' ');
-  const [open, setOpen] = useState(false);
-  const { theme } = useTheme();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const [logoVisible, setLogoVisible] = useState(false);
 
   const upcomingEvents = [
     {
-      title: "Community Meetup",
+      title: "Community Meetup", 
       date: "Next Tuesday, 6:00 PM",
       description: "Join us for our monthly community gathering to network and share ideas"
     },
     {
       title: "Workshop: Advanced React Patterns",
-      date: "This Saturday, 2:00 PM",
+      date: "This Saturday, 2:00 PM", 
       description: "Learn advanced React patterns and best practices from industry experts"
     },
     {
@@ -44,16 +40,27 @@ export default function Header({ logoSrc, brandName = "dejitaru " }: HeaderProps
     }
   ];
 
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    // Here you can add additional search functionality like:
-    // - Filtering content
-    // - Making API calls
-    // - Updating search results
+  // Helper function to determine if dark mode is active
+  const isDarkMode = () => {
+    if (!mounted) return false;
+    return theme === 'dark';
   };
 
+  useEffect(() => {
+    setMounted(true);
+    
+    // Fade in logo after mounting
+    const timer = setTimeout(() => {
+      setLogoVisible(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Prevent hydration mismatch by not rendering until mounted
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <header className="fixed top-0 left-72 right-0 z-50 bg-background backdrop-blur-sm transition-colors duration-200 pt-1">
@@ -62,9 +69,9 @@ export default function Header({ logoSrc, brandName = "dejitaru " }: HeaderProps
           <div className="flex justify-between items-center h-16">
             {/* Left side - Brand/Logo */}
             <div className="flex items-center gap-2 pl-5">
-              <div className="relative w-8 h-8">
+              <div className={`relative w-8 h-8 transition-opacity duration-500 ${logoVisible ? 'opacity-100' : 'opacity-0'}`}>
                 <Image
-                  src={theme === 'dark' || (theme === undefined && window.matchMedia('(prefers-color-scheme: dark)').matches) ? '/cmli-white.png' : '/cmli-black.png'}
+                  src={isDarkMode() ? '/cmli-white.png' : '/cmli-black.png'}
                   alt="/cmli-tt"
                   fill
                   className="object-contain"
