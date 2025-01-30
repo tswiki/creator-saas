@@ -12,6 +12,7 @@ import { auth } from '@/firebase/firebaseConfig';
 import { DocumentView } from './documentView';
 import { AudioView } from './audioView';
 import { VideoViewRes } from './videoView';
+import { cn } from "@/lib/utils"
 import {
   Dialog,
   DialogContent,
@@ -144,7 +145,8 @@ import {
   PenTool,
   Database,
   FolderTree,
-  Edit
+  Edit,
+  PlusCircle
 
 } from "lucide-react";
 import { Input } from '@/components/v0/ui/input';
@@ -3354,7 +3356,11 @@ export default function MentorshipPortal() {
               {/* Column 2: Course Messages */}
               <Card className="border-4 border-primary h-[95%]">
                 <CardHeader>
-                  <CardTitle className="text-lg">Resources</CardTitle>
+                <CardTitle className="text-lg flex justify-between items-center">
+  Resources
+  <ResourceCreationDialog />
+</CardTitle>
+                  
                   <CardDescription>Latest additions and updates</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -3362,7 +3368,7 @@ export default function MentorshipPortal() {
                     <div className="space-y-4">
                       {resources.map((course, i) => (
                         <div key={i} className="flex gap-2">
-                          <Card className="p-2 bg-accent rounded-lg flex-1 border-4"
+                          <Card className="p-2 bg-accent rounded-lg flex-1 border-4 cursor-pointer"
                           onClick={() => {
                             switch (course.type) {
                               case 'document':
@@ -4359,6 +4365,7 @@ export default function MentorshipPortal() {
 
     const [modules, setModules] = useState([]);
     const [tit, setTitle] = useState("")
+    const [subtit, setSubTitle] = useState("")
 
 
     useEffect(() => {
@@ -4386,6 +4393,7 @@ export default function MentorshipPortal() {
             if (currentChapterIndex !== -1) {
               // Set the current chapter directly from data instead of using state variables
               const currentChapter = data.modules[currentModuleIndex].chapters[currentChapterIndex];
+              setSubTitle(currentChapter.name)
               setSelectedModuleIndex(currentModuleIndex);
               setSelectedChapterIndex(currentChapterIndex);
               setCurrentChapter(currentChapter);
@@ -4447,6 +4455,7 @@ export default function MentorshipPortal() {
         // Update the current chapter and indices
         if (newCurrentChapter) {
           setCurrentChapter(newCurrentChapter);
+          setSubTitle(currentChapter.name)
           setSelectedModuleIndex(newModuleIndex);
           setSelectedChapterIndex(newChapterIndex);
         }
@@ -4476,7 +4485,7 @@ export default function MentorshipPortal() {
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
-            <CardTitle>Course: {tit}</CardTitle>
+            <CardTitle>{tit} : {subtit}</CardTitle>
             <Badge variant="secondary">Progress: 45%</Badge>
           </div>
         </CardHeader>
@@ -4553,18 +4562,22 @@ export default function MentorshipPortal() {
                     (modules ?? []).map((module, i) => {
                       // Check if all lessons are completed
                       const isModuleCompleted = module.chapters.every(lesson => lesson.completed);
-
-                      const handleLessonClick = async ( moduleIndex: number, lessonIndex: number) => {
+                      const handleLessonClick = async (moduleIndex: number, lessonIndex: number) => {
                         try {
                           // Get the selected chapter from the modules
                           const selectedModule = modules[moduleIndex];
                           const selectedChapter = selectedModule.chapters[lessonIndex];
                       
+                          // Check if the chapter is either completed or current
+                          if (!selectedChapter.completed && !selectedChapter.current) {
+                            return; // Exit early if neither condition is met
+                          }
+                      
                           // Update the current chapter state
                           setCurrentChapter({
-                            ...selectedChapter,
-                            current: true
+                            ...selectedChapter
                           });
+                          setSubTitle(selectedChapter.name)
                       
                           // Navigate to lesson content
                         } catch (error) {
