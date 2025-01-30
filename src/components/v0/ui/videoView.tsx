@@ -12,7 +12,7 @@ interface VideoContentProps {
   url: string;
 }
 
-export const videoView = ({url, title}: VideoContentProps) => {
+export const VideoViewRes = ({url, title}: VideoContentProps) => {
   const [currentVideo, setCurrentVideo] = useState<string |null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(100);

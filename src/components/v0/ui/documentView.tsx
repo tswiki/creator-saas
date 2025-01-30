@@ -14,7 +14,7 @@ interface DocumentViewProps {
   title: string;
 }
 
-export const documentView = ({ fileUrl, title }: DocumentViewProps) => {
+export const DocumentView = ({ fileUrl, title }: DocumentViewProps) => {
   const [documentUrl, setDocumentUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   console.log("Document URL set to no effect:", fileUrl);

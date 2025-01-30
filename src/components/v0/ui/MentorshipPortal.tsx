@@ -9,9 +9,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/v0/ui/avatar";
 import { Badge } from "@/components/v0/ui/badge";
 import HeroVideoDialog from "@/components/v0/ui/hero-video-dialog";
 import { auth } from '@/firebase/firebaseConfig';
-import { documentView } from './documentView';
-import { audioView } from './audioView';
-import { videoView } from './videoView';
+import { DocumentView } from './documentView';
+import { AudioView } from './audioView';
+import { VideoViewRes } from './videoView';
 import {
   Dialog,
   DialogContent,
@@ -148,7 +148,8 @@ import {
 
 } from "lucide-react";
 import { Input } from '@/components/v0/ui/input';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Label, DropdownMenuSeparator, RadioGroup, Separator } from '@radix-ui/react-dropdown-menu';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Label, DropdownMenuSeparator, Separator } from '@radix-ui/react-dropdown-menu';
+import { RadioGroupItem, RadioGroup } from "@/components/v0/ui/radio-group";
 import { Switch } from '@/components/v0/ui/switch';
 import { useTheme } from 'next-themes';
 import { toast } from '@/hooks/use-toast';
@@ -168,6 +169,34 @@ import AvatarCircles from './avatar-circles';
 import { Slider } from './slider';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from './carousel';
 import Marquee from './marquee';
+
+interface Module {
+  title: string;
+  chapters: Chapter[];
+}
+
+interface CourseData {
+  modules: Module[];
+}
+
+interface Chapter {
+  name: string;
+  vidUrl?: string;
+  content?: string;
+  files?: Array<{ name: string; url: string; }>;
+  quiz?: {
+    questions: Array<{
+      question: string;
+      answerOptions: Array<{
+        text: string;
+        isCorrect: boolean;
+      }>;
+      feedback: string;
+    }>;
+  };
+  completed: boolean;
+  current: boolean;
+}
 
 const DashboardView = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -3333,7 +3362,32 @@ export default function MentorshipPortal() {
                     <div className="space-y-4">
                       {resources.map((course, i) => (
                         <div key={i} className="flex gap-2">
-                          <Card className="p-2 bg-accent rounded-lg flex-1 border-4">
+                          <Card className="p-2 bg-accent rounded-lg flex-1 border-4"
+                          onClick={() => {
+                            switch (course.type) {
+                              case 'document':
+                                setCurrentView('document');
+                                setTitle(course.title);
+                                setFileUrl(course.fileUrl);
+                                break;
+                              case 'video':
+                                setCurrentView('video');
+                                setTitle(course.title);
+                                setFileUrl(course.fileUrl);
+                                break;
+                              case 'audio':
+                                setCurrentView('audio');
+                                setTitle(course.title);
+                                setFileUrl(course.fileUrl);
+                                break;
+                              default:
+                                setSelectedCourse(course);
+                                setTitle(course.title);
+                                setId(course.id);
+                                setCurrentView('course');
+                            }
+                          }}
+                          >
                             <div className="flex items-center">
                               <Avatar className="h-6 w-6 rounded-full border-2 border-primary flex items-center justify-center">
 
@@ -4207,39 +4261,224 @@ export default function MentorshipPortal() {
     );
   };
 
+  interface CourseViewProps {
+    courses: ResourceFormData[];
+    courseId: string;
+    userId: string;
+  }
+
+
+
+
+
+
+
   const CourseView = () => {
     const [courses, setCourses] = useState<any[]>([]);
-    const { isAdmin, setIsAdmin } = useAdmin();
+    const [isAdminView, setIsAdminView] = useState(false);
 
-    // Set initial admin view
     useEffect(() => {
-      setIsAdmin(true);
-    }, [setIsAdmin]);
+      const fetchCourses = async (courseTitle?: string) => {
+        try {
+          // Build the URL with optional courseTitle parameter
+          const url = courseTitle
+            ? `/api/course?courseTitle=${encodeURIComponent(courseTitle)}`
+            : '/api/course';
+
+          const response = await fetch(url, {
+            credentials: 'include'
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch courses');
+          }
+
+          const data = await response.json();
+
+          // If courseTitle was provided, we're fetching a single course
+          if (courseTitle) {
+            setCourses([data.course]); // Wrap single course in array
+          } else {
+            setCourses(data.courses); // Set all courses
+          }
+        } catch (error) {
+          console.error('Error fetching courses:', error);
+        }
+      };
+
+      // You can call fetchCourses with or without a title
+      fetchCourses(DocTitle); // Fetch all courses
+      // Or fetch a specific course:
+      // fetchCourses('Course Title Here');
+    }, []);
 
     return (
       <div className="space-y-6 pt-16">
-        {isAdmin ? (
-          <AdminCourseView courses={courses} />
+        <div className="flex justify-end mb-4">
+          <Button
+            variant="outline"
+            onClick={() => setIsAdminView(!isAdminView)}
+          >
+            {isAdminView ? (
+              <>
+                <Eye className="h-4 w-4 mr-2" />
+                View Course
+              </>
+            ) : (
+              <>
+                <Pencil className="h-4 w-4 mr-2" />
+                Edit Course
+              </>
+            )}
+          </Button>
+        </div>
+
+        {isAdminView ? (
+          <AdminCourseView courseId={resId} userId={userId} />
         ) : (
-          <MemberCourseView courses={courses} />
+          <MemberCourseView courseId={resId} userId={userId} courses={courses} />
         )}
       </div>
     );
   };
 
   // Member facing view
-  const MemberCourseView = ({ courses }: { courses: any[] }) => {
+  const MemberCourseView = ({ courseId, userId, courses }: CourseViewProps) => {
+    console.log("course:  ", courses)
+
+    const [selectedModuleIndex, setSelectedModuleIndex] = useState(0);
+    const [selectedChapterIndex, setSelectedChapterIndex] = useState(0);
+    const [currentChapter, setCurrentChapter] = useState<Chapter>({
+      name: '',
+      vidUrl: '',
+      content: '',
+      files: [],
+      completed: false,
+      current: false
+    });;
+
+    const [modules, setModules] = useState([]);
+    const [tit, setTitle] = useState("")
+
+
+    useEffect(() => {
+      const fetchModules = async () => {
+        try {
+          const response = await fetch(`/api/course-modules?courseId=${courseId}&userId=${userId}`);
+          const data = await response.json();
+          setTitle(data.title)
+
+          if (data.modules) {
+            setModules(data.modules);
+          }
+          console.log(" modules set", data.modules)
+
+          const currentModuleIndex = data.modules.findIndex(
+            (module: any) => module.current === true
+          );
+
+          if (currentModuleIndex !== -1) {
+            // Find the current chapter within the current module
+            const currentChapterIndex = data.modules[currentModuleIndex].chapters.findIndex(
+              (chapter: any) => chapter.current === true
+            );
+
+            if (currentChapterIndex !== -1) {
+              // Set the current chapter directly from data instead of using state variables
+              const currentChapter = data.modules[currentModuleIndex].chapters[currentChapterIndex];
+              setSelectedModuleIndex(currentModuleIndex);
+              setSelectedChapterIndex(currentChapterIndex);
+              setCurrentChapter(currentChapter);
+            }
+          }
+
+        } catch (error) {
+          console.error('Error fetching modules:', error);
+        }
+      };
+
+      fetchModules();
+    }, [courseId, userId]);
+
+    const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
+    const [submittedQuestions, setSubmittedQuestions] = useState<boolean[]>([]);
+
+    // Example usage in your frontend nextChapter function
+    const nextChapter = async (currentChapter: Chapter, moduleIndex: number, chapterIndex: number) => {
+      try {
+        const response = await fetch('/api/next-chapter', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            courseId,
+            moduleIndex,
+            chapterIndex,
+            userId: auth.currentUser.uid
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error);
+        }
+
+        // Update local state with the new course data
+        setModules(data.updatedCourseData.modules);
+
+        let newModuleIndex = moduleIndex;
+        let newChapterIndex = chapterIndex;
+        let newCurrentChapter = null;
+
+        // Check if there's a next chapter in the current module
+        if (chapterIndex < data.updatedCourseData.modules[moduleIndex].chapters.length - 1) {
+          newChapterIndex = chapterIndex + 1;
+          newCurrentChapter = data.updatedCourseData.modules[moduleIndex].chapters[newChapterIndex];
+        }
+        // If not, check if there's a next module
+        else if (moduleIndex < data.updatedCourseData.modules.length - 1) {
+          newModuleIndex = moduleIndex + 1;
+          newChapterIndex = 0;
+          newCurrentChapter = data.updatedCourseData.modules[newModuleIndex].chapters[0];
+        }
+
+        // Update the current chapter and indices
+        if (newCurrentChapter) {
+          setCurrentChapter(newCurrentChapter);
+          setSelectedModuleIndex(newModuleIndex);
+          setSelectedChapterIndex(newChapterIndex);
+        }
+
+        // Reset quiz state
+        setSelectedAnswers([]);
+        setSubmittedQuestions([]);
+
+        toast({
+          title: "Progress Updated",
+          description: "Moving to next chapter",
+          variant: "default"
+        });
+
+      } catch (error) {
+        console.error('Error updating progress:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update progress",
+          variant: "destructive"
+        });
+      }
+    };
+
+
     return (
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
-            <CardTitle>Course: Advanced JavaScript Concepts</CardTitle>
-            <div className="flex items-center space-x-2">
-              <Switch />
-              <Label>Edit</Label>
-            </div>
+            <CardTitle>Course: {tit}</CardTitle>
+            <Badge variant="secondary">Progress: 45%</Badge>
           </div>
-
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-3 gap-6">
@@ -4252,113 +4491,111 @@ export default function MentorshipPortal() {
                   {/* Vertical line connecting modules */}
                   <div className="absolute left-[18px] top-6 bottom-6 w-0.5 bg-border" />
 
-                  {[
-                    {
-                      title: "Introduction to Advanced JS",
-                      completed: true,
-                      lessons: [
-                        { name: "Course Overview", completed: true, current: false, url: "/lessons/course-overview" },
-                        { name: "Setting Up Environment", completed: true, current: false, url: "/lessons/setup" }
-                      ]
-                    },
-                    {
-                      title: "Closures & Scope",
-                      completed: false,
-                      current: true,
-                      lessons: [
-                        { name: "Understanding Closures", completed: true, current: false, url: "/lessons/closures" },
-                        { name: "Lexical Scope", completed: false, current: true, url: "/lessons/lexical-scope" },
-                        { name: "Practical Applications", completed: false, current: false, url: "/lessons/practical-closures" }
-                      ]
-                    },
-                    {
-                      title: "Prototypes & Inheritance",
-                      completed: false,
-                      lessons: [
-                        { name: "Prototype Chain", completed: false, current: false, url: "/lessons/prototype-chain" },
-                        { name: "Inheritance Patterns", completed: false, current: false, url: "/lessons/inheritance" }
-                      ]
-                    },
-                    {
-                      title: "Asynchronous JavaScript",
-                      completed: false,
-                      lessons: [
-                        { name: "Promises Deep Dive", completed: false, current: false, url: "/lessons/promises" },
-                        { name: "Async/Await Patterns", completed: false, current: false, url: "/lessons/async-await" },
-                        { name: "Error Handling", completed: false, current: false, url: "/lessons/error-handling" }
-                      ]
-                    },
-                    {
-                      title: "Design Patterns",
-                      completed: false,
-                      lessons: [
-                        { name: "Singleton Pattern", completed: false, current: false, url: "/lessons/singleton" },
-                        { name: "Factory Pattern", completed: false, current: false, url: "/lessons/factory" },
-                        { name: "Observer Pattern", completed: false, current: false, url: "/lessons/observer" },
-                        { name: "Module Pattern", completed: false, current: false, url: "/lessons/module-pattern" }
-                      ]
-                    },
-                    {
-                      title: "Performance Optimization",
-                      completed: false,
-                      lessons: [
-                        { name: "Memory Management", completed: false, current: false, url: "/lessons/memory" },
-                        { name: "Code Splitting", completed: false, current: false, url: "/lessons/code-splitting" },
-                        { name: "Lazy Loading", completed: false, current: false, url: "/lessons/lazy-loading" }
-                      ]
-                    }
-                  ].map((module, i) => {
-                    // Check if all lessons are completed
-                    const isModuleCompleted = module.lessons.every(lesson => lesson.completed);
+                  {
 
-                    const handleLessonClick = async (lessonUrl: string, moduleIndex: number, lessonIndex: number) => {
-                      try {
-                        // Mark the lesson as completed
-                        const response = await fetch('/api/course/progress', {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                          },
-                          body: JSON.stringify({
-                            moduleIndex,
-                            lessonIndex,
-                            completed: true
-                          })
-                        });
-
-                        if (!response.ok) {
-                          throw new Error('Failed to update lesson progress');
-                        }
-
-                        // Navigate to lesson content
-                        window.location.href = lessonUrl;
-                      } catch (error) {
-                        console.error('Error updating lesson progress:', error);
+                    /*[
+                      {
+                        title: "Introduction to Advanced JS",
+                        completed: true,
+                        lessons: [
+                          { name: "Course Overview", completed: true, current: false, url: "/lessons/course-overview" },
+                          { name: "Setting Up Environment", completed: true, current: false, url: "/lessons/setup" }
+                        ]
+                      },
+                      {
+                        title: "Closures & Scope",
+                        completed: false,
+                        current: true,
+                        lessons: [
+                          { name: "Understanding Closures", completed: true, current: false, url: "/lessons/closures" },
+                          { name: "Lexical Scope", completed: false, current: true, url: "/lessons/lexical-scope" },
+                          { name: "Practical Applications", completed: false, current: false, url: "/lessons/practical-closures" }
+                        ]
+                      },
+                      {
+                        title: "Prototypes & Inheritance",
+                        completed: false,
+                        lessons: [
+                          { name: "Prototype Chain", completed: false, current: false, url: "/lessons/prototype-chain" },
+                          { name: "Inheritance Patterns", completed: false, current: false, url: "/lessons/inheritance" }
+                        ]
+                      },
+                      {
+                        title: "Asynchronous JavaScript",
+                        completed: false,
+                        lessons: [
+                          { name: "Promises Deep Dive", completed: false, current: false, url: "/lessons/promises" },
+                          { name: "Async/Await Patterns", completed: false, current: false, url: "/lessons/async-await" },
+                          { name: "Error Handling", completed: false, current: false, url: "/lessons/error-handling" }
+                        ]
+                      },
+                      {
+                        title: "Design Patterns",
+                        completed: false,
+                        lessons: [
+                          { name: "Singleton Pattern", completed: false, current: false, url: "/lessons/singleton" },
+                          { name: "Factory Pattern", completed: false, current: false, url: "/lessons/factory" },
+                          { name: "Observer Pattern", completed: false, current: false, url: "/lessons/observer" },
+                          { name: "Module Pattern", completed: false, current: false, url: "/lessons/module-pattern" }
+                        ]
+                      },
+                      {
+                        title: "Performance Optimization",
+                        completed: false,
+                        lessons: [
+                          { name: "Memory Management", completed: false, current: false, url: "/lessons/memory" },
+                          { name: "Code Splitting", completed: false, current: false, url: "/lessons/code-splitting" },
+                          { name: "Lazy Loading", completed: false, current: false, url: "/lessons/lazy-loading" }
+                        ]
                       }
-                    };
+                    ]*/
 
-                    return (
-                      <div key={i} className="mb-6 relative">
-                        <div className={`
+                    (modules ?? []).map((module, i) => {
+                      // Check if all lessons are completed
+                      const isModuleCompleted = module.chapters.every(lesson => lesson.completed);
+
+                      const handleLessonClick = async ( moduleIndex: number, lessonIndex: number) => {
+                        try {
+                          // Get the selected chapter from the modules
+                          const selectedModule = modules[moduleIndex];
+                          const selectedChapter = selectedModule.chapters[lessonIndex];
+                      
+                          // Update the current chapter state
+                          setCurrentChapter({
+                            ...selectedChapter,
+                            current: true
+                          });
+                      
+                          // Navigate to lesson content
+                        } catch (error) {
+                          console.error('Error updating current chapter:', error);
+                        }
+                      };
+
+
+
+                      return (
+                        <div key={i} className="mb-6 relative">
+                          <div className={`
                         border rounded-lg p-4
                         ${module.current ? 'border-primary bg-accent shadow-sm' : 'border-border'}
                       `}>
-                          <div className="flex items-center gap-3 mb-3">
-                            <div className={`
+                            <div className="flex items-center gap-3 mb-3">
+                              <div className={`
                             w-5 h-5 rounded-full z-10 flex items-center justify-center
                             ${isModuleCompleted ? 'bg-primary' : module.current ? 'border-2 border-primary' : 'border-2 border-muted-foreground'}
                           `}>
-                              {isModuleCompleted && <Check className="h-3 w-3 text-primary-foreground" />}
+                                {isModuleCompleted && <Check className="h-3 w-3 text-primary-foreground" />}
+                              </div>
+                              <span className="font-medium">{module.title}</span>
                             </div>
-                            <span className="font-medium">{module.title}</span>
-                          </div>
 
-                          <div className="space-y-2 ml-6 border-l-2 pl-4 border-border">
-                            {module.lessons.map((lesson, j) => (
-                              <button
-                                key={j}
-                                onClick={() => handleLessonClick(lesson.url, i, j)}
-                                className={`
+                            <div className="space-y-2 ml-6 border-l-2 pl-4 border-border">
+                              {module.chapters.map((lesson, j) => (
+                                <button
+                                  key={j}
+                                  onClick={() => handleLessonClick( i, j)}
+                                  className={`
                                 block w-full text-left flex items-center gap-2 p-2 rounded-md 
                                 transition-all duration-200 ease-in-out
                                 hover:bg-accent/50 hover:text-primary hover:-translate-y-0.5
@@ -4367,72 +4604,30 @@ export default function MentorshipPortal() {
                                 ${lesson.current ? 'bg-accent/50 text-primary font-medium' : ''}
                                 ${lesson.completed ? 'text-muted-foreground' : ''}
                               `}
-                              >
-                                <div className={`
-                                w-3 h-3 rounded-full
-                                ${lesson.completed ? 'bg-primary/60' : lesson.current ? 'border-2 border-primary' : 'border border-muted-foreground'}
-                              `} />
-                                <span className="text-sm">{lesson.name}</span>
-                              </button>
-                            ))}
+                                >
+                                   <div className={`
+      w-3 h-3 flex items-center justify-center
+      ${lesson.completed 
+        ? 'bg-primary/60 rounded-full' 
+        : lesson.current 
+          ? 'border-2 border-primary rounded-full' 
+          : 'border border-muted-foreground rounded-full'}
+    `}>
+      {lesson.completed && <Check className="h-4 w-4 text-primary-foreground" />}
+    </div>
+                                  <span className="text-sm">{lesson.name}</span>
+                                </button>
+                              ))}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )
-                  })}
+                      )
+                    })}
                 </div>
               </ScrollArea>
 
               {/* Add New Module Section */}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" className="w-full mt-6">
-                    + Add New Module
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle>Add New Module</DialogTitle>
-                    <DialogDescription>
-                      Create a new module and add its submodules. Click save when you're done.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid gap-2">
-                      <label htmlFor="module-name" className="text-sm font-medium">
-                        Module Name
-                      </label>
-                      <input
-                        id="module-name"
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                        placeholder="Enter module name"
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <label className="text-sm font-medium">
-                        Submodules
-                      </label>
-                      <div className="space-y-2">
-                        <input
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                          placeholder="Submodule 1"
-                        />
-                        <input
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                          placeholder="Submodule 2"
-                        />
-                        <Button variant="outline" className="w-full">
-                          + Add Another Submodule
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex justify-end gap-3">
-                    <Button variant="outline">Cancel</Button>
-                    <Button>Save Module</Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
+
             </div>
 
             {/* Content Area */}
@@ -4441,10 +4636,21 @@ export default function MentorshipPortal() {
                 <h3 className="font-semibold text-lg mb-4">Lexical Scope</h3>
 
                 {/* Video Player */}
-                <Card className="mb-6">
+                <Card className="mb-4">
                   <CardContent className="p-4">
                     <div className="aspect-video bg-accent rounded-lg flex items-center justify-center">
-                      <HeroVideoDialogDemoTopInBottomOut />
+                      {currentChapter?.vidUrl ? (
+                        <HeroVideoDialog
+                          videoSrc={currentChapter.vidUrl}
+                          thumbnailSrc="/video-thumbnail.jpg" // You'll need a default thumbnail image
+                          thumbnailAlt={`${currentChapter.name} video`}
+                          animationStyle="top-in-bottom-out"
+                        />
+                      ) : (
+                        <div className="text-muted-foreground">
+                          No video available
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -4460,15 +4666,23 @@ export default function MentorshipPortal() {
                   </CardHeader>
                   <CardContent className="flex justify-center">
                     <div className="space-y-4 w-full max-w-md">
-                      <Card className="p-4">
-                        <div className="flex items-center justify-between gap-4">
-                          <div className="flex items-center gap-2">
-                            <FileText className="h-5 w-5" />
-                            <span>Notes.pdf</span>
+                      {currentChapter.files?.map((file, index) => (
+                        <Card className="p-4" key={index}>
+                          <div className="flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-2">
+                              <FileText className="h-5 w-5" />
+                              <span>{file.name}</span>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => window.open(file.url, '_blank')}
+                            >
+                              Download
+                            </Button>
                           </div>
-                          <Button variant="outline" size="sm">Download</Button>
-                        </div>
-                      </Card>
+                        </Card>
+                      )) || []}
                       <Card className="p-4">
                         <div className="flex items-center justify-between gap-4">
                           <div className="flex items-center gap-2">
@@ -4489,44 +4703,97 @@ export default function MentorshipPortal() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-6">
-                      <Card className="p-6">
-                        <div className="space-y-4">
-                          <Card className="p-4">
-                            <div className="font-medium">Question 1</div>
-                            <div className="text-sm mt-2">What is the main purpose of closures in JavaScript?</div>
-                          </Card>
+                      {currentChapter?.quiz?.questions.map((question, questionIndex) => (
+                        <Card key={questionIndex} className="p-6">
+                          <div className="space-y-4">
+                            <Card className="p-4">
+                              <div className="font-medium">Question {questionIndex + 1}</div>
+                              <div className="text-sm mt-2">{question.question}</div>
+                            </Card>
 
-                          <Card className="p-4">
-                            <RadioGroup className="space-y-3">
-                              <Card className="p-3 hover:bg-accent transition-colors">
-                                <div className="flex items-center space-x-2">
-                                  <RadioGroup value="a" id="a" />
-                                  <Label className="cursor-pointer">Data privacy and encapsulation</Label>
-                                </div>
-                              </Card>
-                              <Card className="p-3 hover:bg-accent transition-colors">
-                                <div className="flex items-center space-x-2">
-                                  <RadioGroup value="b" id="b" />
-                                  <Label className="cursor-pointer">Memory optimization</Label>
-                                </div>
-                              </Card>
-                              <Card className="p-3 hover:bg-accent transition-colors">
-                                <div className="flex items-center space-x-2">
-                                  <RadioGroup value="c" id="c" />
-                                  <Label className="cursor-pointer">Code organization</Label>
-                                </div>
-                              </Card>
-                            </RadioGroup>
-                          </Card>
+                            <Card className="p-4">
+                              <RadioGroup
+                                className="space-y-3"
+                                value={selectedAnswers[questionIndex]}
+                                onValueChange={(value) => {
+                                  const newAnswers = [...selectedAnswers];
+                                  newAnswers[questionIndex] = value;
+                                  setSelectedAnswers(newAnswers);
+                                }}
+                              >
+                                {question.answerOptions.map((option, optionIndex) => (
+                                  <Card
+                                    key={optionIndex}
+                                    className={cn(
+                                      "p-3 hover:bg-accent transition-colors",
+                                      submittedQuestions[questionIndex] && selectedAnswers[questionIndex] === optionIndex.toString() && (
+                                        option.isCorrect
+                                          ? "bg-green-100 dark:bg-green-900"
+                                          : "bg-red-100 dark:bg-red-900"
+                                      )
+                                    )}
+                                  >
+                                    <div className="flex items-center space-x-2">
+                                      <RadioGroupItem
+                                        value={optionIndex.toString()}
+                                        id={`q${questionIndex}-o${optionIndex}`}
+                                        disabled={submittedQuestions[questionIndex]}
+                                      />
+                                      <Label htmlFor={`q${questionIndex}-o${optionIndex}`}>
+                                        {option.text}
+                                      </Label>
+                                    </div>
+                                  </Card>
+                                ))}
+                              </RadioGroup>
+                            </Card>
 
-                          <Card className="p-4">
-                            <div className="flex justify-between items-center gap-4">
-                              <Input placeholder="feedback" className="max-w-xs" />
-                              <Button>Submit Answer</Button>
-                            </div>
-                          </Card>
-                        </div>
-                      </Card>
+                            <Card className="p-4">
+                              <div className="flex justify-between items-center gap-4">
+                                <div className="max-w-xs text-sm text-muted-foreground">
+                                  {submittedQuestions[questionIndex] && question.feedback}
+                                </div>
+                                <Button
+                                  onClick={() => {
+                                    // Mark current question as submitted
+                                    const newSubmitted = [...submittedQuestions];
+                                    newSubmitted[questionIndex] = true;
+                                    setSubmittedQuestions(newSubmitted);
+                                  
+                                    // Check if all questions are now submitted
+                                    const allQuestionsSubmitted = newSubmitted.every(submitted => submitted);
+                                    
+                                    if (allQuestionsSubmitted) {
+                                      // Check if all answers are correct
+                                      const allAnswersCorrect = currentChapter.quiz?.questions.every((question, qIndex) => {
+                                        const selectedOptionIndex = parseInt(selectedAnswers[qIndex]);
+                                        return question.answerOptions[selectedOptionIndex]?.isCorrect;
+                                      });
+                                  
+                                      if (allAnswersCorrect) {
+                                        // If all answers are correct, trigger nextChapter
+                                        nextChapter(currentChapter, selectedModuleIndex, selectedChapterIndex);
+                                      } else {
+                                        toast({
+                                          title: "Review Needed",
+                                          description: "Please review your answers and try again",
+                                          variant: "destructive"
+                                        });
+                                      }
+                                    }
+                                  }}
+                                  disabled={
+                                    submittedQuestions[questionIndex] ||
+                                    !selectedAnswers[questionIndex]
+                                  }
+                                >
+                                  Submit Answer
+                                </Button>
+                              </div>
+                            </Card>
+                          </div>
+                        </Card>
+                      ))}
                     </div>
                   </CardContent>
                 </Card>
@@ -4538,17 +4805,236 @@ export default function MentorshipPortal() {
     );
   };
 
+
+
+  interface AdminCourseViewProps {
+    courseId: string;
+    userId: string;
+  }
   // Admin editing view - contains the original implementation
-  const AdminCourseView = ({ courses }: { courses: any[] }) => {
+  const AdminCourseView = ({ courseId, userId }: AdminCourseViewProps) => {
+
+    const [currentChapter, setCurrentChapter] = useState(null);
+    const [selectedModuleIndex, setSelectedModuleIndex] = useState(0);
+    const [selectedChapterIndex, setSelectedChapterIndex] = useState(0);
+
+    const [modules, setModules] = useState([]);
+
+    const [question, setQuestion] = useState("");
+    const [answerOptions, setAnswerOptions] = useState([
+      { text: "", isCorrect: false }
+    ]);
+    const [feedback, setFeedback] = useState("");
+
+
+
+    const addAnswerOption = () => {
+      setAnswerOptions([...answerOptions, { text: "", isCorrect: false }]);
+    };
+
+    // Add this function to handle removing answer options
+    const removeAnswerOption = (index: number) => {
+      setAnswerOptions(answerOptions.filter((_, i) => i !== index));
+    };
+
+    const updateAnswerOption = (index: number, field: 'text' | 'isCorrect', value: string | boolean) => {
+      const newOptions = [...answerOptions];
+      newOptions[index][field] = value;
+      setAnswerOptions(newOptions);
+    };
+
+    const addQuestion = () => {
+      const questionObject = {
+        question,
+        answerOptions,
+        feedback
+      };
+
+      // Create a copy of the current chapter
+      const updatedChapter = {
+        ...currentChapter,
+        quiz: {
+          questions: [
+            ...(currentChapter.quiz?.questions || []),
+            questionObject
+          ]
+        }
+      };
+
+      // Call updateChapter with the current module and chapter indices
+      updateChapter(selectedModuleIndex, selectedChapterIndex, updatedChapter);
+
+      // Reset form
+      setQuestion("");
+      setAnswerOptions([{ text: "", isCorrect: false }]);
+      setFeedback("");
+    };
+
+
+    const handleFileUpload = async (file: File) => {
+      try {
+        // Upload file logic here (using your existing upload-area component)
+        const fileUrl = await uploadFile(file); // Implement this function
+
+        // Update chapter with new file
+        const response = await fetch('/api/chapter', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            courseId,
+            moduleIndex: selectedModuleIndex,
+            chapterIndex: selectedChapterIndex,
+            updates: {
+              files: [...currentChapter.files, { name: file.name, url: fileUrl }]
+            }
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update chapter');
+        }
+      } catch (error) {
+        console.error('Error uploading file:', error);
+      }
+    };
+
+    const handleQuizUpdate = async (quizData: any) => {
+      try {
+        const response = await fetch('/api/chapter', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            courseId,
+            moduleIndex: selectedModuleIndex,
+            chapterIndex: selectedChapterIndex,
+            updates: {
+              quiz: quizData
+            }
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update quiz');
+        }
+      } catch (error) {
+        console.error('Error updating quiz:', error);
+      }
+    };
+
+    useEffect(() => {
+      const fetchModules = async () => {
+        try {
+          const response = await fetch(`/api/course-modules-source?courseId=${courseId}&userId=${userId}`);
+          const data = await response.json();
+
+          if (data.modules) {
+            setModules(data.modules);
+          }
+          console.log(" modules set", data.modules)
+
+          const currentModuleIndex = data.modules.findIndex(
+            (module: any) => module.current === true
+          );
+
+          if (currentModuleIndex !== -1) {
+            setSelectedModuleIndex(currentModuleIndex);
+
+            // Find the current chapter within the current module
+            const currentChapterIndex = data.modules[currentModuleIndex].chapters.findIndex(
+              (chapter: any) => chapter.current === true
+            );
+
+            if (currentChapterIndex !== -1) {
+
+              setSelectedChapterIndex(currentChapterIndex);
+              console.log("mod: ", data.modules[selectedModuleIndex].chapters[selectedChapterIndex])
+              setCurrentChapter(data.modules[selectedModuleIndex].chapters[selectedChapterIndex])
+            }
+          }
+
+          console.log("Curr chap", currentChapter)
+
+        } catch (error) {
+          console.error('Error fetching modules:', error);
+        }
+      };
+
+      fetchModules();
+    }, [courseId, userId]);
+    console.log("modules:  ", modules)
+
+    useEffect(() => {
+      if (currentChapter) {
+        console.log("Current chapter updated:", currentChapter);
+      }
+    }, [currentChapter]);
+
+    const updateChapter = async (moduleIndex: number, chapterIndex: number, chapterData: Chapter) => {
+      console.log('Updating chapter with:', { courseId, moduleIndex, chapterIndex, chapterData });
+      try {
+        // Extract only the fields that the API expects
+        /*
+        const updates = {
+          content: chapterData.content,
+          files: chapterData.files,
+          quiz: chapterData.quiz || null,
+          vidUrl: chapterData.vidUrl
+        };
+        */
+
+        const updates = {
+          ...(chapterData.content !== undefined && { content: chapterData.content }),
+          ...(chapterData.files !== undefined && { files: chapterData.files }),
+          ...(chapterData.quiz !== undefined && { quiz: chapterData.quiz }),
+          ...(chapterData.vidUrl !== undefined && { vidUrl: chapterData.vidUrl })
+        };
+
+        console.log('Sending request with:', {
+          courseId,
+          moduleIndex,
+          chapterIndex,
+          updates
+        });
+
+
+
+        const response = await fetch('/api/chapter', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            courseId,
+            moduleIndex,
+            chapterIndex,
+            updates  // Send the properly structured updates object
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update chapter');
+        }
+
+        // If Firebase update is successful, update local state
+        setCurrentChapter(chapterData);
+
+      } catch (error) {
+        console.error('Error updating chapter:', error);
+        // You might want to show an error toast or handle the error in some way
+      }
+    };
+
+    
     return (
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
-            <CardTitle>Course: Advanced JavaScript Concepts</CardTitle>
-            <div className="flex items-center space-x-2">
-              <Switch />
-              <Label>Edit</Label>
-            </div>
+            <CardTitle>{modules[selectedModuleIndex] ? modules[selectedModuleIndex].title : 'Loading...'} : {currentChapter ? currentChapter.name : ''}</CardTitle>
+            <Badge variant="secondary">Progress: 45%</Badge>
           </div>
         </CardHeader>
 
@@ -4563,113 +5049,138 @@ export default function MentorshipPortal() {
                   {/* Vertical line connecting modules */}
                   <div className="absolute left-[18px] top-6 bottom-6 w-0.5 bg-border" />
 
-                  {[
-                    {
-                      title: "Introduction to Advanced JS",
-                      completed: true,
-                      lessons: [
-                        { name: "Course Overview", completed: true, current: false, url: "/lessons/course-overview" },
-                        { name: "Setting Up Environment", completed: true, current: false, url: "/lessons/setup" }
-                      ]
-                    },
-                    {
-                      title: "Closures & Scope",
-                      completed: false,
-                      current: true,
-                      lessons: [
-                        { name: "Understanding Closures", completed: true, current: false, url: "/lessons/closures" },
-                        { name: "Lexical Scope", completed: false, current: true, url: "/lessons/lexical-scope" },
-                        { name: "Practical Applications", completed: false, current: false, url: "/lessons/practical-closures" }
-                      ]
-                    },
-                    {
-                      title: "Prototypes & Inheritance",
-                      completed: false,
-                      lessons: [
-                        { name: "Prototype Chain", completed: false, current: false, url: "/lessons/prototype-chain" },
-                        { name: "Inheritance Patterns", completed: false, current: false, url: "/lessons/inheritance" }
-                      ]
-                    },
-                    {
-                      title: "Asynchronous JavaScript",
-                      completed: false,
-                      lessons: [
-                        { name: "Promises Deep Dive", completed: false, current: false, url: "/lessons/promises" },
-                        { name: "Async/Await Patterns", completed: false, current: false, url: "/lessons/async-await" },
-                        { name: "Error Handling", completed: false, current: false, url: "/lessons/error-handling" }
-                      ]
-                    },
-                    {
-                      title: "Design Patterns",
-                      completed: false,
-                      lessons: [
-                        { name: "Singleton Pattern", completed: false, current: false, url: "/lessons/singleton" },
-                        { name: "Factory Pattern", completed: false, current: false, url: "/lessons/factory" },
-                        { name: "Observer Pattern", completed: false, current: false, url: "/lessons/observer" },
-                        { name: "Module Pattern", completed: false, current: false, url: "/lessons/module-pattern" }
-                      ]
-                    },
-                    {
-                      title: "Performance Optimization",
-                      completed: false,
-                      lessons: [
-                        { name: "Memory Management", completed: false, current: false, url: "/lessons/memory" },
-                        { name: "Code Splitting", completed: false, current: false, url: "/lessons/code-splitting" },
-                        { name: "Lazy Loading", completed: false, current: false, url: "/lessons/lazy-loading" }
-                      ]
-                    }
-                  ].map((module, i) => {
-                    // Check if all lessons are completed
-                    const isModuleCompleted = module.lessons.every(lesson => lesson.completed);
-
-                    const handleLessonClick = async (lessonUrl: string, moduleIndex: number, lessonIndex: number) => {
-                      try {
-                        // Mark the lesson as completed
-                        const response = await fetch('/api/course/progress', {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                          },
-                          body: JSON.stringify({
-                            moduleIndex,
-                            lessonIndex,
-                            completed: true
-                          })
-                        });
-
-                        if (!response.ok) {
-                          throw new Error('Failed to update lesson progress');
-                        }
-
-                        // Navigate to lesson content
-                        window.location.href = lessonUrl;
-                      } catch (error) {
-                        console.error('Error updating lesson progress:', error);
+                  {
+                    /*[
+                      {
+                        title: "Introduction to Advanced JS",
+                        completed: true,
+                        lessons: [
+                          { name: "Course Overview", completed: true, current: false, url: "/lessons/course-overview" },
+                          { name: "Setting Up Environment", completed: true, current: false, url: "/lessons/setup" }
+                        ]
+                      },
+                      {
+                        title: "Closures & Scope",
+                        completed: false,
+                        current: true,
+                        lessons: [
+                          { name: "Understanding Closures", completed: true, current: false, url: "/lessons/closures" },
+                          { name: "Lexical Scope", completed: false, current: true, url: "/lessons/lexical-scope" },
+                          { name: "Practical Applications", completed: false, current: false, url: "/lessons/practical-closures" }
+                        ]
+                      },
+                      {
+                        title: "Prototypes & Inheritance",
+                        completed: false,
+                        lessons: [
+                          { name: "Prototype Chain", completed: false, current: false, url: "/lessons/prototype-chain" },
+                          { name: "Inheritance Patterns", completed: false, current: false, url: "/lessons/inheritance" }
+                        ]
+                      },
+                      {
+                        title: "Asynchronous JavaScript",
+                        completed: false,
+                        lessons: [
+                          { name: "Promises Deep Dive", completed: false, current: false, url: "/lessons/promises" },
+                          { name: "Async/Await Patterns", completed: false, current: false, url: "/lessons/async-await" },
+                          { name: "Error Handling", completed: false, current: false, url: "/lessons/error-handling" }
+                        ]
+                      },
+                      {
+                        title: "Design Patterns",
+                        completed: false,
+                        lessons: [
+                          { name: "Singleton Pattern", completed: false, current: false, url: "/lessons/singleton" },
+                          { name: "Factory Pattern", completed: false, current: false, url: "/lessons/factory" },
+                          { name: "Observer Pattern", completed: false, current: false, url: "/lessons/observer" },
+                          { name: "Module Pattern", completed: false, current: false, url: "/lessons/module-pattern" }
+                        ]
+                      },
+                      {
+                        title: "Performance Optimization",
+                        completed: false,
+                        lessons: [
+                          { name: "Memory Management", completed: false, current: false, url: "/lessons/memory" },
+                          { name: "Code Splitting", completed: false, current: false, url: "/lessons/code-splitting" },
+                          { name: "Lazy Loading", completed: false, current: false, url: "/lessons/lazy-loading" }
+                        ]
                       }
-                    };
+                    ]*/
 
-                    return (
-                      <div key={i} className="mb-6 relative">
-                        <div className={`
+                    modules.map((module, i) => {
+                      // Check if all lessons are completed
+                      const isModuleCompleted = module.chapters?.every(chapter => chapter.completed);
+
+                      const handleLessonClick = async (lessonUrl: string, moduleIndex: number, lessonIndex: number) => {
+                        try {
+                          // Mark the lesson as completed
+                          const response = await fetch('/api/course/progress', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                              moduleIndex,
+                              lessonIndex,
+                              completed: true
+                            })
+                          });
+
+                          if (!response.ok) {
+                            throw new Error('Failed to update lesson progress');
+                          }
+
+                          // Navigate to lesson content
+                          window.location.href = lessonUrl;
+                        } catch (error) {
+                          console.error('Error updating lesson progress:', error);
+                        }
+                      };
+                      const handleChapterClick = async (moduleIndex: number, chapterIndex: number) => {
+                        try {
+                          // Fetch chapter data
+                          const response = await fetch(
+                            `/api/chapter?courseId=${courseId}&moduleIndex=${moduleIndex}&chapterIndex=${chapterIndex}`
+                          );
+
+                          if (!response.ok) {
+                            throw new Error('Failed to fetch chapter data');
+                          }
+
+                          const { chapter } = await response.json();
+
+                          // Update the UI with chapter data
+                          setCurrentChapter(chapter);
+                          setSelectedModuleIndex(moduleIndex);
+                          setSelectedChapterIndex(chapterIndex);
+                        } catch (error) {
+                          console.error('Error fetching chapter:', error);
+                        }
+                      };
+
+
+                      return (
+                        <div key={i} className="mb-6 relative">
+                          <div className={`
                         border rounded-lg p-4
                         ${module.current ? 'border-primary bg-accent shadow-sm' : 'border-border'}
                       `}>
-                          <div className="flex items-center gap-3 mb-3">
-                            <div className={`
+                            <div className="flex items-center gap-3 mb-3">
+                              <div className={`
                             w-5 h-5 rounded-full z-10 flex items-center justify-center
                             ${isModuleCompleted ? 'bg-primary' : module.current ? 'border-2 border-primary' : 'border-2 border-muted-foreground'}
                           `}>
-                              {isModuleCompleted && <Check className="h-3 w-3 text-primary-foreground" />}
+                                {isModuleCompleted && <Check className="h-3 w-3 text-primary-foreground" />}
+                              </div>
+                              <span className="font-medium">{module.title}</span>
                             </div>
-                            <span className="font-medium">{module.title}</span>
-                          </div>
 
-                          <div className="space-y-2 ml-6 border-l-2 pl-4 border-border">
-                            {module.lessons.map((lesson, j) => (
-                              <button
-                                key={j}
-                                onClick={() => handleLessonClick(lesson.url, i, j)}
-                                className={`
+                            <div className="space-y-2 ml-6 border-l-2 pl-4 border-border">
+                              {module.chapters.map((lesson, j) => (
+                                <button
+                                  key={j}
+                                  onClick={() => handleChapterClick(i, j)}
+                                  className={`
                                 block w-full text-left flex items-center gap-2 p-2 rounded-md 
                                 transition-all duration-200 ease-in-out
                                 hover:bg-accent/50 hover:text-primary hover:-translate-y-0.5
@@ -4678,19 +5189,19 @@ export default function MentorshipPortal() {
                                 ${lesson.current ? 'bg-accent/50 text-primary font-medium' : ''}
                                 ${lesson.completed ? 'text-muted-foreground' : ''}
                               `}
-                              >
-                                <div className={`
+                                >
+                                  <div className={`
                                 w-3 h-3 rounded-full
                                 ${lesson.completed ? 'bg-primary/60' : lesson.current ? 'border-2 border-primary' : 'border border-muted-foreground'}
                               `} />
-                                <span className="text-sm">{lesson.name}</span>
-                              </button>
-                            ))}
+                                  <span className="text-sm">{lesson.name}</span>
+                                </button>
+                              ))}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )
-                  })}
+                      )
+                    })}
                 </div>
               </ScrollArea>
 
@@ -4755,11 +5266,21 @@ export default function MentorshipPortal() {
                 <Card className="mb-4">
                   <CardContent className="p-4">
                     <div className="aspect-video bg-accent rounded-lg flex items-center justify-center">
-                      <HeroVideoDialogDemoTopInBottomOut />
+                      {currentChapter?.vidUrl ? (
+                        <HeroVideoDialog
+                          videoSrc={currentChapter.vidUrl}
+                          thumbnailSrc="/video-thumbnail.jpg" // You'll need a default thumbnail image
+                          thumbnailAlt={`${currentChapter.title} video`}
+                          animationStyle="top-in-bottom-out"
+                        />
+                      ) : (
+                        <div className="text-muted-foreground">
+                          No video available
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
-
                 {/* Content Upload Section */}
                 <Card className="mb-4">
                   <CardHeader>
@@ -4771,17 +5292,97 @@ export default function MentorshipPortal() {
                         <div>
                           <label className="block text-sm font-medium mb-2">Upload Video Content</label>
                           <div className="border-2 border-dashed rounded-lg p-4 text-center">
-                            <input type="file" accept="video/*" className="hidden" id="video-upload" />
+                            <input
+                              type="file"
+                              accept="video/*"
+                              className="hidden"
+                              id="video-upload"
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  try {
+                                    // Upload video file
+                                    const videoUrl = await uploadFile(file,
+                                      `course-content/${courseId}/chapter-${selectedChapterIndex}`);
+
+                                    // Create updated chapter data
+                                    const updatedChapter = {
+                                      ...currentChapter,
+                                      vidUrl: videoUrl
+                                    };
+
+                                    // Update chapter using the provided function
+                                    await updateChapter(selectedModuleIndex, selectedChapterIndex, updatedChapter);
+
+                                    toast({
+                                      title: "Success",
+                                      description: "Video uploaded successfully",
+                                    });
+                                  } catch (error) {
+                                    console.error('Error uploading video:', error);
+                                    toast({
+                                      title: "Error",
+                                      description: "Failed to upload video",
+                                      variant: "destructive"
+                                    });
+                                  }
+                                }
+                              }}
+                            />
                             <label htmlFor="video-upload" className="cursor-pointer">
                               <Video className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                               <span className="text-sm text-muted-foreground">Click to upload video</span>
                             </label>
                           </div>
                         </div>
+
                         <div>
                           <label className="block text-sm font-medium mb-2">Upload Documents</label>
                           <div className="border-2 border-dashed rounded-lg p-4 text-center">
-                            <input type="file" accept=".pdf,.doc,.docx" className="hidden" id="doc-upload" />
+                            <input
+                              type="file"
+                              accept=".pdf,.doc,.docx"
+                              className="hidden"
+                              id="doc-upload"
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  try {
+                                    // Upload document file
+                                    const docUrl = await uploadFile(file,
+                                      `course-content/${courseId}/chapter-${selectedChapterIndex}`);
+
+                                    // Create updated chapter data
+                                    console.log("chapter", currentChapter)
+                                    const updatedChapter = {
+                                      ...currentChapter,
+                                      files: [
+                                        ...(currentChapter.files || []),
+                                        {
+                                          name: file.name,
+                                          url: docUrl
+                                        }
+                                      ]
+                                    };
+
+                                    // Update chapter using the provided function
+                                    await updateChapter(selectedModuleIndex, selectedChapterIndex, updatedChapter);
+
+                                    toast({
+                                      title: "Success",
+                                      description: "Document uploaded successfully",
+                                    });
+                                  } catch (error) {
+                                    console.error('Error uploading document:', error);
+                                    toast({
+                                      title: "Error",
+                                      description: "Failed to upload document",
+                                      variant: "destructive"
+                                    });
+                                  }
+                                }
+                              }}
+                            />
                             <label htmlFor="doc-upload" className="cursor-pointer">
                               <BookOpen className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                               <span className="text-sm text-muted-foreground">Click to upload documents</span>
@@ -4796,12 +5397,42 @@ export default function MentorshipPortal() {
                           type="url"
                           placeholder="Enter Google Drive or external link"
                           className="w-full rounded-md border border-input px-3 py-2"
+                          onBlur={async (e) => {
+                            if (e.target.value) {
+                              try {
+                                // Create updated chapter data
+                                const updatedChapter = {
+                                  ...currentChapter,
+                                  files: [
+                                    ...(currentChapter.files || []),
+                                    {
+                                      name: 'External Resource',
+                                      url: e.target.value
+                                    }
+                                  ]
+                                };
+
+                                // Update chapter using the provided function
+                                await updateChapter(selectedModuleIndex, selectedChapterIndex, updatedChapter);
+
+                                toast({
+                                  title: "Success",
+                                  description: "External resource added successfully",
+                                });
+                              } catch (error) {
+                                toast({
+                                  title: "Error",
+                                  description: "Failed to add external resource",
+                                  variant: "destructive"
+                                });
+                              }
+                            }
+                          }}
                         />
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-
                 {/* Quiz Section */}
                 <Card>
                   <CardHeader>
@@ -4814,58 +5445,56 @@ export default function MentorshipPortal() {
                           <label className="block text-sm font-medium mb-2">Question</label>
                           <input
                             type="text"
+                            value={question}
+                            onChange={(e) => setQuestion(e.target.value)}
                             placeholder="Enter your question"
                             className="w-full rounded-md border border-input px-3 py-2"
                           />
                         </div>
 
-                        <div>
-                          <label className="block text-sm font-medium mb-2">Answer Type</label>
-                          <Select>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select answer type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="radio">Single Choice (Radio)</SelectItem>
-                              <SelectItem value="checkbox">Multiple Choice (Checkbox)</SelectItem>
-                              <SelectItem value="short">Short Text</SelectItem>
-                              <SelectItem value="long">Long Text</SelectItem>
-                              <SelectItem value="truefalse">True/False</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
+
 
                         <div className="space-y-4">
                           <label className="block text-sm font-medium">Answer Options</label>
 
                           <div className="space-y-3">
-                            {/* Dynamic answer options based on type */}
-                            <div className="flex items-center gap-2">
-                              <input
-                                type="text"
-                                placeholder="Enter answer option"
-                                className="flex-1 rounded-md border border-input px-3 py-2"
-                              />
-                              <div className="flex items-center gap-2">
+                            {answerOptions.map((option, index) => (
+                              <div key={index} className="flex items-center gap-2">
                                 <input
-                                  type="checkbox"
-                                  id="correct-1"
-                                  className="h-4 w-4 rounded border-gray-300"
+                                  type="text"
+                                  value={option.text}
+                                  onChange={(e) => updateAnswerOption(index, 'text', e.target.value)}
+                                  placeholder="Enter answer option"
+                                  className="flex-1 rounded-md border border-input px-3 py-2"
                                 />
-                                <label htmlFor="correct-1" className="text-sm">
-                                  Correct
-                                </label>
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="checkbox"
+                                    id={`correct-${index}`}
+                                    checked={option.isCorrect}
+                                    onChange={(e) => updateAnswerOption(index, 'isCorrect', e.target.checked)}
+                                    className="h-4 w-4 rounded border-gray-300"
+                                  />
+                                  <label htmlFor={`correct-${index}`} className="text-sm">
+                                    Correct
+                                  </label>
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => removeAnswerOption(index)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
                               </div>
-                              <Button variant="ghost" size="icon">
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
+                            ))}
                           </div>
 
                           <Button
                             variant="outline"
                             size="sm"
                             className="w-full"
+                            onClick={addAnswerOption}
                           >
                             <Plus className="h-4 w-4 mr-2" />
                             Add Answer Option
@@ -4875,13 +5504,18 @@ export default function MentorshipPortal() {
                         <div className="space-y-2">
                           <label className="block text-sm font-medium">Feedback</label>
                           <textarea
+                            value={feedback}
+                            onChange={(e) => setFeedback(e.target.value)}
                             placeholder="Enter feedback for correct/incorrect answers"
                             className="w-full rounded-md border border-input px-3 py-2 min-h-[80px]"
                           />
                         </div>
 
                         <div className="flex gap-2">
-                          <Button className="flex-1">
+                          <Button
+                            className="flex-1"
+                            onClick={addQuestion}
+                          >
                             <Plus className="h-4 w-4 mr-2" />
                             Add Question
                           </Button>
@@ -4906,24 +5540,20 @@ export default function MentorshipPortal() {
                                     <CardDescription>Test your understanding of the concepts covered</CardDescription>
                                   </CardHeader>
                                   <CardContent className="space-y-4">
-                                    <div className="space-y-4">
-                                      <div className="font-medium">Question 1</div>
-                                      <div className="text-sm">What is the main purpose of closures in JavaScript?</div>
-                                      <div className="space-y-2">
-                                        <div className="flex items-center space-x-2">
-                                          <input type="radio" name="quiz" id="a" value="a" className="radio" />
-                                          <label htmlFor="a" className="text-sm">Data privacy and encapsulation</label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                          <input type="radio" name="quiz" id="b" value="b" className="radio" />
-                                          <label htmlFor="b" className="text-sm">Memory optimization</label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                          <input type="radio" name="quiz" id="c" value="c" className="radio" />
-                                          <label htmlFor="c" className="text-sm">Code organization</label>
-                                        </div>
+                                    {currentChapter?.quiz?.questions.map((question, index) => (
+                                      <div key={index} className="space-y-4">
+                                        <div className="font-medium">Question {index + 1}</div>
+                                        <div className="text-sm">{question.question}</div>
+                                        <RadioGroup className="space-y-2">
+                                          {question.answerOptions.map((option, optionIndex) => (
+                                            <div key={optionIndex} className="flex items-center space-x-2">
+                                              <RadioGroupItem value={option.text} id={`q${index}-${optionIndex}`} />
+                                              <Label htmlFor={`q${index}-${optionIndex}`}>{option.text}</Label>
+                                            </div>
+                                          ))}
+                                        </RadioGroup>
                                       </div>
-                                    </div>
+                                    ))}
                                   </CardContent>
                                   <CardFooter>
                                     <Button className="w-full">Submit Answer</Button>
@@ -4945,23 +5575,33 @@ export default function MentorshipPortal() {
                         </div>
 
                         <div className="space-y-4">
-                          {/* Question list/preview */}
-                          <div className="border rounded-lg p-4">
-                            <div className="flex items-center justify-between">
-                              <div className="font-medium">Question 1</div>
-                              <div className="flex gap-2">
-                                <Button variant="ghost" size="icon">
-                                  <Pencil className="h-4 w-4" />
-                                </Button>
-                                <Button variant="ghost" size="icon">
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
+                          {currentChapter?.quiz?.questions?.map((question, index) => (
+                            <div key={index} className="border rounded-lg p-4">
+                              <div className="flex items-center justify-between">
+                                <div className="font-medium">Question {index + 1}</div>
+                                <div className="flex gap-2">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => {
+                                      setQuestion(question.question);
+                                      setAnswerOptions(question.answerOptions);
+                                      setFeedback(question.feedback);
+                                    }}
+                                  >
+                                    <Pencil className="h-4 w-4" />
+                                  </Button>
+                                  <Button variant="ghost" size="icon">
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
                               </div>
+                              <div className="text-sm text-muted-foreground mt-1">
+                                Multiple Choice • {question.answerOptions.length} Options
+                              </div>
+
                             </div>
-                            <div className="text-sm text-muted-foreground mt-1">
-                              Multiple Choice • 4 Options
-                            </div>
-                          </div>
+                          ))}
                         </div>
                       </div>
                     </div>
@@ -4975,6 +5615,8 @@ export default function MentorshipPortal() {
       </Card>
     );
   };
+
+
   const ConnectView = () => {
     return (
       <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-auto">
@@ -5177,9 +5819,9 @@ export default function MentorshipPortal() {
         {currentView === 'stream' && <StreamView />}
         {currentView === 'video' && <VideoView />}
         {currentView === 'channel' && <ChannelView />}
-        {currentView === 'document' && <documentView fileUrl={fileUrl} title={DocTitle} />}
-        {currentView === 'audio' && <audioView url={fileUrl} title={DocTitle} />}
-        {currentView === 'video' && <videoView url={fileUrl} title={DocTitle} />}
+        {currentView === 'document' && <DocumentView fileUrl={fileUrl} title={DocTitle} />}
+        {currentView === 'audio' && <AudioView url={fileUrl} title={DocTitle} />}
+        {currentView === 'video' && <VideoViewRes url={fileUrl} title={DocTitle} />}
       </div>
     </div>
   );

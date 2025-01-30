@@ -10,7 +10,7 @@ interface AudioProps {
   url: string;
 }
 
-export const audioView = ({url, title}: AudioProps) => {
+export const AudioView = ({url, title}: AudioProps) => {
   const [currentAudio, setCurrentAudio] = useState("");
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(100);
