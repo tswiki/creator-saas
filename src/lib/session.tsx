@@ -45,10 +45,10 @@ export class SessionManager {
   async getSession(): Promise<SessionData | null> {
     try {
       const currentUser = auth.currentUser;
-      if (!currentUser) return null;
+      if (!currentUser){console.log("getSession failed: No current user");return null;} 
 
       const token = await currentUser.getIdTokenResult(true);
-      if (!token) return null;
+      if (!token) {console.log("getSession failed: No token retrieved");;return null};
       
       const sessionData: SessionData = {
         userId: currentUser.uid,
@@ -68,6 +68,10 @@ export class SessionManager {
     try {
       const currentUser = auth.currentUser;
       if (currentUser) {
+/*
+        if (streamClient) {
+          await streamClient.disconnectUser();
+        }*/
         // Revoke refresh tokens on server side
         await adminAuth.revokeRefreshTokens(currentUser.uid);
       }
@@ -75,6 +79,10 @@ export class SessionManager {
       await auth.signOut();
     } catch (error) {
       console.error('Error destroying session:', error);
+/*
+      if (streamClient) {
+        await streamClient.disconnectUser();
+      }*/
       // Try sign out again even if error
       try {
         await auth.signOut();

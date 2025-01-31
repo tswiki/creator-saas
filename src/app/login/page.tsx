@@ -97,7 +97,7 @@ export default function LoginPage() {
 
     connectUserAndChannel();
   }, [token, userId, userName, isConnected]);
-
+/*
   const handleGoogleSignIn = async (e: any) => {
     try {
       const provider = new GoogleAuthProvider();
@@ -112,6 +112,13 @@ export default function LoginPage() {
       });
 
       const result = await signInWithPopup(auth, provider);
+      await new Promise<void>((resolve) => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+          unsubscribe();
+          resolve();
+        });
+      });
+
       const idToken = await result.user.getIdToken();
     
       const response = await fetch('/api/auth/session', {
@@ -125,7 +132,7 @@ export default function LoginPage() {
       if (response.ok) {
 
         const isNewUser = result.user.metadata.creationTime === result.user.metadata.lastSignInTime;
-        
+          console.log("is new USer?: ",isNewUser)
         if (isNewUser) {
           // Redirect to onboarding page for new users
           router.push('/onboarding');
@@ -140,6 +147,94 @@ export default function LoginPage() {
       console.error('Error signing in with Google:', error);
     }
   };
+*/
+// In login/page.tsx
+
+const handleGoogleSignIn = async (e: any) => {
+  try {
+    const provider = new GoogleAuthProvider();
+
+    provider.addScope('https://www.googleapis.com/auth/gmail.readonly');
+    provider.addScope('https://www.googleapis.com/auth/calendar');
+    provider.addScope('https://www.googleapis.com/auth/drive.readonly');
+  
+    provider.setCustomParameters({
+      access_type: 'offline',
+      prompt: 'consent'
+    });
+
+    // First, ensure we're disconnected
+    if (streamClient.userID) {
+      await streamClient.disconnectUser();
+    }
+
+    // Wait for auth state to be updated
+    const result = await signInWithPopup(auth, provider);
+    
+    // Wait for auth state to be fully updated
+    await new Promise<void>((resolve, reject) => {
+      const unsubscribe = auth.onAuthStateChanged((user) => {
+        unsubscribe();
+        if (user) {
+          resolve();
+        } else {
+          reject(new Error('No authenticated user'));
+        }
+      });
+
+      // Add timeout to prevent hanging
+      setTimeout(() => {
+        unsubscribe();
+        reject(new Error('Auth state timeout'));
+      }, 10000);
+    });
+
+    const idToken = await result.user.getIdToken();
+    
+    const response = await fetch('/api/auth/session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ idToken }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create session');
+    }
+
+    // Wait for the session to be created
+    const sessionData = await response.json();
+
+    if (sessionData.status === 'success') {
+      const isNewUser = result.user.metadata.creationTime === result.user.metadata.lastSignInTime;
+      console.log("is new User?: ",isNewUser)
+      if (isNewUser) {
+        router.push('/onboarding');
+      } else {
+        router.push('/cohort');
+      }
+    } else {
+      throw new Error('Session creation failed');
+    }
+
+  } catch (error) {
+    console.error('Error signing in with Google:', error);
+    // Cleanup on error
+    if (streamClient.userID) {
+      await streamClient.disconnectUser();
+    }
+  }
+};
+
+// Cleanup function for chat connection
+useEffect(() => {
+  return () => {
+    if (streamClient.userID) {
+      streamClient.disconnectUser();
+    }
+  };
+}, []);
 
   const renderChat = () => {
     if (isLoading) return <div>Loading...</div>;
