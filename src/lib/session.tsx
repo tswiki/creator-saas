@@ -2,6 +2,7 @@
 import { auth } from '../firebase/firebaseConfig'
 import { browserLocalPersistence, signInWithCustomToken } from 'firebase/auth'
 import { adminAuth } from '../firebase/admin-config'
+import { cookies } from 'next/headers'
 
 interface SessionData {
   userId: string;
@@ -41,7 +42,7 @@ export class SessionManager {
       throw new Error('Failed to create session');
     }
   }
-
+/*
   async getSession(): Promise<SessionData | null> {
     try {
       const currentUser = auth.currentUser;
@@ -63,6 +64,34 @@ export class SessionManager {
       return null;
     }
   }
+    */
+  async getSession(): Promise<SessionData | null> {
+    try {
+      const sessionCookie = (await cookies()).get('session')?.value;
+      if (!sessionCookie) {
+        console.log("getSession failed: No session cookie");
+        return null;
+      }
+  
+      // Verify the session cookie
+      const decodedClaims = await adminAuth.verifySessionCookie(sessionCookie, true);
+      
+      const sessionData: SessionData = {
+        userId: decodedClaims.uid,
+        createdAt: new Date(decodedClaims.iat * 1000).toISOString(),
+        expiresAt: new Date(decodedClaims.exp * 1000).toISOString()
+      };
+      
+      return sessionData;
+  
+    } catch (error) {
+      console.error('Error getting session:', error);
+      await this.destroySession();
+      return null;
+    }
+  }
+
+
 
   async destroySession(): Promise<void> {
     try {

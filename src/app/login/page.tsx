@@ -149,7 +149,7 @@ export default function LoginPage() {
   };
 */
 // In login/page.tsx
-
+/*
 const handleGoogleSignIn = async (e: any) => {
   try {
     const provider = new GoogleAuthProvider();
@@ -224,6 +224,46 @@ const handleGoogleSignIn = async (e: any) => {
     if (streamClient.userID) {
       await streamClient.disconnectUser();
     }
+  }
+};
+*/
+const handleGoogleSignIn = async (e: any) => {
+  try {
+    const provider = new GoogleAuthProvider();
+    // ... provider setup code ...
+
+    const result = await signInWithPopup(auth, provider);
+    
+    // Get fresh ID token
+    const idToken = await result.user.getIdToken(true); // Force refresh token
+    
+    const response = await fetch('/api/auth/session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ idToken }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create session');
+    }
+
+    const sessionData = await response.json();
+
+    if (sessionData.status === 'success') {
+      // Wait a brief moment to ensure cookie is set
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const isNewUser = result.user.metadata.creationTime === result.user.metadata.lastSignInTime;
+      if (isNewUser) {
+        router.push('/onboarding');
+      } else {
+        router.push('/cohort');
+      }
+    }
+  } catch (error) {
+    console.error('Error signing in with Google:', error);
   }
 };
 
