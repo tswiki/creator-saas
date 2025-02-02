@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+
 import { Button } from "@/components/v0/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/v0/ui/card"
 import { useToast } from "@/hooks/use-toast"
@@ -10,8 +10,12 @@ import { NicheAndGoals } from './NicheAndGoals'
 import { InterestsAndSocial } from './InterestsAndSocial'
 import { CommitmentAndInvestment } from './CommitmentAndInvestment'
 import { useRouter } from 'next/navigation'
+import { getAuth } from 'firebase/auth';
+import { useEffect, useState } from 'react';
+
 
 type FormData = {
+  email: string
   currentSituation: string
   biggestBottleneck: string
   skills: string[]
@@ -29,6 +33,7 @@ type FormData = {
 }
 
 const INITIAL_DATA: FormData = {
+  email: "",
   currentSituation: "",
   biggestBottleneck: "",
   skills: [],
@@ -51,6 +56,19 @@ export function OnboardingSurvey() {
   const { toast } = useToast()
   const router = useRouter()
 
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  // Get the current user's email when component mounts
+  useEffect(() => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    
+    if (user && user.email) {
+      setUserEmail(user.email);
+      updateFields({ email: user.email });
+    }
+  }, []);
+
   const updateFields = (fields: Partial<FormData>) => {
     setData(prev => ({ ...prev, ...fields }))
   }
@@ -68,7 +86,7 @@ export function OnboardingSurvey() {
       return i - 1
     })
   }
-
+/*
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     // Here you would typically send the data to your backend
@@ -78,6 +96,50 @@ export function OnboardingSurvey() {
       description: "Thank you for completing the onboarding survey!",
     })
   }
+*/
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  
+  try {
+    if (!data.email && userEmail) {
+      updateFields({ email: userEmail });}
+
+    const response = await fetch('/api/members', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to submit survey')
+    }
+
+    const result = await response.json()
+
+    if (result.status === 'success') {
+      toast({
+        title: "Survey Submitted",
+        description: "Thank you for completing the onboarding survey!",
+      })
+      //router.push('/cohort')
+    } else {
+      toast({
+        title: "Error",
+        description: "Failed to submit survey. Please try again.",
+        variant: "destructive"
+      })
+    }
+  } catch (error) {
+    console.error('Survey submission error:', error)
+    toast({
+      title: "Error",
+      description: "Failed to submit survey. Please try again.",
+      variant: "destructive"
+    })
+  }
+}
 
   const steps = [
     <About key="about" currentSituation={data.currentSituation} biggestBottleneck={data.biggestBottleneck} updateFields={updateFields} />,
