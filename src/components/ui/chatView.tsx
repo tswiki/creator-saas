@@ -2,11 +2,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/v0/ui/card";
-import { Button } from "@/components/v0/ui/button";
-import { ScrollArea } from "@/components/v0/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/v0/ui/avatar";
-import { Badge } from "@/components/v0/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { useView } from '@/contexts/viewContext';
 import { auth } from '@/firebase/firebaseConfig';
 import {

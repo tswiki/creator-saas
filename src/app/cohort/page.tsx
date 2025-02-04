@@ -1,6 +1,6 @@
 
 
-import MentorshipPortal from "@/components/v0/ui/MentorshipPortal"
+import MentorshipPortal from "@/components/ui/MentorshipPortal"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 

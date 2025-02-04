@@ -1,5 +1,5 @@
-import { Textarea } from "@/components/v0/ui/textarea"
-import { Label } from "@/components/v0/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
 
 type AboutProps = {
   currentSituation: string

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useForm, Controller } from "react-hook-form"
-import { Button } from "@/components/v0/ui/button"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -11,17 +11,17 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/v0/ui/dialog"
-import { Input } from "@/components/v0/ui/input"
-import { Label } from "@/components/v0/ui/label"
-import { Textarea } from "@/components/v0/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/v0/ui/select"
-import { RadioGroup, RadioGroupItem } from "@/components/v0/ui/radio-group"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/v0/ui/command"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/v0/ui/popover"
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Calendar } from "./ui/calendar"
+import { Calendar } from "@/components/ui/calendar"
 
 type EventFormData = {
   date: Date

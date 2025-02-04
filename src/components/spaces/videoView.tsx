@@ -22,7 +22,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 
 import "@stream-io/video-react-sdk/dist/css/styles.css";
-import { Card } from '../v0/ui/card';
+import { Card } from '../ui/card';
 import { ScrollArea } from '@radix-ui/react-scroll-area';
 
 const apiKey = process.env.NEXT_PUBLIC_STREAM_KEY!;

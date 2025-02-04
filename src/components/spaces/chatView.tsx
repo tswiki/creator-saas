@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 
 import 'stream-chat-react/dist/css/v2/index.css';
 import './layout.css';
-import { Card } from '../v0/ui/card';
+import { Card } from '../ui/card';
 
 const apiKey = process.env.NEXT_PUBLIC_STREAM_KEY!;
 const streamClient = StreamChat.getInstance(apiKey);

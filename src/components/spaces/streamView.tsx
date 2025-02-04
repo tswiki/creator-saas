@@ -7,7 +7,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import stream from 'getstream';
-import { Card } from '../v0/ui/card';
+import { Card } from '../ui/card';
 
 const apiKey = process.env.NEXT_PUBLIC_STREAM_KEY!;
 

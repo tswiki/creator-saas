@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useForm, FormProvider } from "react-hook-form"
-import { Button } from "@/components/v0/ui/button"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/v0/ui/dialog"
+} from "@/components/ui/dialog"
 import { Step1Form } from "./step1-form"
 import { Step2Form } from "./step2-form"
 import { Step3Form } from "./step3-form"

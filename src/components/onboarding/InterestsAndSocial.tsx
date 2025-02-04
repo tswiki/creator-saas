@@ -1,5 +1,5 @@
-import { Input } from "@/components/v0/ui/input"
-import { Label } from "@/components/v0/ui/label"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 // Define FormData type to include social media fields
 type FormData = {

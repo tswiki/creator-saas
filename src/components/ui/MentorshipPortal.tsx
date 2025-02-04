@@ -1,13 +1,13 @@
 
 'use client';
 
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { AwaitedReactNode, JSXElementConstructor, Key, ReactElement, ReactNode, SetStateAction, useEffect, useRef, useState } from 'react';
-import { Button } from "@/components/v0/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/v0/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/v0/ui/avatar";
-import { Badge } from "@/components/v0/ui/badge";
-import HeroVideoDialog from "@/components/v0/ui/hero-video-dialog";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import HeroVideoDialog from "@/components/ui/hero-video-dialog";
 import { auth } from '@/firebase/firebaseConfig';
 import {
   Dialog,
@@ -17,20 +17,20 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/v0/ui/dialog"
+} from "@/components/ui/dialog"
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
-} from "@/components/v0/ui/sheet";
-import { ScrollArea } from "@/components/v0/ui/scroll-area";
+} from "@/components/ui/sheet";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/v0/ui/select";
+} from "@/components/ui/select";
 import { 
   BookOpen, 
   Calendar as CalendarIcon, 
@@ -141,20 +141,22 @@ import {
   PenTool,
   Database,
   FolderTree,
-  Edit
+  Edit,
+  MessagesSquare,
+  Reply,
+  Library
 } from "lucide-react";
-import { Input } from '@/components/v0/ui/input';
+import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Label, DropdownMenuSeparator, RadioGroup, Separator } from '@radix-ui/react-dropdown-menu';
-import { Switch } from '@/components/v0/ui/switch';
+import { Switch } from '@/components/ui/switch';
 import { useTheme } from 'next-themes';
 import { toast } from '@/hooks/use-toast';
 import { Textarea } from './textarea';
 import { Menubar, MenubarCheckboxItem, MenubarContent, MenubarItem, MenubarMenu, MenubarRadioGroup, MenubarRadioItem, MenubarSeparator, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarTrigger } from './menubar';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@radix-ui/react-tabs';
 import SpacesView from './chatView';
-import {EventCreationDialog} from '../event-creation-dialog'
-import ResourceCreationDialog from '../resource-creation-dialog';
-import ConsoleView from '../SystemView';
+import {EventCreationDialog} from '@/components/v0/event-creation-dialog'
+import ResourceCreationDialog from '@/components/v0/resource-creation-dialog';
 import { useView } from '@/contexts/viewContext'
 import { useAdmin } from '@/contexts/adminContext';
 import ChannelView from '@/components/spaces/chatView';
@@ -164,6 +166,7 @@ import AvatarCircles from './avatar-circles';
 import { Slider } from './slider';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from './carousel';
 import Marquee from './marquee';
+import React from 'react';
 
 const DashboardView = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -1216,7 +1219,7 @@ const ScheduleView = () => {
     <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4">
       <Card className="w-full border-8 border-primary">
         <Card className="rounded-b-none">
-          <Card className="border-4">
+          <Card className="border-0">
             <CardHeader className="sticky top-0 bg-background z-10">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pl-10">
                 <Card className="bg-white dark:bg-gray-800 shadow-sm">
@@ -2456,66 +2459,70 @@ export default function MentorshipPortal() {
                     <div className="space-y-4">
                       {resources.map((course, i) => (
                         <div key={i} className="flex gap-2">
-                          <Card className="p-2 bg-accent rounded-lg flex-1 border-4">
-                            <div className="flex items-center">
-                            <Avatar className="h-6 w-6 rounded-full border-2 border-primary flex items-center justify-center">
-                            {(() => {
-                              const icons = [
-                                <Video className="h-3 w-3" />,
-                                <FileText className="h-3 w-3" />,
-                                <MonitorPlay className="h-3 w-3" />
-                              ];
-                              return icons[Math.floor(Math.random() * icons.length)];
-                            })()}
-                          </Avatar>
-                              <div className="flex justify-between items-start px-2">
-                                <Badge variant="secondary" className="text-xs text-muted-foreground">3/12</Badge>
-                              </div>
-                                <div className="top-2 right-2 ml-auto">
-                                  <Menubar className="border-0 bg-transparent p-0 h-auto">
-                                    <MenubarMenu>
-                                      <MenubarTrigger asChild>
-                                        <Badge variant="outline" className="cursor-pointer hover:bg-accent-foreground/10">
-                                          <MoreVertical className="h-4 w-4 rotate-90" />
-                                        </Badge>
-                                      </MenubarTrigger>
-                                      <MenubarContent>
-                                        <MenubarItem>
-                                          <Edit className="mr-2 h-4 w-4" />
-                                          Edit
-                                        </MenubarItem>
-                                        <MenubarItem>
-                                          <Share className="mr-2 h-4 w-4" />
-                                          Share
-                                        </MenubarItem>
-                                        <MenubarSeparator />
-                                        <MenubarItem className="text-destructive">
-                                          <Trash className="mr-2 h-4 w-4" />
-                                          Delete
-                                        </MenubarItem>
-                                      </MenubarContent>
-                                    </MenubarMenu>
-                                  </Menubar>
+                          <Button variant="ghost" className="w-full p-0 h-auto hover:bg-transparent" asChild onClick={() => setCurrentView('course')}>
+                            <div>
+                              <Card className="p-2 bg-accent rounded-lg flex-1 border-4">
+                                <div className="flex items-center">
+                                  <Avatar className="h-6 w-6 rounded-full border-2 border-primary flex items-center justify-center">
+                                    {(() => {
+                                      const icons = [
+                                        <Video className="h-3 w-3" />,
+                                        <FileText className="h-3 w-3" />,
+                                        <MonitorPlay className="h-3 w-3" />
+                                      ];
+                                      return icons[Math.floor(Math.random() * icons.length)];
+                                    })()}
+                                  </Avatar>
+                                  <div className="flex justify-between items-start px-2">
+                                    <Badge variant="secondary" className="text-xs text-muted-foreground">3/12</Badge>
+                                  </div>
+                                  <div className="top-2 right-2 ml-auto" onClick={(e) => e.stopPropagation()}>
+                                    <Menubar className="border-0 bg-transparent p-0 h-auto">
+                                      <MenubarMenu>
+                                        <MenubarTrigger asChild>
+                                          <Badge variant="outline" className="cursor-pointer hover:bg-accent-foreground/10">
+                                            <MoreVertical className="h-4 w-4 rotate-90" />
+                                          </Badge>
+                                        </MenubarTrigger>
+                                        <MenubarContent>
+                                          <MenubarItem>
+                                            <Edit className="mr-2 h-4 w-4" />
+                                            Edit
+                                          </MenubarItem>
+                                          <MenubarItem>
+                                            <Share className="mr-2 h-4 w-4" />
+                                            Share
+                                          </MenubarItem>
+                                          <MenubarSeparator />
+                                          <MenubarItem className="text-destructive">
+                                            <Trash className="mr-2 h-4 w-4" />
+                                            Delete
+                                          </MenubarItem>
+                                        </MenubarContent>
+                                      </MenubarMenu>
+                                    </Menubar>
+                                  </div>
                                 </div>
+                                <p className="text-xs text-muted-foreground p-2">{course.type || 'Video Course'} by {course.creator || 'Sarah Smith'}</p>
+                                <p className="font-medium">{course.title}</p>
+                                <div className="mt-3 space-y-2">
+                                  <div className="w-full flex items-center gap-2">
+                                    <Slider 
+                                      defaultValue={[(3/12) * 100]}
+                                      max={100}
+                                      step={1}
+                                      disabled
+                                      className="cursor-default"
+                                    />
+                                  </div>
+                                  <div className="flex justify-between text-[0.7rem] text-muted-foreground">
+                                    <span>Jan 15, 2024</span>
+                                    <span>Feb 1, 2024</span>
+                                  </div>
+                                </div>
+                              </Card>
                             </div>
-                            <p className="text-xs text-muted-foreground p-2">{course.type || 'Video Course'} by {course.creator || 'Sarah Smith'}</p>
-                            <p className="font-medium">{course.title}</p>
-                            <div className="mt-3 space-y-2">
-                              <div className="w-full flex items-center gap-2">
-                                <Slider 
-                                  defaultValue={[(3/12) * 100]}
-                                  max={100}
-                                  step={1}
-                                  disabled
-                                  className="cursor-default"
-                                />
-                              </div>
-                              <div className="flex justify-between text-[0.7rem] text-muted-foreground">
-                                <span>Jan 15, 2024</span>
-                                <span>Feb 1, 2024</span>
-                              </div>
-                            </div>
-                          </Card>
+                          </Button>
                         </div>
                       ))}
                     </div>
@@ -3322,20 +3329,9 @@ export default function MentorshipPortal() {
   
   const CourseView = () => {
     const [courses, setCourses] = useState<any[]>([]);
-    const { isAdmin, setIsAdmin } = useAdmin();
-
-    // Set initial admin view
-    useEffect(() => {
-      setIsAdmin(true);
-    }, [setIsAdmin]);
-
     return (
       <div className="space-y-6 pt-16">
-        {isAdmin ? (
-          <AdminCourseView courses={courses} />
-        ) : (
           <MemberCourseView courses={courses} />
-        )}
       </div>
     );
   };
@@ -3343,13 +3339,15 @@ export default function MentorshipPortal() {
   // Member facing view
   const MemberCourseView = ({ courses }: { courses: any[] }) => {
     return (
-      <Card>
+      <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-auto">
+          <Card className="h-full w-full border-8 border-primary"> 
+          <ScrollArea className="h-full w-full overflow-auto">
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle>Course: Advanced JavaScript Concepts</CardTitle>
             <div className="flex items-center space-x-2">
-              <Switch/>
-              <Label>Edit</Label>
+              {/* <Switch/>
+              <Label>Edit</Label> */}
             </div>
           </div>
           
@@ -3494,57 +3492,6 @@ export default function MentorshipPortal() {
                   )})}
                 </div>
               </ScrollArea>
-
-              {/* Add New Module Section */}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" className="w-full mt-6">
-                    + Add New Module
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle>Add New Module</DialogTitle>
-                    <DialogDescription>
-                      Create a new module and add its submodules. Click save when you're done.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid gap-2">
-                      <label htmlFor="module-name" className="text-sm font-medium">
-                        Module Name
-                      </label>
-                      <input
-                        id="module-name"
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                        placeholder="Enter module name"
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <label className="text-sm font-medium">
-                        Submodules
-                      </label>
-                      <div className="space-y-2">
-                        <input
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                          placeholder="Submodule 1"
-                        />
-                        <input
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                          placeholder="Submodule 2"
-                        />
-                        <Button variant="outline" className="w-full">
-                          + Add Another Submodule
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex justify-end gap-3">
-                    <Button variant="outline">Cancel</Button>
-                    <Button>Save Module</Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
             </div>
 
             {/* Content Area */}
@@ -3646,446 +3593,727 @@ export default function MentorshipPortal() {
             </div>
           </div>
         </CardContent>
+        </ScrollArea>
       </Card>
+      </div>
     );
-  };
+  };  
+  
 
-  // Admin editing view - contains the original implementation
-  const AdminCourseView = ({ courses }: { courses: any[] }) => {
+  const FeedbackView = () => {
+    const [selectedReview, setSelectedReview] = React.useState({
+      filter: 'all',
+      sortBy: 'newest', 
+      likes: {} as Record<string, boolean>
+    });
+
+    const feedbackData = {
+      all: [
+        {
+          id: '1',
+          name: 'John Doe',
+          avatar: '/default-avatar.png',
+          totalReviews: 15,
+          rating: 5,
+          content: 'Excellent product! The user interface is intuitive and the features are exactly what I needed for my workflow.'
+        },
+        {
+          id: '2',
+          name: 'Jane Smith', 
+          avatar: '/default-avatar.png',
+          totalReviews: 8,
+          rating: 4,
+          content: 'Very good overall. Could use some minor improvements but definitely recommended.'
+        }
+      ],
+      featured: [
+        {
+          id: '3',
+          name: 'Mike Johnson',
+          avatar: '/default-avatar.png',
+          totalReviews: 25,
+          rating: 5,
+          content: 'Outstanding experience! This has completely transformed how I work.'
+        }
+      ],
+      recent: [
+        {
+          id: '4',
+          name: 'Sarah Wilson',
+          avatar: '/default-avatar.png',
+          totalReviews: 3,
+          rating: 4,
+          content: 'Just started using this last week. Really impressed with the functionality.'
+        }
+      ],
+      'by-product': [
+        {
+          id: '5',
+          name: 'Alex Brown',
+          avatar: '/default-avatar.png',
+          totalReviews: 12,
+          rating: 5,
+          content: 'The premium features are well worth the investment. Highly recommended!'
+        }
+      ]
+    };
+
+    const handleLike = (reviewId: string) => {
+      setSelectedReview(prev => ({
+        ...prev,
+        likes: {
+          ...prev.likes,
+          [reviewId]: !prev.likes[reviewId]
+        }
+      }));
+    };
+
+    const handleReply = (reviewId: string) => {
+      toast({
+        title: "Reply Sent",
+        description: "Your reply has been submitted successfully."
+      });
+    };
+
+    const handleMessage = (reviewId: string) => {
+      toast({
+        title: "Message Sent",
+        description: "Your message has been sent successfully."
+      });
+    };
+
     return (
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle>Course: Advanced JavaScript Concepts</CardTitle>
-            <div className="flex items-center space-x-2">
-              <Switch/>
-              <Label>Edit</Label>
-            </div>
-          </div>
-        </CardHeader>
-        
-        
-        <CardContent>
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Course Content Navigation */}
-            <div className="md:col-span-1 flex flex-col h-full">
-              <div className="font-semibold mb-4">Course Modules</div>
-              <ScrollArea className="flex-grow pr-4">
-                <div className="relative">
-                  {/* Vertical line connecting modules */}
-                  <div className="absolute left-[18px] top-6 bottom-6 w-0.5 bg-border" />
-                  
-                  {[
-                    {
-                      title: "Introduction to Advanced JS",
-                      completed: true,
-                      lessons: [
-                        { name: "Course Overview", completed: true, current: false, url: "/lessons/course-overview" },
-                        { name: "Setting Up Environment", completed: true, current: false, url: "/lessons/setup" }
-                      ]
-                    },
-                    {
-                      title: "Closures & Scope", 
-                      completed: false,
-                      current: true,
-                      lessons: [
-                        { name: "Understanding Closures", completed: true, current: false, url: "/lessons/closures" },
-                        { name: "Lexical Scope", completed: false, current: true, url: "/lessons/lexical-scope" },
-                        { name: "Practical Applications", completed: false, current: false, url: "/lessons/practical-closures" }
-                      ]
-                    },
-                    {
-                      title: "Prototypes & Inheritance",
-                      completed: false,
-                      lessons: [
-                        { name: "Prototype Chain", completed: false, current: false, url: "/lessons/prototype-chain" },
-                        { name: "Inheritance Patterns", completed: false, current: false, url: "/lessons/inheritance" }
-                      ]
-                    },
-                    {
-                      title: "Asynchronous JavaScript",
-                      completed: false,
-                      lessons: [
-                        { name: "Promises Deep Dive", completed: false, current: false, url: "/lessons/promises" },
-                        { name: "Async/Await Patterns", completed: false, current: false, url: "/lessons/async-await" },
-                        { name: "Error Handling", completed: false, current: false, url: "/lessons/error-handling" }
-                      ]
-                    },
-                    {
-                      title: "Design Patterns",
-                      completed: false,
-                      lessons: [
-                        { name: "Singleton Pattern", completed: false, current: false, url: "/lessons/singleton" },
-                        { name: "Factory Pattern", completed: false, current: false, url: "/lessons/factory" },
-                        { name: "Observer Pattern", completed: false, current: false, url: "/lessons/observer" },
-                        { name: "Module Pattern", completed: false, current: false, url: "/lessons/module-pattern" }
-                      ]
-                    },
-                    {
-                      title: "Performance Optimization",
-                      completed: false,
-                      lessons: [
-                        { name: "Memory Management", completed: false, current: false, url: "/lessons/memory" },
-                        { name: "Code Splitting", completed: false, current: false, url: "/lessons/code-splitting" },
-                        { name: "Lazy Loading", completed: false, current: false, url: "/lessons/lazy-loading" }
-                      ]
-                    }
-                  ].map((module, i) => {
-                    // Check if all lessons are completed
-                    const isModuleCompleted = module.lessons.every(lesson => lesson.completed);
-                    
-                    const handleLessonClick = async (lessonUrl: string, moduleIndex: number, lessonIndex: number) => {
-                      try {
-                        // Mark the lesson as completed
-                        const response = await fetch('/api/course/progress', {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                          },
-                          body: JSON.stringify({
-                            moduleIndex,
-                            lessonIndex,
-                            completed: true
-                          })
-                        });
-
-                        if (!response.ok) {
-                          throw new Error('Failed to update lesson progress');
-                        }
-
-                        // Navigate to lesson content
-                        window.location.href = lessonUrl;
-                      } catch (error) {
-                        console.error('Error updating lesson progress:', error);
-                      }
-                    };
-
-                    return (
-                    <div key={i} className="mb-6 relative">
-                      <div className={`
-                        border rounded-lg p-4
-                        ${module.current ? 'border-primary bg-accent shadow-sm' : 'border-border'}
-                      `}>
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className={`
-                            w-5 h-5 rounded-full z-10 flex items-center justify-center
-                            ${isModuleCompleted ? 'bg-primary' : module.current ? 'border-2 border-primary' : 'border-2 border-muted-foreground'}
-                          `}>
-                            {isModuleCompleted && <Check className="h-3 w-3 text-primary-foreground" />}
-                          </div>
-                          <span className="font-medium">{module.title}</span>
-                        </div>
-                        
-                        <div className="space-y-2 ml-6 border-l-2 pl-4 border-border">
-                          {module.lessons.map((lesson, j) => (
-                            <button
-                              key={j}
-                              onClick={() => handleLessonClick(lesson.url, i, j)}
-                              className={`
-                                block w-full text-left flex items-center gap-2 p-2 rounded-md 
-                                transition-all duration-200 ease-in-out
-                                hover:bg-accent/50 hover:text-primary hover:-translate-y-0.5
-                                hover:underline hover:decoration-primary hover:decoration-2
-                                focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
-                                ${lesson.current ? 'bg-accent/50 text-primary font-medium' : ''}
-                                ${lesson.completed ? 'text-muted-foreground' : ''}
-                              `}
-                            >
-                              <div className={`
-                                w-3 h-3 rounded-full
-                                ${lesson.completed ? 'bg-primary/60' : lesson.current ? 'border-2 border-primary' : 'border border-muted-foreground'}
-                              `} />
-                              <span className="text-sm">{lesson.name}</span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )})}
-                </div>
-              </ScrollArea>
-
-              {/* Add New Module Section */}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" className="w-full mt-6">
-                    + Add New Module
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle>Add New Module</DialogTitle>
-                    <DialogDescription>
-                      Create a new module and add its submodules. Click save when you're done.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid gap-2">
-                      <label htmlFor="module-name" className="text-sm font-medium">
-                        Module Name
-                      </label>
-                      <input
-                        id="module-name"
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                        placeholder="Enter module name"
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <label className="text-sm font-medium">
-                        Submodules
-                      </label>
-                      <div className="space-y-2">
-                        <input
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                          placeholder="Submodule 1"
-                        />
-                        <input
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                          placeholder="Submodule 2"
-                        />
-                        <Button variant="outline" className="w-full">
-                          + Add Another Submodule
-                        </Button>
-                      </div>
-                    </div>
+      <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-6 overflow-hidden">
+        <Card className="h-full w-full border-8 border-primary p-4">
+          <CardHeader className="p-4">
+            <CardTitle>Feedback & Reviews</CardTitle>
+            <CardDescription>View and manage feedback from users</CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="grid grid-cols-12 h-[calc(100vh-15rem)] gap-0">
+              {/* Sidebar */}
+              <div className="col-span-3">
+                <Card className="h-full">
+                  <div className="h-full p-4 space-y-4">
+                    <Button 
+                      variant={selectedReview.filter === 'all' ? 'default' : 'ghost'}
+                      className="w-full justify-start h-12"
+                      onClick={() => setSelectedReview(prev => ({...prev, filter: 'all'}))}
+                    >
+                      <MessagesSquare className="h-5 w-5 mr-3" />
+                      All Feedback
+                    </Button>
+                    <Button 
+                      variant={selectedReview.filter === 'featured' ? 'default' : 'ghost'}
+                      className="w-full justify-start h-12"
+                      onClick={() => setSelectedReview(prev => ({...prev, filter: 'featured'}))}
+                    >
+                      <Star className="h-5 w-5 mr-3" />
+                      Featured
+                    </Button>
+                    <Button 
+                      variant={selectedReview.filter === 'recent' ? 'default' : 'ghost'}
+                      className="w-full justify-start h-12"
+                      onClick={() => setSelectedReview(prev => ({...prev, filter: 'recent'}))}
+                    >
+                      <Clock className="h-5 w-5 mr-3" />
+                      Recent
+                    </Button>
+                    <Button 
+                      variant={selectedReview.filter === 'by-product' ? 'default' : 'ghost'}
+                      className="w-full justify-start h-12"
+                      onClick={() => setSelectedReview(prev => ({...prev, filter: 'by-product'}))}
+                    >
+                      <Library className="h-5 w-5 mr-3" />
+                      By Product
+                    </Button>
                   </div>
-                  <div className="flex justify-end gap-3">
-                    <Button variant="outline">Cancel</Button>
-                    <Button>Save Module</Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
-
-            {/* Main Content Area */}
-            <div className="md:col-span-2 space-y-6">
-              <div>
-                <h3 className="font-semibold text-lg mb-4">Lexical Scope</h3>
-                
-                {/* Video Player */}
-                <Card className="mb-4">
-                  <CardContent className="p-4">
-                    <div className="aspect-video bg-accent rounded-lg flex items-center justify-center">
-                    <HeroVideoDialogDemoTopInBottomOut />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Content Upload Section */}
-                <Card className="mb-4">
-                  <CardHeader>
-                    <CardTitle className="text-base">Course Materials</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium mb-2">Upload Video Content</label>
-                          <div className="border-2 border-dashed rounded-lg p-4 text-center">
-                            <input type="file" accept="video/*" className="hidden" id="video-upload" />
-                            <label htmlFor="video-upload" className="cursor-pointer">
-                              <Video className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                              <span className="text-sm text-muted-foreground">Click to upload video</span>
-                            </label>
-                          </div>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium mb-2">Upload Documents</label>
-                          <div className="border-2 border-dashed rounded-lg p-4 text-center">
-                            <input type="file" accept=".pdf,.doc,.docx" className="hidden" id="doc-upload" />
-                            <label htmlFor="doc-upload" className="cursor-pointer">
-                              <BookOpen className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                              <span className="text-sm text-muted-foreground">Click to upload documents</span>
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium mb-2">External Resources</label>
-                        <input 
-                          type="url" 
-                          placeholder="Enter Google Drive or external link"
-                          className="w-full rounded-md border border-input px-3 py-2"
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Quiz Section */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">Knowledge Check</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-6">
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-medium mb-2">Question</label>
-                          <input
-                            type="text"
-                            placeholder="Enter your question"
-                            className="w-full rounded-md border border-input px-3 py-2"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium mb-2">Answer Type</label>
-                          <Select>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select answer type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="radio">Single Choice (Radio)</SelectItem>
-                              <SelectItem value="checkbox">Multiple Choice (Checkbox)</SelectItem>
-                              <SelectItem value="short">Short Text</SelectItem>
-                              <SelectItem value="long">Long Text</SelectItem>
-                              <SelectItem value="truefalse">True/False</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div className="space-y-4">
-                          <label className="block text-sm font-medium">Answer Options</label>
-                          
-                          <div className="space-y-3">
-                            {/* Dynamic answer options based on type */}
-                            <div className="flex items-center gap-2">
-                              <input
-                                type="text"
-                                placeholder="Enter answer option"
-                                className="flex-1 rounded-md border border-input px-3 py-2"
-                              />
-                              <div className="flex items-center gap-2">
-                                <input 
-                                  type="checkbox"
-                                  id="correct-1"
-                                  className="h-4 w-4 rounded border-gray-300"
-                                />
-                                <label htmlFor="correct-1" className="text-sm">
-                                  Correct
-                                </label>
-                              </div>
-                              <Button variant="ghost" size="icon">
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            className="w-full"
-                          >
-                            <Plus className="h-4 w-4 mr-2" />
-                            Add Answer Option
-                          </Button>
-                        </div>
-
-                        <div className="space-y-2">
-                          <label className="block text-sm font-medium">Feedback</label>
-                          <textarea
-                            placeholder="Enter feedback for correct/incorrect answers"
-                            className="w-full rounded-md border border-input px-3 py-2 min-h-[80px]"
-                          />
-                        </div>
-
-                        <div className="flex gap-2">
-                          <Button className="flex-1">
-                            <Plus className="h-4 w-4 mr-2" />
-                            Add Question
-                          </Button>
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant="outline">
-                                <Eye className="h-4 w-4 mr-2" />
-                                Preview Quiz
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-3xl">
-                              <DialogHeader>
-                                <DialogTitle>Quiz Preview</DialogTitle>
-                                <DialogDescription>
-                                  This is how students will see the quiz
-                                </DialogDescription>
-                              </DialogHeader>
-                              <div className="space-y-6 py-4">
-                                <Card>
-                                  <CardHeader>
-                                    <CardTitle>Knowledge Check Quiz</CardTitle>
-                                    <CardDescription>Test your understanding of the concepts covered</CardDescription>
-                                  </CardHeader>
-                                  <CardContent className="space-y-4">
-                                    <div className="space-y-4">
-                                      <div className="font-medium">Question 1</div>
-                                      <div className="text-sm">What is the main purpose of closures in JavaScript?</div>
-                                      <div className="space-y-2">
-                                        <div className="flex items-center space-x-2">
-                                          <input type="radio" name="quiz" id="a" value="a" className="radio" />
-                                          <label htmlFor="a" className="text-sm">Data privacy and encapsulation</label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                          <input type="radio" name="quiz" id="b" value="b" className="radio" />
-                                          <label htmlFor="b" className="text-sm">Memory optimization</label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                          <input type="radio" name="quiz" id="c" value="c" className="radio" />
-                                          <label htmlFor="c" className="text-sm">Code organization</label>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </CardContent>
-                                  <CardFooter>
-                                    <Button className="w-full">Submit Answer</Button>
-                                  </CardFooter>
-                                </Card>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                        </div>
-                      </div>
-
-                      <div className="border-t pt-4">
-                        <div className="flex items-center justify-between mb-4">
-                          <h3 className="font-medium">Questions</h3>
-                          <Button variant="outline" size="sm">
-                            <Settings2 className="h-4 w-4 mr-2" />
-                            Quiz Settings
-                          </Button>
-                        </div>
-
-                        <div className="space-y-4">
-                          {/* Question list/preview */}
-                          <div className="border rounded-lg p-4">
-                            <div className="flex items-center justify-between">
-                              <div className="font-medium">Question 1</div>
-                              <div className="flex gap-2">
-                                <Button variant="ghost" size="icon">
-                                  <Pencil className="h-4 w-4" />
-                                </Button>
-                                <Button variant="ghost" size="icon">
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </div>
-                            <div className="text-sm text-muted-foreground mt-1">
-                              Multiple Choice • 4 Options
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
                 </Card>
               </div>
-            </div>
-          </div>
-        </CardContent>
 
-      </Card>
+              {/* Main Content */}
+              <div className="col-span-9">
+                <ScrollArea className="h-full">
+                  <div className="p-6 space-y-4">
+                    {feedbackData[selectedReview.filter].map((review) => (
+                      <Card key={review.id} className="hover:bg-accent transition-colors">
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-start gap-4">
+                            <div className="flex items-center gap-4">
+                              <Avatar className="h-12 w-12">
+                                <AvatarImage src={review.avatar} />
+                                <AvatarFallback>{review.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                              </Avatar>
+                              <div className="space-y-1">
+                                <h4 className="font-medium">{review.name}</h4>
+                                <div className="flex text-yellow-400">
+                                  {[...Array(review.rating)].map((_, i) => (
+                                    <Star key={i} className="h-4 w-4 fill-current" />
+                                  ))}
+                                </div>
+                                <p className="text-sm text-muted-foreground">Total Reviews: {review.totalReviews}</p>
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => handleMessage(review.id)}
+                              >
+                                <MessagesSquare className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant={selectedReview.likes[review.id] ? "default" : "ghost"}
+                                size="sm"
+                                onClick={() => handleLike(review.id)}
+                              >
+                                <Star className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => handleReply(review.id)}
+                              >
+                                <Reply className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                          <p className="mt-4 text-sm">{review.content}</p>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     );
   };
+
+
+  const ConsoleView = () => {
+    const [activeSlide, setActiveSlide] = React.useState(0);
+    const totalSlides = 3;
+  
+    const [selectedReview, setSelectedReview] = React.useState({
+      rating: 0,
+      comment: '',
+      timestamp: '',
+      reviewer: '',
+      status: 'all',
+      filter: 'all', 
+      sortBy: 'newest',
+      mainContent: 'reviews',
+      productFilter: 'all'
+    });
+  
+    const [selectedSetting, setSelectedSetting] = React.useState({
+      agentName: 'settings',
+      agentRole: '',
+      agentBehavior: '',
+      customInstructions: '',
+      model: 'gpt4',
+      temperature: 0.7
+    });
+  
+    const handleSettingChange = (field: string, value: string | number | File[]) => {
+      if (field === 'documents' && Array.isArray(value)) {
+        const files = value as File[];
+        const allowedTypes = ['application/pdf', 'text/plain', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        
+        const validFiles = files.filter(file => allowedTypes.includes(file.type));
+        
+        if (validFiles.length !== files.length) {
+          console.warn('Some files were skipped due to invalid file type');
+        }
+  
+        setSelectedSetting(prev => ({
+          ...prev,
+          ...{documents: [...((prev as any).documents || []), ...validFiles]}
+        }));
+  
+      } else {
+        setSelectedSetting(prev => ({
+          ...prev,
+          [field]: value
+        }));
+      }
+    };
+  
+    return (
+      <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-6">
+        <Card className="h-full w-full border-4 border-primary shadow-lg">
+          <CardHeader className="pb-4">
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-2xl font-bold">User Console</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="grid grid-cols-12 gap-6 h-[calc(100vh-12rem)]">
+              
+              {/* Sidebar */}
+              <div className="col-span-3 p-4">
+                  <div className="space-y-2">
+                    {[
+                      {name: 'settings', icon: Settings2, label: 'Agent Settings'},
+                      {name: 'history', icon: Clock, label: 'Conversation History'}, 
+                      {name: 'context', icon: Library, label: 'Context Library'},
+                      {name: 'prompts', icon: MessagesSquare, label: 'Prompt Templates'}
+                    ].map((item) => (
+                      <Button 
+                        key={item.name}
+                        variant={selectedSetting.agentName === item.name ? 'default' : 'ghost'} 
+                        className="w-full justify-start"
+                        onClick={() => setSelectedSetting({
+                          ...selectedSetting,
+                          agentName: item.name
+                        })}
+                      >
+                        <item.icon className="h-4 w-4 mr-2" />
+                        {item.label}
+                      </Button>
+                    ))}
+                  </div>
+              </div>
+
+              {/* Main Content */}
+              <div className="col-span-9 p-4">
+                <ScrollArea className="h-[calc(100vh-14rem)] ">
+                  {selectedSetting.agentName === 'settings' && (
+                    <div className="space-y-6">
+                      <Card className="border-2">
+                        <CardHeader>
+                          <CardTitle className="text-center">Agent Configuration</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                          <div className="grid grid-cols-2 gap-6">
+                            <div className="space-y-4">
+                              <div>
+                                <Label className="text-center">Model Selection</Label>
+                                <Menubar className="w-full mt-2">
+                                  <MenubarMenu>
+                                    <MenubarTrigger className="w-full justify-between">
+                                      {selectedSetting.model === 'gpt4' && 'GPT-4'}
+                                      {selectedSetting.model === 'gpt35' && 'GPT-3.5'} 
+                                      {selectedSetting.model === 'claude' && 'Claude'}
+                                      {selectedSetting.model === 'llama' && 'Llama 2'}
+                                    </MenubarTrigger>
+                                    <MenubarContent>
+                                      {['gpt4', 'gpt35', 'claude', 'llama'].map((model) => (
+                                        <MenubarItem key={model} onClick={() => handleSettingChange('model', model)}>
+                                          {model === 'gpt4' && 'GPT-4'}
+                                          {model === 'gpt35' && 'GPT-3.5'}
+                                          {model === 'claude' && 'Claude'} 
+                                          {model === 'llama' && 'Llama 2'}
+                                        </MenubarItem>
+                                      ))}
+                                    </MenubarContent>
+                                  </MenubarMenu>
+                                </Menubar>
+                              </div>
+
+                              <div>
+                                <Label className="text-center">Agent Role</Label>
+                                <Menubar className="w-full mt-2">
+                                  <MenubarMenu>
+                                    <MenubarTrigger className="w-full justify-between">
+                                      {selectedSetting.agentRole || 'Select Agent Role'}
+                                    </MenubarTrigger>
+                                    <MenubarContent>
+                                      <MenubarItem onClick={() => handleSettingChange('agentRole', 'Research Assistant')}>
+                                        Research Assistant
+                                      </MenubarItem>
+                                      <MenubarItem onClick={() => handleSettingChange('agentRole', 'Copywriter')}>
+                                        Copywriter
+                                      </MenubarItem>
+                                      <MenubarItem onClick={() => handleSettingChange('agentRole', 'Data Analyst')}>
+                                        Data Analyst
+                                      </MenubarItem>
+                                      <MenubarItem onClick={() => handleSettingChange('agentRole', 'Content Strategist')}>
+                                        Content Strategist
+                                      </MenubarItem>
+                                      <MenubarItem onClick={() => handleSettingChange('agentRole', 'Business Analyst')}>
+                                        Business Analyst
+                                      </MenubarItem>
+                                      <MenubarItem onClick={() => handleSettingChange('agentRole', 'Technical Writer')}>
+                                        Technical Writer
+                                      </MenubarItem>
+                                    </MenubarContent>
+                                  </MenubarMenu>
+                                </Menubar>
+                              </div>
+                            </div>
+
+                            <div className="space-y-4">
+                              <div>
+                                <Label className="text-center">Agent Behavior</Label>
+                                <Textarea
+                                  className="mt-2 min-h-[120px]"
+                                  placeholder="Describe how the agent should behave...  eg. provide responses in a specific format etc..."
+                                  value={selectedSetting.agentBehavior}
+                                  onChange={(e) => handleSettingChange('agentBehavior', e.target.value)}
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          <div>
+                            <Label className="text-center">Custom Instructions</Label>
+                            <Textarea
+                              className="mt-2 min-h-[120px]"
+                              placeholder="Add any custom instructions to further personalise the agent... eg. You are a sales manager for a supplements company"
+                              value={selectedSetting.customInstructions}
+                              onChange={(e) => handleSettingChange('customInstructions', e.target.value)}
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <Label>Temperature ({selectedSetting.temperature})</Label>
+                              <span className="text-sm text-muted-foreground">Controls randomness</span>
+                            </div>
+                            <Slider 
+                              defaultValue={[selectedSetting.temperature]} 
+                              max={1} 
+                              step={0.1}
+                              onValueChange={(value) => handleSettingChange('temperature', value[0])}
+                            />
+                          </div>
+
+                          <div>
+                            <Label>Knowledge Base</Label>
+                            <Input
+                              type="file"
+                              multiple
+                              accept=".pdf,.txt,.doc,.docx"
+                              className="mt-2"
+                              onChange={(e) => handleSettingChange('documents', Array.from(e.target.files || []))}
+                            />
+                            <p className="text-sm text-muted-foreground mt-1">Upload documents to enhance agent knowledge</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  )}
+
+                  {selectedSetting.agentName === 'history' && (
+                    <div className="grid grid-cols-2 gap-4">
+                      {[1,2,3,4].map((i) => (
+                        <Dialog key={i}>
+                          <DialogTrigger asChild>
+                            <Card className="border-2 hover:border-primary cursor-pointer transition-all">
+                              <CardContent className="p-4">
+                                <div className="flex justify-between items-center">
+                                  <div>
+                                    <h4 className="font-medium">Conversation #{i}</h4>
+                                    <p className="text-sm text-muted-foreground">2 hours ago</p>
+                                  </div>
+                                  <Button variant="outline" size="sm">View</Button>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          </DialogTrigger>
+                          <DialogContent className="w-[70vw] h-[70vh]">
+                            <DialogHeader>
+                              <DialogTitle>Conversation History #{i}</DialogTitle>
+                            </DialogHeader>
+                            <ScrollArea className="h-[calc(70vh-8rem)] p-6">
+                              <div className="space-y-4">
+                                <div className="flex justify-end mb-4">
+                                  <Card className="max-w-[80%] border-2 border-primary">
+                                    <CardContent className="p-3">
+                                      <div className="flex items-start gap-3">
+                                        <div className="text-sm whitespace-pre-wrap break-words">
+                                          How can I improve this code?
+                                        </div>
+                                      </div>
+                                    </CardContent>
+                                  </Card>
+                                </div>
+                                <div className="flex justify-start mb-4">
+                                  <Card className="max-w-[80%] border-2 border-neutral-900 dark:border-neutral-50">
+                                    <CardContent className="p-3">
+                                      <div className="flex items-start gap-3">
+                                        <Avatar className="h-8 w-8">
+                                          <AvatarImage src="/default-avatar.png" alt="AI Assistant" />
+                                          <AvatarFallback>AI</AvatarFallback>
+                                        </Avatar>
+                                        <div className="text-sm whitespace-pre-wrap break-words">
+                                          Here are some suggestions to improve your code...
+                                        </div>
+                                      </div>
+                                    </CardContent>
+                                  </Card>
+                                </div>
+                              </div>
+                            </ScrollArea>
+                          </DialogContent>
+                        </Dialog>
+                      ))}
+                    </div>
+                  )}
+
+                  {selectedSetting.agentName === 'context' && (
+                    <div className="space-y-6">
+                      <Card className="border-2">
+                        <CardHeader>
+                          <CardTitle className="text-center">Creator Resources Library</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-2 gap-4">
+                            {[
+                              {
+                                title: 'Content Creation Guides',
+                                categories: ['Video Editing', 'Podcasting', 'Copywriting'],
+                                lastUpdated: '1 day ago'
+                              },
+                              {
+                                title: 'Platform Best Practices', 
+                                categories: ['YouTube', 'TikTok', 'Instagram'],
+                                lastUpdated: '3 days ago'
+                              },
+                              {
+                                title: 'Marketing Resources',
+                                categories: ['Social Media', 'Email Marketing', 'Brand Strategy'],
+                                lastUpdated: '1 week ago'
+                              },
+                              {
+                                title: 'Design Assets',
+                                categories: ['Motion Graphics', 'Graphic Design'],
+                                lastUpdated: '2 days ago'
+                              }
+                            ].map((resource) => (
+                              <Card key={resource.title} className="border-2">
+                                <CardContent className="p-4">
+                                  <div className="flex justify-between items-start">
+                                    <div>
+                                      <h4 className="font-medium">{resource.title}</h4>
+                                      <div className="flex flex-wrap gap-1 mt-1">
+                                        {resource.categories.map((category) => (
+                                          <span key={category} className="text-xs bg-muted px-2 py-1 rounded">
+                                            {category}
+                                          </span>
+                                        ))}
+                                      </div>
+                                      <p className="text-sm text-muted-foreground mt-2">
+                                        Last updated {resource.lastUpdated}
+                                      </p>
+                                    </div>
+                                    <div className="space-x-2">
+                                      <Button variant="outline" size="sm">Edit</Button>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                          <Button className="w-full mt-4" variant="outline">
+                            Add New Resource
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  )}
+
+                  {selectedSetting.agentName === 'prompts' && (
+                    <div className="space-y-6">
+                      <Card className="border-2">
+                        <CardHeader>
+                          <CardTitle>Prompt Templates</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-2 gap-4">
+                            {[
+                              {
+                                title: 'Content Strategy',
+                                description: 'Generate content ideas and strategy for your niche'
+                              },
+                              {
+                                title: 'Video Script',
+                                description: 'Create engaging video scripts with hooks and storytelling'
+                              },
+                              {
+                                title: 'Social Caption',
+                                description: 'Write compelling social media captions that drive engagement'
+                              },
+                              {
+                                title: 'SEO Optimization',
+                                description: 'Optimize your content titles and descriptions for search'
+                              }
+                            ].map((template) => (
+                              <Card key={template.title} className="border-2">
+                                <CardContent className="p-4">
+                                  <div className="flex justify-between items-center">
+                                    <div>
+                                      <h4 className="font-medium">{template.title}</h4>
+                                      <p className="text-sm text-muted-foreground mt-1">{template.description}</p>
+                                    </div>
+                                    <Button variant="outline" size="sm">Edit</Button>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  )}
+                </ScrollArea>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
+
+  const InboxView = () => {
+    const [selectedMessage, setSelectedMessage] = React.useState({
+      filter: 'all',
+      sortBy: 'newest',
+      starred: {} as Record<string, boolean>
+    });
+
+    const messagesData = {
+      all: [
+        {
+          id: '1',
+          sender: 'John Doe',
+          avatar: '/default-avatar.png',
+          subject: 'Question about JavaScript Closures',
+          preview: 'Hi, I was wondering if you could help explain closures in JavaScript...',
+          timestamp: '2:30 PM',
+          unread: true
+        },
+        {
+          id: '2',
+          sender: 'Jane Smith',
+          avatar: '/default-avatar.png', 
+          subject: 'Next Mentoring Session',
+          preview: 'Would you be available next Tuesday for our mentoring session?',
+          timestamp: '11:45 AM',
+          unread: false
+        }
+      ],
+      starred: [
+        {
+          id: '3',
+          sender: 'Mike Johnson',
+          avatar: '/default-avatar.png',
+          subject: 'Code Review Request',
+          preview: 'Could you take a look at my latest project when you have time?',
+          timestamp: 'Yesterday',
+          unread: true
+        }
+      ],
+      sent: [
+        {
+          id: '4',
+          sender: 'You',
+          recipient: 'Sarah Wilson',
+          avatar: '/default-avatar.png',
+          subject: 'Re: Project Feedback',
+          preview: 'Here are my thoughts on your recent project submission...',
+          timestamp: 'Oct 12',
+          unread: false
+        }
+      ]
+    };
+
+    return (
+      <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4">
+        <Card className="w-full h-full border-8 border-primary">
+          <ScrollArea className="h-full">
+            <CardContent className="h-full p-6">
+              <div className="grid grid-cols-12 gap-6 h-full">
+                <div className="col-span-3 h-full">
+                  <Card className="h-full">
+                    <CardContent className="p-6 space-y-4">
+                      <Button className="w-full h-12 text-lg">
+                        <PenSquare className="h-5 w-5 mr-3" />
+                        Compose
+                      </Button>
+                      <div className="space-y-3 pt-4">
+                        <Button variant="ghost" className="w-full h-10 justify-start text-base">
+                          <Inbox className="h-5 w-5 mr-3" />
+                          Inbox
+                        </Button>
+                        <Button variant="ghost" className="w-full h-10 justify-start text-base">
+                          <Star className="h-5 w-5 mr-3" />
+                          Starred
+                        </Button>
+                        <Button variant="ghost" className="w-full h-10 justify-start text-base">
+                          <Send className="h-5 w-5 mr-3" />
+                          Sent
+                        </Button>
+                        <Button variant="ghost" className="w-full h-10 justify-start text-base">
+                          <Archive className="h-5 w-5 mr-3" />
+                          Archive
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="col-span-9 h-full">
+                  <Card className="h-full">
+                    <CardContent className="p-6">
+                      <div className="flex gap-4 mb-6">
+                        <div className="relative flex-1">
+                          <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                          <Input placeholder="Search messages..." className="pl-10 h-12 text-base" />
+                        </div>
+                        <Button variant="outline" size="icon" className="h-12 w-12">
+                          <Filter className="h-5 w-5" />
+                        </Button>
+                      </div>
+
+                      <ScrollArea className="h-[calc(100vh-16rem)]">
+                        <div className="space-y-3">
+                          {messagesData.all.map((message) => (
+                            <Card key={message.id} className="cursor-pointer hover:bg-accent transition-colors">
+                              <CardContent className="p-5">
+                                <div className="flex justify-between items-center">
+                                  <div className="flex items-center gap-4">
+                                    <Avatar className="h-12 w-12">
+                                      <AvatarImage src={message.avatar} />
+                                      <AvatarFallback>{message.sender[0]}</AvatarFallback>
+                                    </Avatar>
+                                    <div className="space-y-1">
+                                      <h4 className={`text-lg font-medium ${message.unread ? 'text-primary' : ''}`}>
+                                        {message.sender}
+                                      </h4>
+                                      <p className="text-base font-medium">{message.subject}</p>
+                                      <p className="text-sm text-muted-foreground line-clamp-1">{message.preview}</p>
+                                    </div>
+                                  </div>
+                                  <div className="flex flex-col items-end gap-2">
+                                    <span className="text-sm text-muted-foreground">{message.timestamp}</span>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                      <Star className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </CardContent>
+          </ScrollArea>
+        </Card>
+      </div>
+    );
+  };
+
+
   const ConnectView = () => {
     return (
       <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-auto">
@@ -4168,10 +4396,120 @@ export default function MentorshipPortal() {
                     </ScrollArea>
                   </DialogContent>
                 </Dialog>
-                <Button variant="outline" className="flex items-center gap-2">
-                  <FolderTree className="h-4 w-4" />
-                  Categories
-                </Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="flex items-center gap-2">
+                      <Activity className="h-4 w-4" />
+                      Activity
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-3xl h-[80vh]">
+                    <DialogHeader>
+                      <DialogTitle>Your Activity</DialogTitle>
+                      <DialogDescription>
+                        A detailed overview of your platform engagement and progress
+                      </DialogDescription>
+                    </DialogHeader>
+                    <ScrollArea className="h-[calc(80vh-8rem)] w-full">
+                      <div className="space-y-4 p-4">
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className="text-lg">Course Progress</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-3">
+                              <div className="flex justify-between items-center">
+                                <div>
+                                  <p className="font-medium">React Fundamentals</p>
+                                  <p className="text-sm text-muted-foreground">Completed Module 3: Hooks & State</p>
+                                </div>
+                                <Badge>80% Complete</Badge>
+                              </div>
+                              <div className="w-full bg-secondary rounded-full h-2">
+                                <div 
+                                  className="bg-primary h-full rounded-full" 
+                                  style={{ width: '80%' }}
+                                />
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className="text-lg">Recent Connections</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-4">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <Avatar>
+                                    <AvatarImage src="/avatars/01.png" />
+                                    <AvatarFallback>JD</AvatarFallback>
+                                  </Avatar>
+                                  <div>
+                                    <p className="font-medium">Connected with Sarah Chen</p>
+                                    <p className="text-sm text-muted-foreground">Frontend Mentor • 2 days ago</p>
+                                  </div>
+                                </div>
+                                <Button variant="outline" size="sm">Message</Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className="text-lg">Upcoming Events</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="font-medium">Code Review Session</p>
+                                  <p className="text-sm text-muted-foreground">Tomorrow at 2:00 PM</p>
+                                </div>
+                                <Button size="sm">Join</Button>
+                              </div>
+                              <Separator />
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="font-medium">Team Project Meeting</p>
+                                  <p className="text-sm text-muted-foreground">Friday at 11:00 AM</p>
+                                </div>
+                                <Button size="sm">Join</Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className="text-lg">Recent Reviews</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-4">
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <ThumbsUp className="h-4 w-4 text-green-500" />
+                                  <p className="font-medium">You reviewed "Advanced TypeScript Workshop"</p>
+                                </div>
+                                <p className="text-sm text-muted-foreground mt-1">Great session! The practical examples were very helpful.</p>
+                              </div>
+                              <Separator />
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <MessageSquare className="h-4 w-4" />
+                                  <p className="font-medium">2 people found your review helpful</p>
+                                </div>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </ScrollArea>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
             <CardDescription>
@@ -4208,17 +4546,42 @@ export default function MentorshipPortal() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    <Button variant="outline" className="w-full justify-start border-4">
-                      <Code className="h-4 w-4 mr-2" />
-                      Programming
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" className="w-full justify-start border-4">
+                          <PenTool className="h-4 w-4 mr-2" />
+                          Request Features
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                          <DialogTitle>Request New Features</DialogTitle>
+                          <DialogDescription>
+                            Tell us what features or tools would help improve your experience.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                          <div className="grid gap-2">
+                            <Label htmlFor="feature-request">Feature Request</Label>
+                            <Textarea
+                              id="feature-request"
+                              placeholder="Describe the feature you'd like to see..."
+                              className="min-h-[100px] resize-none"
+                            />
+                          </div>
+                        </div>
+                        <DialogFooter className="flex items-center justify-center">
+                          <Button type="submit">Submit Request</Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                    <Button variant="outline" className="w-full justify-start border-4" onClick={() => setCurrentView('feedback')}>
+                      <MessagesSquare className="h-4 w-4 mr-2" />
+                      Community Insights
                     </Button>
-                    <Button variant="outline" className="w-full justify-start border-4">
-                      <PenTool className="h-4 w-4 mr-2" />
-                      Graphic Design
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start border-4">
-                      <Database className="h-4 w-4 mr-2" />
-                      Data Science
+                    <Button variant="outline" className="w-full justify-start border-4" onClick={() => setCurrentView('inbox')}>
+                      <Inbox className="h-4 w-4 mr-2" />
+                      Inbox
                     </Button>
                   </div>
                 </CardContent>
@@ -4288,6 +4651,8 @@ export default function MentorshipPortal() {
         {currentView === 'stream' && <StreamView/>}
         {currentView === 'video' && <VideoView/>}
         {currentView === 'channel' && <ChannelView/>}
+        {currentView === 'feedback' && <FeedbackView/>}
+        {currentView === 'inbox' && <InboxView/>}
       </div>
     </div>
   );

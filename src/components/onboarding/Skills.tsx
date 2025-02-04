@@ -1,5 +1,5 @@
-import { Checkbox } from "@/components/v0/ui/checkbox"
-import { Label } from "@/components/v0/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
 
 type SkillsProps = {
   skills: string[]

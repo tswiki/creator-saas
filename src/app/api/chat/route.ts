@@ -1,6 +1,5 @@
-
 import { anthropic } from '@ai-sdk/anthropic';
-import { generateText } from 'ai';
+import { streamText } from 'ai';
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
@@ -8,7 +7,7 @@ export const maxDuration = 30;
 export async function POST(req: Request) {
   const { messages } = await req.json();
 
-  const { text } = await generateText({
+  const result = streamText({
     model: anthropic('claude-3-5-sonnet-20241022'),
     system:
 
@@ -31,7 +30,5 @@ export async function POST(req: Request) {
     messages,
   });
 
-  console.log(text);
-  return new Response(text);
+  return result.toDataStreamResponse();
 }
-

@@ -1,8 +1,8 @@
 import { useFormContext, useFieldArray } from "react-hook-form"
-import { Input } from "@/components/v0/ui/input"
-import { Label } from "@/components/v0/ui/label"
-import { Button } from "@/components/v0/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/v0/ui/select"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ResourceFormData, ResourceType } from "@/app/types/resource"
 import { PlusCircle, Trash2 } from 'lucide-react'
 

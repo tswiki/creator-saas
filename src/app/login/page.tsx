@@ -7,7 +7,7 @@ import { Channel, ChannelHeader, Chat, MessageList, Window, Thread } from 'strea
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { StreamChat, Channel as StreamChannel } from 'stream-chat';
-import { Card } from '@/components/v0/ui/card';
+import { Card } from '@/components/ui/card';
 import 'stream-chat-react/dist/css/v2/index.css';
 
 const apiKey = process.env.NEXT_PUBLIC_STREAM_KEY!;

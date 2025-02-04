@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import React from 'react'
-import Header from '@/components/v0/ui/header'
+import Header from '@/components/ui/header'
 
 export default async function AdminLayout({
   children,

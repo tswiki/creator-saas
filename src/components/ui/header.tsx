@@ -1,7 +1,8 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
-import {Bell, User, Settings } from 'lucide-react';
+import {Bell, User, Settings, LogOut, Menu, Shield, Users } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './dialog';
@@ -10,6 +11,11 @@ import { ScrollArea } from './scroll-area';
 import { useView } from '@/contexts/viewContext';
 import { SearchBar } from '@/components/v0/search-bar';
 import { Card, CardContent } from './card';
+import { signOut } from 'firebase/auth';
+import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarTrigger } from '@/components/ui/menubar';
+import router, { useRouter } from 'next/router';
+import { Separator } from '@radix-ui/react-menubar';
+import { auth } from '@/firebase/firebaseConfig';
 
 interface HeaderProps {
   logoSrc?: string;
@@ -128,6 +134,64 @@ export default function Header({ logoSrc, brandName = "dejitaru " }: HeaderProps
               >
                 <User className="h-8 w-8" />
               </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="icon" className="">
+                    <Menu className="h-8 w-8" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle className="text-center">Menu</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-3 w-full max-w-sm mx-auto">
+                    <Card className="w-full transition-all hover:scale-[1.02]">
+                      <CardContent className="p-2">
+                        <Button 
+                          variant="ghost" 
+                          className="w-full justify-center h-12" 
+                          onClick={() => {
+                            window.location.href = '/admin';
+                          }}
+                        >
+                          <Shield className="mr-3 h-5 w-5" />
+                          <span className="text-center">Admin Dashboard</span>
+                        </Button>
+                      </CardContent>
+                    </Card>
+                    <Card className="w-full transition-all hover:scale-[1.02]">
+                      <CardContent className="p-2">
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-center h-12"
+                          onClick={() => {
+                            window.location.href = '/cohort';
+                          }}
+                        >
+                          <Users className="mr-3 h-5 w-5" />
+                          <span className="text-center">Cohort View</span>
+                        </Button>
+                      </CardContent>
+                    </Card>
+                    <Separator className="my-2" />
+                    <Card className="w-full transition-all hover:scale-[1.02]">
+                      <CardContent className="p-2">
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-center h-12"
+                          onClick={async () => {
+                            await signOut(auth);
+                            window.location.href = '/login';
+                          }}
+                        >
+                          <LogOut className="mr-3 h-5 w-5" />
+                          <span className="text-center">Sign Out</span>
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </DialogContent>
+              </Dialog>
               </div>
           </div>
         </div>      

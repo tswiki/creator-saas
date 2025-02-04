@@ -1,17 +1,15 @@
-
 import type { Metadata } from "next";
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
 import "./globals.css";
-import { headers } from 'next/headers'; // Add this import
+import { headers } from 'next/headers';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { ThemeProvider } from '@/components/v0/ui/theme-provider'
+import { ThemeProvider } from '@/components/ui/theme-provider'
 import { ViewProvider } from "@/contexts/viewContext";
 import { AdminProvider} from "@/contexts/adminContext";
-import Header from "@/components/v0/ui/header";
 import { CampaignProvider } from "@/contexts/campaignContext";
-
+import { AuthProvider } from "@/contexts/authContext";
 
 export const metadata: Metadata = {
   title: "dejitaru",
@@ -28,6 +26,13 @@ export const metadata: Metadata = {
 // 影響力 (eikyōryoku) - Impact
 // 成長 (seichō) - Growth/scaling
 
+// Protected routes that require authentication
+const protectedRoutes = [
+  '/cohort',
+  '/admin',
+  '/spaces',
+];
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -40,8 +45,13 @@ export default async function RootLayout({
   const headersList = await headers();
   const pathname = headersList.get('x-pathname') || headersList.get('x-invoke-path') || '';
 
-  // Only check auth for cohort routes
-  if (pathname.startsWith('/cohort') && !sessionCookie) {
+  // Check if current route requires authentication
+  const isProtectedRoute = protectedRoutes.some(route => 
+    pathname.startsWith(route)
+  );
+
+  // Redirect to login if accessing protected route without valid auth
+  if (isProtectedRoute && !sessionCookie) {
     redirect('/login');
   }
 
@@ -54,13 +64,15 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AdminProvider>
-            <ViewProvider>
-              <CampaignProvider>
-                {children}
-              </CampaignProvider>
-            </ViewProvider>
-          </AdminProvider>
+          <AuthProvider>
+            <AdminProvider>
+              <ViewProvider>
+                <CampaignProvider>
+                  {children}
+                </CampaignProvider>
+              </ViewProvider>
+            </AdminProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
