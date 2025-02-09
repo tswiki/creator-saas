@@ -4315,6 +4315,73 @@ export default function MentorshipPortal() {
 
 
   const ConnectView = () => {
+
+    const [profileData] = useState([
+      {
+        id: 1,
+        name: "Sarah Johnson",
+        role: "Senior Frontend Developer",
+        avatar: "/avatars/sarah.jpg",
+        skills: ["React", "TypeScript", "UI/UX"],
+        availability: "Available for mentoring",
+        experience: "8 years",
+        bio: "Passionate about creating beautiful user experiences and helping others learn frontend development.",
+        location: "San Francisco, CA",
+        connections: 245,
+        projects: 12,
+        mentees: 5,
+        rating: 4.9,
+        badges: ["Top Mentor", "Frontend Expert", "Community Leader"],
+        socialLinks: {
+          github: "https://github.com/sarahj",
+          linkedin: "https://linkedin.com/in/sarahj",
+          twitter: "https://twitter.com/sarahj"
+        }
+      },
+      {
+        id: 2,
+        name: "Michael Chen",
+        role: "Full Stack Engineer",
+        avatar: "/avatars/michael.jpg", 
+        skills: ["Node.js", "React", "MongoDB", "AWS"],
+        availability: "Limited availability",
+        experience: "6 years",
+        bio: "Full stack developer specializing in scalable web applications. Love teaching and mentoring.",
+        location: "New York, NY",
+        connections: 189,
+        projects: 15,
+        mentees: 3,
+        rating: 4.8,
+        badges: ["Full Stack Pro", "AWS Certified", "Mentor"],
+        socialLinks: {
+          github: "https://github.com/michaelc",
+          linkedin: "https://linkedin.com/in/michaelc",
+          twitter: "https://twitter.com/michaelc"
+        }
+      },
+      {
+        id: 3,
+        name: "Emma Wilson",
+        role: "Backend Developer",
+        avatar: "/avatars/emma.jpg",
+        skills: ["Python", "Django", "PostgreSQL", "Docker"],
+        availability: "Not available",
+        experience: "5 years",
+        bio: "Backend developer focused on building robust and scalable systems. Enthusiastic about system design.",
+        location: "London, UK",
+        connections: 156,
+        projects: 8,
+        mentees: 2,
+        rating: 4.7,
+        badges: ["Backend Specialist", "Python Expert"],
+        socialLinks: {
+          github: "https://github.com/emmaw",
+          linkedin: "https://linkedin.com/in/emmaw",
+          twitter: "https://twitter.com/emmaw"
+        }
+      }
+    ]);
+
     return (
       <div className="fixed h-[calc(100vh-3.5rem)] w-[calc(100vw-16rem)] left-64 top-14 p-4 overflow-auto">
         <Card className="h-full w-full border-8 border-primary">
@@ -4521,11 +4588,11 @@ export default function MentorshipPortal() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-10">
               <Card className="hover:shadow-lg transition-shadow border-4">
                 <CardHeader>
-                  <CardTitle className="text-lg">Featured Members</CardTitle>
+                  <CardTitle className="text-lg text-center">Featured Members</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
+                  <div className="space-y-8">
+                    <div className="flex items-center justify-center gap-3">
                       <Avatar>
                         <AvatarImage src="/avatars/01.png" />
                         <AvatarFallback>JD</AvatarFallback>
@@ -4535,14 +4602,77 @@ export default function MentorshipPortal() {
                         <p className="text-sm text-muted-foreground">Senior Developer</p>
                       </div>
                     </div>
-                    <Button variant="outline" className="w-full border-4">View All Members</Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" className="w-full border-4">View Members</Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[500px] p-0">
+                        <Card className="border-2">
+                          <CardHeader className="pb-2 text-center">
+                            <DialogTitle className="text-lg font-semibold">Member Profile</DialogTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <ScrollArea className="h-[220px]">
+                              <div className="grid gap-4">
+                                <Card className="border-2">
+                                  <CardContent className="p-4">
+                                    <div className="flex flex-col items-center gap-4">
+                                      <Avatar className="h-16 w-16">
+                                        <AvatarImage src="/default-avatar.png" />
+                                        <AvatarFallback>JD</AvatarFallback>
+                                      </Avatar>
+                                      <div className="text-center">
+                                        <h3 className="font-semibold">{profileData[0].name}</h3>
+                                        <p className="text-sm text-muted-foreground">{profileData[0].role}</p>
+                                        <p className="text-sm text-muted-foreground">{profileData[0].bio}</p>
+                                      </div>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                                
+                                <Card className="border-2">
+                                  <CardContent className="p-4">
+                                    <h4 className="font-medium text-sm mb-2 text-center">Skills & Expertise</h4>
+                                    <div className="flex flex-wrap gap-1 justify-center">
+                                      {profileData[0].skills.map((skill: string) => (
+                                        <Badge key={skill} variant="secondary" className="text-xs">
+                                          {skill}
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  </CardContent>
+                                </Card>
+
+                                <Card className="border-2">
+                                  <CardContent className="p-4 text-center">
+                                    <h4 className="font-medium text-sm mb-2">Experience & Availability</h4>
+                                    <p className="text-sm text-muted-foreground">{profileData[0].experience}</p>
+                                    <p className="text-sm text-muted-foreground mt-1">{profileData[0].availability}</p>
+                                  </CardContent>
+                                </Card>
+                              </div>
+                            </ScrollArea>
+                            <div className="flex justify-center gap-4 p-4">
+                                  <Button variant="outline" size="sm">
+                                    <MessageSquare className="h-4 w-4 mr-2" />
+                                    Message
+                                  </Button>
+                                  <Button variant="outline" size="sm">
+                                    <UserPlus className="h-4 w-4 mr-2" />
+                                    Connect
+                                  </Button>
+                                </div>
+                          </CardContent>
+                        </Card>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </CardContent>
               </Card>
 
               <Card className="hover:shadow-lg transition-shadow border-4">
                 <CardHeader>
-                  <CardTitle className="text-lg">Popular Categories</CardTitle>
+                  <CardTitle className="text-lg text-center">Popular Categories</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
@@ -4553,26 +4683,36 @@ export default function MentorshipPortal() {
                           Request Features
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                          <DialogTitle>Request New Features</DialogTitle>
-                          <DialogDescription>
-                            Tell us what features or tools would help improve your experience.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                          <div className="grid gap-2">
-                            <Label htmlFor="feature-request">Feature Request</Label>
-                            <Textarea
-                              id="feature-request"
-                              placeholder="Describe the feature you'd like to see..."
-                              className="min-h-[100px] resize-none"
-                            />
-                          </div>
-                        </div>
-                        <DialogFooter className="flex items-center justify-center">
-                          <Button type="submit">Submit Request</Button>
-                        </DialogFooter>
+                      <DialogContent className="sm:max-w-[425px] flex flex-col items-center">
+                        <Card className="w-full">
+                          <CardHeader>
+                            <DialogHeader className="text-center">
+                              <DialogTitle className="text-center">Request New Features</DialogTitle>
+                              <DialogDescription className="text-center">
+                                Tell us what features or tools would help improve your experience.
+                              </DialogDescription>
+                            </DialogHeader>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="grid gap-4 py-2 w-full">
+                              <Card className="p-4">
+                                <div className="grid gap-2">
+                                  <Label htmlFor="feature-request" className="text-center">Feature Request</Label>
+                                  <Textarea
+                                    id="feature-request"
+                                    placeholder="Describe the feature you'd like to see..."
+                                    className="min-h-[100px] resize-none"
+                                  />
+                                </div>
+                              </Card>
+                            </div>
+                          </CardContent>
+                          <CardFooter className="flex justify-center">
+                            <DialogFooter>
+                              <Button type="submit">Submit Request</Button>
+                            </DialogFooter>
+                          </CardFooter>
+                        </Card>
                       </DialogContent>
                     </Dialog>
                     <Button variant="outline" className="w-full justify-start border-4" onClick={() => setCurrentView('feedback')}>
@@ -4589,10 +4729,51 @@ export default function MentorshipPortal() {
 
               <Card className="hover:shadow-lg transition-shadow border-4">
                 <CardHeader>
-                  <CardTitle className="text-lg">Recent Activities</CardTitle>
+                  <CardTitle className="text-lg text-center">Highlights</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" className="w-full border-4">Open Feed</Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-[425px] h-[80vh]">
+                        <DialogHeader>
+                          <DialogTitle>Feed</DialogTitle>
+                        </DialogHeader>
+                        <ScrollArea className="h-full w-full">
+                          <div className="flex flex-col gap-4 p-4">
+                            {Array.from({ length: 6 }, (_, i) => (
+                              <Card key={i} className="w-full cursor-pointer hover:bg-accent">
+                                <CardContent className="p-4">
+                                  <div className="relative" style={{ paddingBottom: '56.25%' }}>
+                                    <img 
+                                      src={`https://picsum.photos/400/225?random=${i}`}
+                                      alt={`Feed item ${i + 1}`}
+                                      className="absolute top-0 left-0 w-full h-full object-cover rounded-md"
+                                    />
+                                  </div>
+                                  <div className="pt-2 mt-2 text-center">
+                                    <h4 className="font-medium">Post Title {i + 1}</h4>
+                                    <p className="text-sm text-muted-foreground">Description for post {i + 1}</p>
+                                  </div>
+                                  <div className="flex justify-center gap-2 mt-2">
+                                    <Button variant="ghost" size="sm">
+                                      <MessageSquare className="h-4 w-4 mr-2" />
+                                      Comment
+                                    </Button>
+                                    <Button variant="ghost" size="sm">
+                                      <Heart className="h-4 w-4 mr-2" />
+                                      Like
+                                    </Button>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        </ScrollArea>
+                      </DialogContent>
+                    </Dialog>
                     <div className="flex items-center gap-2">
                       <MessageSquare className="h-4 w-4 text-muted-foreground" />
                       <p className="text-sm">New discussion in Programming</p>
@@ -4601,7 +4782,6 @@ export default function MentorshipPortal() {
                       <Users className="h-4 w-4 text-muted-foreground" />
                       <p className="text-sm">5 new members joined today</p>
                     </div>
-                    <Button variant="outline" className="w-full border-4">View All Activities</Button>
                   </div>
                 </CardContent>
               </Card>

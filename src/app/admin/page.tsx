@@ -170,6 +170,8 @@ import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, Me
 import { Slider } from '@/components/ui/slider';
 import AvatarCircles from '@/components/ui/avatar-circles';
 import React from 'react';
+import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 
 
@@ -333,6 +335,7 @@ export default function AdminPortal() {
                   </Card>
                 </div>
               </div>
+
 
               {/* Right Sidebar */}
               <div className="col-span-4 space-y-4">
@@ -1786,45 +1789,165 @@ export default function AdminPortal() {
             <CardContent className="p-6 space-y-6">
               <Card className="border-2">
                 <CardHeader>
-                  <CardTitle>Engagement Metrics</CardTitle>
+                  <div className="flex justify-between items-center">
+                    <CardTitle>Engagement Metrics</CardTitle>
+                    <Button variant="outline" size="sm">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Metric
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-4 gap-4">
-                    <Card className="p-4">
-                      <div className="flex flex-col items-center">
-                        <Users2 className="h-8 w-8 mb-2 text-primary" />
-                        <h3 className="text-2xl font-bold">2,543</h3>
-                        <p className="text-sm text-muted-foreground">Active Users</p>
-                        <span className="text-xs text-green-500 mt-1">+12% vs last month</span>
-                      </div>
-                    </Card>
+                  <div className="space-y-6">
+                    
+                    <div className="relative w-full h-full">
+                      <Carousel
+                        className="w-full"
+                        opts={{
+                          align: "start",
+                          loop: true,
+                          dragFree: true,
+                          skipSnaps: false,
+                          startIndex: 0
+                        }}
+                      >
+                        <CarouselContent>
+                          <CarouselItem className="pl-4 basis-1/4">
+                            <Card className="h-[120px] hover:bg-primary/5 transition-all cursor-pointer group">
+                              <CardHeader className="p-2 flex flex-row items-center justify-between">
+                                <h4 className="font-medium text-sm">Active Users</h4>
+                                <Users2 className="w-5 h-5 text-primary" />
+                              </CardHeader>
+                              <CardContent className="p-2 text-center">
+                                <div className="flex items-baseline gap-2 justify-center">
+                                  <p className="text-2xl font-bold">2,543</p>
+                                  <p className="text-xs text-green-500 font-medium">+12%</p>
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-1">Total Users</p>
+                              </CardContent>
+                            </Card>
+                          </CarouselItem>
 
-                    <Card className="p-4">
-                      <div className="flex flex-col items-center">
-                        <MessageSquare className="h-8 w-8 mb-2 text-primary" />
-                        <h3 className="text-2xl font-bold">1,877</h3>
-                        <p className="text-sm text-muted-foreground">Comments</p>
-                        <span className="text-xs text-green-500 mt-1">+8% vs last month</span>
-                      </div>
-                    </Card>
+                          <CarouselItem className="pl-4 basis-1/4">
+                            <Card className="h-[120px] hover:bg-primary/5 transition-all cursor-pointer group">
+                              <CardHeader className="p-2 flex flex-row items-center justify-between">
+                                <h4 className="font-medium text-sm">Comments</h4>
+                                <MessageSquare className="w-5 h-5 text-primary" />
+                              </CardHeader>
+                              <CardContent className="p-2 text-center">
+                                <div className="flex items-baseline gap-2 justify-center">
+                                  <p className="text-2xl font-bold">1,877</p>
+                                  <p className="text-xs text-green-500 font-medium">+8%</p>
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-1">Total Comments</p>
+                              </CardContent>
+                            </Card>
+                          </CarouselItem>
 
-                    <Card className="p-4">
-                      <div className="flex flex-col items-center">
-                        <Star className="h-8 w-8 mb-2 text-primary" />
-                        <h3 className="text-2xl font-bold">4.7</h3>
-                        <p className="text-sm text-muted-foreground">Avg Rating</p>
-                        <span className="text-xs text-green-500 mt-1">+0.2 vs last month</span>
-                      </div>
-                    </Card>
+                          <CarouselItem className="pl-4 basis-1/4">
+                            <Card className="h-[120px] hover:bg-primary/5 transition-all cursor-pointer group">
+                              <CardHeader className="p-2 flex flex-row items-center justify-between">
+                                <h4 className="font-medium text-sm">Rating</h4>
+                                <Star className="w-5 h-5 text-primary" />
+                              </CardHeader>
+                              <CardContent className="p-2 text-center">
+                                <div className="flex items-baseline gap-2 justify-center">
+                                  <p className="text-2xl font-bold">4.7</p>
+                                  <p className="text-xs text-green-500 font-medium">+0.2</p>
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-1">Average Rating</p>
+                              </CardContent>
+                            </Card>
+                          </CarouselItem>
 
-                    <Card className="p-4">
-                      <div className="flex flex-col items-center">
-                        <Share2 className="h-8 w-8 mb-2 text-primary" />
-                        <h3 className="text-2xl font-bold">892</h3>
-                        <p className="text-sm text-muted-foreground">Shares</p>
-                        <span className="text-xs text-green-500 mt-1">+15% vs last month</span>
-                      </div>
-                    </Card>
+                          <CarouselItem className="pl-4 basis-1/4">
+                            <Card className="h-[120px] hover:bg-primary/5 transition-all cursor-pointer group">
+                              <CardHeader className="p-2 flex flex-row items-center justify-between">
+                                <h4 className="font-medium text-sm">Shares</h4>
+                                <Share2 className="w-5 h-5 text-primary" />
+                              </CardHeader>
+                              <CardContent className="p-2 text-center">
+                                <div className="flex items-baseline gap-2 justify-center">
+                                  <p className="text-2xl font-bold">892</p>
+                                  <p className="text-xs text-green-500 font-medium">+15%</p>
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-1">Total Shares</p>
+                              </CardContent>
+                            </Card>
+                          </CarouselItem>
+                        </CarouselContent>
+                        <CarouselPrevious className="absolute -left-4" />
+                        <CarouselNext className="absolute -right-4" />
+                      </Carousel>
+                    </div>
+
+                    <Collapsible>
+                      <CollapsibleTrigger asChild>
+                        <Button variant="ghost" className="w-full justify-between">
+                          <span>View Detailed Analytics</span>
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-4 mt-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <Card className="p-4">
+                            <CardHeader>
+                              <CardTitle className="text-lg">Engagement Over Time</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              {/* Area Chart Component would go here */}
+                              <div className="h-[200px] w-full bg-muted rounded-lg flex items-center justify-center">
+                                Area Chart Placeholder
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          <Card className="p-4">
+                            <CardHeader>
+                              <CardTitle className="text-lg">User Distribution</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              {/* Pie Chart Component would go here */}
+                              <div className="h-[200px] w-full bg-muted rounded-lg flex items-center justify-center">
+                                Pie Chart Placeholder
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </div>
+
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className="text-lg">Detailed Metrics</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>Metric</TableHead>
+                                  <TableHead>Value</TableHead>
+                                  <TableHead>Change</TableHead>
+                                  <TableHead>Trend</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                <TableRow>
+                                  <TableCell>Session Duration</TableCell>
+                                  <TableCell>12m 30s</TableCell>
+                                  <TableCell className="text-green-500">+2m 15s</TableCell>
+                                  <TableCell>↗</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                  <TableCell>Bounce Rate</TableCell>
+                                  <TableCell>24.8%</TableCell>
+                                  <TableCell className="text-red-500">+2.1%</TableCell>
+                                  <TableCell>↘</TableCell>
+                                </TableRow>
+                              </TableBody>
+                            </Table>
+                          </CardContent>
+                        </Card>
+                      </CollapsibleContent>
+                    </Collapsible>
                   </div>
                 </CardContent>
               </Card>
@@ -1832,34 +1955,34 @@ export default function AdminPortal() {
               <Card className="border-2">
                 <CardHeader>
                   <div className="flex justify-between items-center">
-                    <CardTitle>Community Reviews</CardTitle>
+                    <CardTitle>Community Engagement & Feedback</CardTitle>
                     <div className="flex gap-4">
                       <Select 
-                        value={selectedReview.filter} 
+                        value={selectedReview.filter}
                         onValueChange={(value) => setSelectedReview(prev => ({...prev, filter: value}))}
                       >
                         <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Filter reviews" />
+                          <SelectValue placeholder="View Type" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="all">All Reviews</SelectItem>
-                          <SelectItem value="featured">Featured</SelectItem>
-                          <SelectItem value="recent">Recent</SelectItem>
-                          <SelectItem value="by-product">By Product</SelectItem>
+                          <SelectItem value="all">All Feedback</SelectItem>
+                          <SelectItem value="reviews">Reviews</SelectItem>
+                          <SelectItem value="suggestions">Suggestions</SelectItem>
+                          <SelectItem value="bugs">Bug Reports</SelectItem>
                         </SelectContent>
                       </Select>
-                      <Select 
+                      <Select
                         value={selectedReview.sortBy}
                         onValueChange={(value) => setSelectedReview(prev => ({...prev, sortBy: value}))}
                       >
                         <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Sort by" />
+                          <SelectValue placeholder="Time Range" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="newest">Newest First</SelectItem>
-                          <SelectItem value="oldest">Oldest First</SelectItem>
-                          <SelectItem value="highest">Highest Rated</SelectItem>
-                          <SelectItem value="lowest">Lowest Rated</SelectItem>
+                          <SelectItem value="day">Last 24 Hours</SelectItem>
+                          <SelectItem value="week">Last Week</SelectItem>
+                          <SelectItem value="month">Last Month</SelectItem>
+                          <SelectItem value="quarter">Last Quarter</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -1868,73 +1991,88 @@ export default function AdminPortal() {
                 <CardContent>
                   <div className="grid grid-cols-12 gap-4">
                     <div className="col-span-4">
-                      <Card className="p-4">
-                        <h4 className="font-medium text-lg mb-2 text-center">Average Rating</h4>
-                        <div className="flex flex-col items-center justify-center">
-                          <span className="text-4xl font-bold my-6">4.7</span>
-                          <div className="flex text-yellow-400 mt-2 justify-center">
-                            <Star className="h-5 w-5 fill-current" />
-                            <Star className="h-5 w-5 fill-current" />
-                            <Star className="h-5 w-5 fill-current" />
-                            <Star className="h-5 w-5 fill-current" />
-                            <Star className="h-5 w-5 fill-current" />
+                      <div className="space-y-4">
+                        <Card className="p-4">
+                          <h4 className="font-medium text-lg mb-2 text-center">Engagement Score</h4>
+                          <div className="flex flex-col items-center justify-center">
+                            <span className="text-4xl font-bold my-6">87</span>
+                            <div className="w-[80%] h-2 bg-gray-200 rounded-full">
+                              <div className="h-full bg-primary rounded-full" style={{width: '87%'}}></div>
+                            </div>
+                            <div className="text-sm text-muted-foreground mt-4 text-center">
+                              <span className="text-green-500">+12</span>
+                              <span className="ml-1">from previous period</span>
+                            </div>
                           </div>
-                          <div className="text-sm text-muted-foreground mt-2 text-center">
-                            <span className="text-green-500">+0.2</span>
-                            <span className="ml-1">vs last 30 days</span>
+                        </Card>
+
+                        <Card className="p-4">
+                          <h4 className="font-medium text-lg mb-4">Quick Stats</h4>
+                          <div className="space-y-4">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm">Active Users</span>
+                              <span className="font-medium">2,847</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm">Avg. Response Time</span>
+                              <span className="font-medium">2.3 hrs</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm">Resolution Rate</span>
+                              <span className="font-medium">94%</span>
+                            </div>
                           </div>
-                        </div>
-                      </Card>
+                        </Card>
+                      </div>
                     </div>
 
                     <div className="col-span-8">
-                      <ScrollArea className="h-[400px]">
-                        <div className="space-y-4 pr-4">
-                          {[1, 2, 3, 4, 5].map((i) => (
-                            <Card key={i} className="p-4">
-                              <div className="flex gap-4">
-                                <div className="w-[30%]">
-                                  <div className="flex items-center gap-3">
-                                    <Avatar>
-                                      <AvatarImage src="/default-avatar.png" />
-                                      <AvatarFallback>JD</AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                      <h4 className="font-medium">John Doe</h4>
-                                      <p className="text-sm text-muted-foreground">Total Reviews: 15</p>
+                      <Card className="h-full">
+                        <CardHeader>
+                          <h4 className="font-medium">Recent Community Activity</h4>
+                        </CardHeader>
+                        <CardContent>
+                          <ScrollArea className="h-[400px]">
+                            <div className="space-y-4">
+                              {[1, 2, 3, 4, 5].map((i) => (
+                                <Card key={i} className="p-4 hover:bg-muted/50 transition-colors">
+                                  <div className="flex gap-4">
+                                    <div className="w-[15%]">
+                                      <Avatar>
+                                        <AvatarImage src="/default-avatar.png" />
+                                        <AvatarFallback>U{i}</AvatarFallback>
+                                      </Avatar>
+                                    </div>
+                                    <div className="w-[85%]">
+                                      <div className="flex justify-between items-start mb-2">
+                                        <div>
+                                          <h4 className="font-medium">User Feedback #{i}</h4>
+                                          <p className="text-sm text-muted-foreground">2 hours ago</p>
+                                        </div>
+                                        <Badge variant="outline">Feature Request</Badge>
+                                      </div>
+                                      <p className="text-sm mb-3">Would love to see more customization options for the dashboard layout. The current setup is good but more flexibility would be great!</p>
+                                      <div className="flex items-center gap-4">
+                                        <Button variant="outline" size="sm" className="gap-2">
+                                          <ThumbsUp className="h-4 w-4" />
+                                          <span>23</span>
+                                        </Button>
+                                        <Button variant="outline" size="sm" className="gap-2">
+                                          <MessageCircle className="h-4 w-4" />
+                                          <span>12</span>
+                                        </Button>
+                                        <Button variant="outline" size="sm">
+                                          View Thread
+                                        </Button>
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
-
-                                <div className="w-[70%]">
-                                  <div className="flex text-yellow-400 mb-2">
-                                    <Star className="h-4 w-4 fill-current" />
-                                    <Star className="h-4 w-4 fill-current" />
-                                    <Star className="h-4 w-4 fill-current" />
-                                    <Star className="h-4 w-4 fill-current" />
-                                    <Star className="h-4 w-4 fill-current" />
-                                  </div>
-                                  <p className="text-sm mb-4">Excellent product! The user interface is intuitive and the features are exactly what I needed.</p>
-                                  <div className="flex gap-2">
-                                    <Button variant="outline" size="sm">
-                                      <MessagesSquare className="h-4 w-4 mr-2" />
-                                      Message
-                                    </Button>
-                                    <Button variant="outline" size="sm">
-                                      <Star className="h-4 w-4 mr-2" />
-                                      Like
-                                    </Button>
-                                    <Button variant="outline" size="sm">
-                                      <Reply className="h-4 w-4 mr-2" />
-                                      Reply
-                                    </Button>
-                                  </div>
-                                </div>
-                              </div>
-                            </Card>
-                          ))}
-                        </div>
-                      </ScrollArea>
+                                </Card>
+                              ))}
+                            </div>
+                          </ScrollArea>
+                        </CardContent>
+                      </Card>
                     </div>
                   </div>
                 </CardContent>
